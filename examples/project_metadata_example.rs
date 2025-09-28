@@ -52,7 +52,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config_args = json!({
         "project_key": project_key
     });
-    
+
     match project_config_tool.handle(config_args).await {
         Ok(result) => {
             println!("✅ Project configuration retrieved successfully!");
@@ -68,7 +68,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let issue_types_args = json!({
         "project_key": project_key
     });
-    
+
     match issue_types_tool.handle(issue_types_args).await {
         Ok(result) => {
             println!("✅ Project issue types retrieved successfully!");
@@ -84,7 +84,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let components_args = json!({
         "project_key": project_key
     });
-    
+
     match components_tool.handle(components_args).await {
         Ok(result) => {
             println!("✅ Project components retrieved successfully!");
@@ -98,7 +98,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Example 4: Get priorities and statuses
     println!("\n4. Getting priorities and statuses...");
     let priorities_args = json!({});
-    
+
     match priorities_statuses_tool.handle(priorities_args).await {
         Ok(result) => {
             println!("✅ Priorities and statuses retrieved successfully!");
@@ -112,7 +112,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Example 5: Get custom fields
     println!("\n5. Getting custom fields...");
     let custom_fields_args = json!({});
-    
+
     match custom_fields_tool.handle(custom_fields_args).await {
         Ok(result) => {
             println!("✅ Custom fields retrieved successfully!");
@@ -128,7 +128,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let metadata_args = json!({
         "project_key": project_key
     });
-    
+
     match metadata_tool.handle(metadata_args).await {
         Ok(result) => {
             println!("✅ Comprehensive project metadata retrieved successfully!");

@@ -480,10 +480,13 @@ impl JiraClient {
     /// # Errors
     ///
     /// Returns an error if the request fails or the response cannot be parsed.
-    pub async fn get_project_issue_types(&self, project_key: &str) -> Result<Vec<crate::types::jira::JiraIssueType>> {
+    pub async fn get_project_issue_types(
+        &self,
+        project_key: &str,
+    ) -> Result<Vec<crate::types::jira::JiraIssueType>> {
         let endpoint = format!("project/{project_key}");
         let project: serde_json::Value = self.get(&endpoint).await?;
-        
+
         let issue_types = project
             .get("issueTypes")
             .and_then(|it| it.as_array())
@@ -493,8 +496,9 @@ impl JiraClient {
 
         let mut result = Vec::new();
         for issue_type in issue_types {
-            let issue_type: crate::types::jira::JiraIssueType = 
-                serde_json::from_value(issue_type.clone()).map_err(JiraError::SerializationError)?;
+            let issue_type: crate::types::jira::JiraIssueType =
+                serde_json::from_value(issue_type.clone())
+                    .map_err(JiraError::SerializationError)?;
             result.push(issue_type);
         }
 
@@ -506,7 +510,10 @@ impl JiraClient {
     /// # Errors
     ///
     /// Returns an error if the request fails or the response cannot be parsed.
-    pub async fn get_issue_type_metadata(&self, issue_type_id: &str) -> Result<crate::types::jira::JiraIssueType> {
+    pub async fn get_issue_type_metadata(
+        &self,
+        issue_type_id: &str,
+    ) -> Result<crate::types::jira::JiraIssueType> {
         let endpoint = format!("issuetype/{issue_type_id}");
         self.get(&endpoint).await
     }
@@ -525,7 +532,10 @@ impl JiraClient {
     /// # Errors
     ///
     /// Returns an error if the request fails or the response cannot be parsed.
-    pub async fn get_project_components(&self, project_key: &str) -> Result<Vec<crate::types::jira::JiraComponent>> {
+    pub async fn get_project_components(
+        &self,
+        project_key: &str,
+    ) -> Result<Vec<crate::types::jira::JiraComponent>> {
         let endpoint = format!("project/{project_key}/components");
         self.get(&endpoint).await
     }
@@ -556,12 +566,10 @@ impl JiraClient {
     pub async fn get_custom_fields(&self) -> Result<Vec<serde_json::Value>> {
         let endpoint = "field";
         let response: serde_json::Value = self.get(endpoint).await?;
-        
-        let fields = response
-            .as_array()
-            .ok_or_else(|| JiraError::ApiError {
-                message: "Invalid custom fields response format".to_string(),
-            })?;
+
+        let fields = response.as_array().ok_or_else(|| JiraError::ApiError {
+            message: "Invalid custom fields response format".to_string(),
+        })?;
 
         Ok(fields.clone())
     }

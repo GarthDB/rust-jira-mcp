@@ -490,7 +490,8 @@ impl crate::mcp::server::MCPToolHandler for GetProjectConfigTool {
         let response_text = format!(
             "Project Configuration for {}:\n\n{}",
             project_key,
-            serde_json::to_string_pretty(&config).unwrap_or_else(|_| "Failed to format configuration".to_string())
+            serde_json::to_string_pretty(&config)
+                .unwrap_or_else(|_| "Failed to format configuration".to_string())
         );
 
         Ok(MCPToolResult {
@@ -539,7 +540,10 @@ impl crate::mcp::server::MCPToolHandler for GetIssueTypesTool {
                     i + 1,
                     issue_type.name,
                     issue_type.id,
-                    issue_type.description.as_deref().unwrap_or("No description"),
+                    issue_type
+                        .description
+                        .as_deref()
+                        .unwrap_or("No description"),
                     issue_type.subtask
                 ));
             }
@@ -580,7 +584,8 @@ impl crate::mcp::server::MCPToolHandler for GetIssueTypeMetadataTool {
 
         let issue_type = self.client.get_issue_type_metadata(issue_type_id).await?;
 
-        let response_text = format!(
+        let response_text =
+            format!(
             "Issue Type Metadata:\n\nName: {}\nID: {}\nDescription: {}\nSubtask: {}\nIcon URL: {}",
             issue_type.name,
             issue_type.id,
@@ -667,10 +672,8 @@ impl crate::mcp::server::MCPToolHandler for GetPrioritiesAndStatusesTool {
     async fn handle(&self, _args: serde_json::Value) -> Result<MCPToolResult> {
         info!("Getting priorities and statuses");
 
-        let (priorities, statuses) = tokio::try_join!(
-            self.client.get_priorities(),
-            self.client.get_statuses()
-        )?;
+        let (priorities, statuses) =
+            tokio::try_join!(self.client.get_priorities(), self.client.get_statuses())?;
 
         let mut response_text = "Priorities and Statuses:\n\n".to_string();
 
@@ -742,10 +745,23 @@ impl crate::mcp::server::MCPToolHandler for GetCustomFieldsTool {
             response_text.push_str("No custom fields found.");
         } else {
             for (i, field) in custom_fields.iter().enumerate() {
-                let field_name = field.get("name").and_then(|v| v.as_str()).unwrap_or("Unknown");
-                let field_id = field.get("id").and_then(|v| v.as_str()).unwrap_or("Unknown");
-                let field_type = field.get("schema").and_then(|s| s.get("type")).and_then(|v| v.as_str()).unwrap_or("Unknown");
-                let custom = field.get("custom").and_then(|v| v.as_bool()).unwrap_or(false);
+                let field_name = field
+                    .get("name")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("Unknown");
+                let field_id = field
+                    .get("id")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("Unknown");
+                let field_type = field
+                    .get("schema")
+                    .and_then(|s| s.get("type"))
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("Unknown");
+                let custom = field
+                    .get("custom")
+                    .and_then(|v| v.as_bool())
+                    .unwrap_or(false);
 
                 response_text.push_str(&format!(
                     "{}. {} (ID: {})\n   Type: {}\n   Custom: {}\n\n",
@@ -789,14 +805,18 @@ impl crate::mcp::server::MCPToolHandler for GetProjectMetadataTool {
                 message: "Missing required parameter: project_key".to_string(),
             })?;
 
-        info!("Getting comprehensive project metadata for: {}", project_key);
+        info!(
+            "Getting comprehensive project metadata for: {}",
+            project_key
+        );
 
         let metadata = self.client.get_project_metadata(project_key).await?;
 
         let response_text = format!(
             "Comprehensive Project Metadata for {}:\n\n{}",
             project_key,
-            serde_json::to_string_pretty(&metadata).unwrap_or_else(|_| "Failed to format metadata".to_string())
+            serde_json::to_string_pretty(&metadata)
+                .unwrap_or_else(|_| "Failed to format metadata".to_string())
         );
 
         Ok(MCPToolResult {
