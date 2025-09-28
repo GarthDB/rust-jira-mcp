@@ -462,4 +462,141 @@ impl JiraClient {
         let _: serde_json::Value = self.post(&endpoint, &transition_data).await?;
         Ok(())
     }
+
+    // Project Configuration and Metadata methods
+
+    /// Get project configuration details
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the request fails or the response cannot be parsed.
+    pub async fn get_project_configuration(&self, project_key: &str) -> Result<serde_json::Value> {
+        let endpoint = format!("project/{project_key}/configuration");
+        self.get(&endpoint).await
+    }
+
+    /// Get issue types for a project
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the request fails or the response cannot be parsed.
+    pub async fn get_project_issue_types(
+        &self,
+        project_key: &str,
+    ) -> Result<Vec<crate::types::jira::JiraIssueType>> {
+        let endpoint = format!("project/{project_key}");
+        let project: serde_json::Value = self.get(&endpoint).await?;
+
+        let issue_types = project
+            .get("issueTypes")
+            .and_then(|it| it.as_array())
+            .ok_or_else(|| JiraError::ApiError {
+                message: "Invalid project response format - missing issueTypes".to_string(),
+            })?;
+
+        let mut result = Vec::new();
+        for issue_type in issue_types {
+            let issue_type: crate::types::jira::JiraIssueType =
+                serde_json::from_value(issue_type.clone())
+                    .map_err(JiraError::SerializationError)?;
+            result.push(issue_type);
+        }
+
+        Ok(result)
+    }
+
+    /// Get issue type metadata by ID
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the request fails or the response cannot be parsed.
+    pub async fn get_issue_type_metadata(
+        &self,
+        issue_type_id: &str,
+    ) -> Result<crate::types::jira::JiraIssueType> {
+        let endpoint = format!("issuetype/{issue_type_id}");
+        self.get(&endpoint).await
+    }
+
+    /// Get all issue types
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the request fails or the response cannot be parsed.
+    pub async fn get_issue_types(&self) -> Result<Vec<crate::types::jira::JiraIssueType>> {
+        self.get("issuetype").await
+    }
+
+    /// Get project components
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the request fails or the response cannot be parsed.
+    pub async fn get_project_components(
+        &self,
+        project_key: &str,
+    ) -> Result<Vec<crate::types::jira::JiraComponent>> {
+        let endpoint = format!("project/{project_key}/components");
+        self.get(&endpoint).await
+    }
+
+    /// Get all priorities
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the request fails or the response cannot be parsed.
+    pub async fn get_priorities(&self) -> Result<Vec<crate::types::jira::JiraPriority>> {
+        self.get("priority").await
+    }
+
+    /// Get all statuses
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the request fails or the response cannot be parsed.
+    pub async fn get_statuses(&self) -> Result<Vec<crate::types::jira::JiraStatus>> {
+        self.get("status").await
+    }
+
+    /// Get custom fields
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the request fails or the response cannot be parsed.
+    pub async fn get_custom_fields(&self) -> Result<Vec<serde_json::Value>> {
+        let endpoint = "field";
+        let response: serde_json::Value = self.get(endpoint).await?;
+
+        let fields = response.as_array().ok_or_else(|| JiraError::ApiError {
+            message: "Invalid custom fields response format".to_string(),
+        })?;
+
+        Ok(fields.clone())
+    }
+
+    /// Get project metadata including all configuration details
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if any of the metadata requests fail.
+    pub async fn get_project_metadata(&self, project_key: &str) -> Result<serde_json::Value> {
+        let (configuration, issue_types, components, priorities, statuses, custom_fields) = tokio::try_join!(
+            self.get_project_configuration(project_key),
+            self.get_project_issue_types(project_key),
+            self.get_project_components(project_key),
+            self.get_priorities(),
+            self.get_statuses(),
+            self.get_custom_fields()
+        )?;
+
+        Ok(serde_json::json!({
+            "project_key": project_key,
+            "configuration": configuration,
+            "issue_types": issue_types,
+            "components": components,
+            "priorities": priorities,
+            "statuses": statuses,
+            "custom_fields": custom_fields
+        }))
+    }
 }
