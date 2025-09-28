@@ -1,10 +1,11 @@
 use crate::config::JiraConfig;
 use crate::error::Result;
 use crate::mcp::tools::{
-    AddCommentTool, CreateIssueTool, GetCommentsTool, GetCustomFieldsTool, GetIssueTool,
+    AddCommentTool, BulkAddCommentsTool, BulkTransitionIssuesTool, BulkUpdateIssuesTool,
+    CreateIssueTool, GetCommentsTool, GetCustomFieldsTool, GetIssueTool,
     GetIssueTypeMetadataTool, GetIssueTypesTool, GetPrioritiesAndStatusesTool,
     GetProjectComponentsTool, GetProjectConfigTool, GetProjectMetadataTool, GetTransitionsTool,
-    SearchIssuesTool, TestAuthTool, TransitionIssueTool, UpdateIssueTool,
+    MixedBulkOperationsTool, SearchIssuesTool, TestAuthTool, TransitionIssueTool, UpdateIssueTool,
 };
 use crate::types::mcp::{
     CallToolParams, CallToolResult, InitializeParams, InitializeResult, JsonRpcError,
@@ -99,6 +100,24 @@ impl MCPServer {
         tools.insert(
             "get_project_metadata".to_string(),
             Box::new(GetProjectMetadataTool::new(config.clone())),
+        );
+
+        // Bulk Operations tools
+        tools.insert(
+            "bulk_update_issues".to_string(),
+            Box::new(BulkUpdateIssuesTool::new(config.clone())),
+        );
+        tools.insert(
+            "bulk_transition_issues".to_string(),
+            Box::new(BulkTransitionIssuesTool::new(config.clone())),
+        );
+        tools.insert(
+            "bulk_add_comments".to_string(),
+            Box::new(BulkAddCommentsTool::new(config.clone())),
+        );
+        tools.insert(
+            "mixed_bulk_operations".to_string(),
+            Box::new(MixedBulkOperationsTool::new(config.clone())),
         );
 
         Self {
@@ -575,6 +594,138 @@ impl MCPServer {
                         }
                     },
                     "required": ["project_key"]
+                }),
+            },
+            // Bulk Operations tools
+            MCPTool {
+                name: "bulk_update_issues".to_string(),
+                description: "Bulk update multiple Jira issues with the same fields".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "issue_keys": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                            "description": "Array of issue keys to update"
+                        },
+                        "fields": {
+                            "type": "object",
+                            "description": "The fields to update on all issues"
+                        },
+                        "config": {
+                            "type": "object",
+                            "description": "Optional configuration for batch processing",
+                            "properties": {
+                                "batch_size": {"type": "integer", "description": "Number of issues to process per batch"},
+                                "continue_on_error": {"type": "boolean", "description": "Whether to continue processing if individual operations fail"},
+                                "rate_limit_ms": {"type": "integer", "description": "Delay between operations in milliseconds"},
+                                "max_retries": {"type": "integer", "description": "Maximum number of retries for failed operations"}
+                            }
+                        }
+                    },
+                    "required": ["issue_keys", "fields"]
+                }),
+            },
+            MCPTool {
+                name: "bulk_transition_issues".to_string(),
+                description: "Bulk transition multiple Jira issues to the same status".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "issue_keys": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                            "description": "Array of issue keys to transition"
+                        },
+                        "transition_id": {
+                            "type": "string",
+                            "description": "The ID of the transition to apply to all issues"
+                        },
+                        "comment": {
+                            "type": "string",
+                            "description": "Optional comment to add during transition"
+                        },
+                        "config": {
+                            "type": "object",
+                            "description": "Optional configuration for batch processing",
+                            "properties": {
+                                "batch_size": {"type": "integer", "description": "Number of issues to process per batch"},
+                                "continue_on_error": {"type": "boolean", "description": "Whether to continue processing if individual operations fail"},
+                                "rate_limit_ms": {"type": "integer", "description": "Delay between operations in milliseconds"},
+                                "max_retries": {"type": "integer", "description": "Maximum number of retries for failed operations"}
+                            }
+                        }
+                    },
+                    "required": ["issue_keys", "transition_id"]
+                }),
+            },
+            MCPTool {
+                name: "bulk_add_comments".to_string(),
+                description: "Bulk add the same comment to multiple Jira issues".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "issue_keys": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                            "description": "Array of issue keys to add comments to"
+                        },
+                        "comment_body": {
+                            "type": "string",
+                            "description": "The comment text to add to all issues"
+                        },
+                        "config": {
+                            "type": "object",
+                            "description": "Optional configuration for batch processing",
+                            "properties": {
+                                "batch_size": {"type": "integer", "description": "Number of issues to process per batch"},
+                                "continue_on_error": {"type": "boolean", "description": "Whether to continue processing if individual operations fail"},
+                                "rate_limit_ms": {"type": "integer", "description": "Delay between operations in milliseconds"},
+                                "max_retries": {"type": "integer", "description": "Maximum number of retries for failed operations"}
+                            }
+                        }
+                    },
+                    "required": ["issue_keys", "comment_body"]
+                }),
+            },
+            MCPTool {
+                name: "mixed_bulk_operations".to_string(),
+                description: "Execute mixed bulk operations on multiple Jira issues (update, transition, add comments, or mixed operations)".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "operations": {
+                            "type": "array",
+                            "description": "Array of operation objects",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "issue_key": {"type": "string", "description": "The issue key for this operation"},
+                                    "operation_type": {
+                                        "type": "string",
+                                        "enum": ["update", "transition", "add_comment", "mixed"],
+                                        "description": "The type of operation to perform"
+                                    },
+                                    "data": {
+                                        "type": "object",
+                                        "description": "The data for the operation (fields for update, transition_id for transition, comment_body for add_comment)"
+                                    }
+                                },
+                                "required": ["issue_key", "operation_type", "data"]
+                            }
+                        },
+                        "config": {
+                            "type": "object",
+                            "description": "Optional configuration for batch processing",
+                            "properties": {
+                                "batch_size": {"type": "integer", "description": "Number of issues to process per batch"},
+                                "continue_on_error": {"type": "boolean", "description": "Whether to continue processing if individual operations fail"},
+                                "rate_limit_ms": {"type": "integer", "description": "Delay between operations in milliseconds"},
+                                "max_retries": {"type": "integer", "description": "Maximum number of retries for failed operations"}
+                            }
+                        }
+                    },
+                    "required": ["operations"]
                 }),
             },
         ]

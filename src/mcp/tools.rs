@@ -1,6 +1,7 @@
 use crate::config::JiraConfig;
 use crate::error::Result;
 use crate::jira::client::JiraClient;
+use crate::types::jira::{BulkOperationConfig, BulkOperationItem, BulkOperationType};
 use crate::types::mcp::{MCPContent, MCPToolResult};
 use serde_json::json;
 use tracing::info;
@@ -817,6 +818,412 @@ impl crate::mcp::server::MCPToolHandler for GetProjectMetadataTool {
             project_key,
             serde_json::to_string_pretty(&metadata)
                 .unwrap_or_else(|_| "Failed to format metadata".to_string())
+        );
+
+        Ok(MCPToolResult {
+            content: vec![MCPContent::text(response_text)],
+            is_error: Some(false),
+        })
+    }
+}
+
+// Bulk Operations Tools
+
+// Bulk Update Issues Tool
+pub struct BulkUpdateIssuesTool {
+    client: JiraClient,
+}
+
+impl BulkUpdateIssuesTool {
+    #[must_use]
+    pub fn new(config: JiraConfig) -> Self {
+        Self {
+            client: JiraClient::new(config).expect("Failed to create JiraClient"),
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl crate::mcp::server::MCPToolHandler for BulkUpdateIssuesTool {
+    async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
+        let issue_keys = args
+            .get("issue_keys")
+            .and_then(|v| v.as_array())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: issue_keys (array of issue keys)".to_string(),
+            })?;
+
+        let fields = args
+            .get("fields")
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: fields".to_string(),
+            })?;
+
+        // Parse configuration if provided
+        let config = if let Some(config_data) = args.get("config") {
+            serde_json::from_value(config_data.clone()).unwrap_or_default()
+        } else {
+            BulkOperationConfig::default()
+        };
+
+        // Convert issue keys to strings
+        let issue_keys: Vec<String> = issue_keys
+            .iter()
+            .filter_map(|v| v.as_str().map(|s| s.to_string()))
+            .collect();
+
+        if issue_keys.is_empty() {
+            return Err(crate::error::JiraError::ApiError {
+                message: "No issue keys provided".to_string(),
+            });
+        }
+
+        info!("Bulk updating {} issues", issue_keys.len());
+
+        let summary = self
+            .client
+            .bulk_update_issues(issue_keys, fields.clone(), Some(config))
+            .await?;
+
+        let response_text = format!(
+            "Bulk Update Completed!\n\n\
+            Total Operations: {}\n\
+            Successful: {}\n\
+            Failed: {}\n\
+            Success Rate: {:.1}%\n\
+            Duration: {}ms\n\n\
+            Results:\n{}",
+            summary.total_operations,
+            summary.successful_operations,
+            summary.failed_operations,
+            summary.success_rate(),
+            summary.duration_ms,
+            summary
+                .results
+                .iter()
+                .map(|r| format!(
+                    "• {}: {} ({})",
+                    r.issue_key,
+                    if r.success { "SUCCESS" } else { "FAILED" },
+                    r.error_message.as_deref().unwrap_or("No error")
+                ))
+                .collect::<Vec<_>>()
+                .join("\n")
+        );
+
+        Ok(MCPToolResult {
+            content: vec![MCPContent::text(response_text)],
+            is_error: Some(false),
+        })
+    }
+}
+
+// Bulk Transition Issues Tool
+pub struct BulkTransitionIssuesTool {
+    client: JiraClient,
+}
+
+impl BulkTransitionIssuesTool {
+    #[must_use]
+    pub fn new(config: JiraConfig) -> Self {
+        Self {
+            client: JiraClient::new(config).expect("Failed to create JiraClient"),
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl crate::mcp::server::MCPToolHandler for BulkTransitionIssuesTool {
+    async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
+        let issue_keys = args
+            .get("issue_keys")
+            .and_then(|v| v.as_array())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: issue_keys (array of issue keys)".to_string(),
+            })?;
+
+        let transition_id = args
+            .get("transition_id")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: transition_id".to_string(),
+            })?;
+
+        let comment = args.get("comment").and_then(|v| v.as_str());
+
+        // Parse configuration if provided
+        let config = if let Some(config_data) = args.get("config") {
+            serde_json::from_value(config_data.clone()).unwrap_or_default()
+        } else {
+            BulkOperationConfig::default()
+        };
+
+        // Convert issue keys to strings
+        let issue_keys: Vec<String> = issue_keys
+            .iter()
+            .filter_map(|v| v.as_str().map(|s| s.to_string()))
+            .collect();
+
+        if issue_keys.is_empty() {
+            return Err(crate::error::JiraError::ApiError {
+                message: "No issue keys provided".to_string(),
+            });
+        }
+
+        info!("Bulk transitioning {} issues to transition {}", issue_keys.len(), transition_id);
+
+        let summary = self
+            .client
+            .bulk_transition_issues(
+                issue_keys,
+                transition_id.to_string(),
+                comment.map(|s| s.to_string()),
+                Some(config),
+            )
+            .await?;
+
+        let response_text = format!(
+            "Bulk Transition Completed!\n\n\
+            Total Operations: {}\n\
+            Successful: {}\n\
+            Failed: {}\n\
+            Success Rate: {:.1}%\n\
+            Duration: {}ms\n\n\
+            Results:\n{}",
+            summary.total_operations,
+            summary.successful_operations,
+            summary.failed_operations,
+            summary.success_rate(),
+            summary.duration_ms,
+            summary
+                .results
+                .iter()
+                .map(|r| format!(
+                    "• {}: {} ({})",
+                    r.issue_key,
+                    if r.success { "SUCCESS" } else { "FAILED" },
+                    r.error_message.as_deref().unwrap_or("No error")
+                ))
+                .collect::<Vec<_>>()
+                .join("\n")
+        );
+
+        Ok(MCPToolResult {
+            content: vec![MCPContent::text(response_text)],
+            is_error: Some(false),
+        })
+    }
+}
+
+// Bulk Add Comments Tool
+pub struct BulkAddCommentsTool {
+    client: JiraClient,
+}
+
+impl BulkAddCommentsTool {
+    #[must_use]
+    pub fn new(config: JiraConfig) -> Self {
+        Self {
+            client: JiraClient::new(config).expect("Failed to create JiraClient"),
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl crate::mcp::server::MCPToolHandler for BulkAddCommentsTool {
+    async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
+        let issue_keys = args
+            .get("issue_keys")
+            .and_then(|v| v.as_array())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: issue_keys (array of issue keys)".to_string(),
+            })?;
+
+        let comment_body = args
+            .get("comment_body")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: comment_body".to_string(),
+            })?;
+
+        // Parse configuration if provided
+        let config = if let Some(config_data) = args.get("config") {
+            serde_json::from_value(config_data.clone()).unwrap_or_default()
+        } else {
+            BulkOperationConfig::default()
+        };
+
+        // Convert issue keys to strings
+        let issue_keys: Vec<String> = issue_keys
+            .iter()
+            .filter_map(|v| v.as_str().map(|s| s.to_string()))
+            .collect();
+
+        if issue_keys.is_empty() {
+            return Err(crate::error::JiraError::ApiError {
+                message: "No issue keys provided".to_string(),
+            });
+        }
+
+        info!("Bulk adding comments to {} issues", issue_keys.len());
+
+        let summary = self
+            .client
+            .bulk_add_comments(issue_keys, comment_body.to_string(), Some(config))
+            .await?;
+
+        let response_text = format!(
+            "Bulk Add Comments Completed!\n\n\
+            Total Operations: {}\n\
+            Successful: {}\n\
+            Failed: {}\n\
+            Success Rate: {:.1}%\n\
+            Duration: {}ms\n\n\
+            Results:\n{}",
+            summary.total_operations,
+            summary.successful_operations,
+            summary.failed_operations,
+            summary.success_rate(),
+            summary.duration_ms,
+            summary
+                .results
+                .iter()
+                .map(|r| format!(
+                    "• {}: {} ({})",
+                    r.issue_key,
+                    if r.success { "SUCCESS" } else { "FAILED" },
+                    r.error_message.as_deref().unwrap_or("No error")
+                ))
+                .collect::<Vec<_>>()
+                .join("\n")
+        );
+
+        Ok(MCPToolResult {
+            content: vec![MCPContent::text(response_text)],
+            is_error: Some(false),
+        })
+    }
+}
+
+// Mixed Bulk Operations Tool
+pub struct MixedBulkOperationsTool {
+    client: JiraClient,
+}
+
+impl MixedBulkOperationsTool {
+    #[must_use]
+    pub fn new(config: JiraConfig) -> Self {
+        Self {
+            client: JiraClient::new(config).expect("Failed to create JiraClient"),
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl crate::mcp::server::MCPToolHandler for MixedBulkOperationsTool {
+    async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
+        let operations = args
+            .get("operations")
+            .and_then(|v| v.as_array())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: operations (array of operation objects)".to_string(),
+            })?;
+
+        // Parse configuration if provided
+        let config = if let Some(config_data) = args.get("config") {
+            serde_json::from_value(config_data.clone()).unwrap_or_default()
+        } else {
+            BulkOperationConfig::default()
+        };
+
+        // Parse operations
+        let mut bulk_operations = Vec::new();
+        for (i, op) in operations.iter().enumerate() {
+            let issue_key = op
+                .get("issue_key")
+                .and_then(|v| v.as_str())
+                .ok_or_else(|| crate::error::JiraError::ApiError {
+                    message: format!("Missing issue_key in operation {}", i + 1),
+                })?;
+
+            let operation_type = op
+                .get("operation_type")
+                .and_then(|v| v.as_str())
+                .ok_or_else(|| crate::error::JiraError::ApiError {
+                    message: format!("Missing operation_type in operation {}", i + 1),
+                })?;
+
+            let operation_type = match operation_type {
+                "update" => BulkOperationType::Update,
+                "transition" => BulkOperationType::Transition,
+                "add_comment" => BulkOperationType::AddComment,
+                "mixed" => BulkOperationType::Mixed,
+                _ => {
+                    return Err(crate::error::JiraError::ApiError {
+                        message: format!(
+                            "Invalid operation_type '{}' in operation {}. Must be one of: update, transition, add_comment, mixed",
+                            operation_type, i + 1
+                        ),
+                    });
+                }
+            };
+
+            let data = op
+                .get("data")
+                .ok_or_else(|| crate::error::JiraError::ApiError {
+                    message: format!("Missing data in operation {}", i + 1),
+                })?;
+
+            bulk_operations.push(BulkOperationItem {
+                issue_key: issue_key.to_string(),
+                operation_type,
+                data: data.clone(),
+            });
+        }
+
+        if bulk_operations.is_empty() {
+            return Err(crate::error::JiraError::ApiError {
+                message: "No operations provided".to_string(),
+            });
+        }
+
+        info!("Executing {} mixed bulk operations", bulk_operations.len());
+
+        let summary = self
+            .client
+            .execute_bulk_operations(bulk_operations, config)
+            .await?;
+
+        let response_text = format!(
+            "Mixed Bulk Operations Completed!\n\n\
+            Total Operations: {}\n\
+            Successful: {}\n\
+            Failed: {}\n\
+            Success Rate: {:.1}%\n\
+            Duration: {}ms\n\n\
+            Results:\n{}",
+            summary.total_operations,
+            summary.successful_operations,
+            summary.failed_operations,
+            summary.success_rate(),
+            summary.duration_ms,
+            summary
+                .results
+                .iter()
+                .map(|r| format!(
+                    "• {} ({}): {} ({})",
+                    r.issue_key,
+                    match r.operation_type {
+                        BulkOperationType::Update => "UPDATE",
+                        BulkOperationType::Transition => "TRANSITION",
+                        BulkOperationType::AddComment => "COMMENT",
+                        BulkOperationType::Mixed => "MIXED",
+                    },
+                    if r.success { "SUCCESS" } else { "FAILED" },
+                    r.error_message.as_deref().unwrap_or("No error")
+                ))
+                .collect::<Vec<_>>()
+                .join("\n")
         );
 
         Ok(MCPToolResult {
