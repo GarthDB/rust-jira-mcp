@@ -2,7 +2,7 @@ use crate::config::JiraConfig;
 use crate::error::{JiraError, Result};
 use crate::types::jira::{
     BulkOperationConfig, BulkOperationItem, BulkOperationResult, BulkOperationSummary,
-    BulkOperationType, JiraComment, JiraIssue, JiraProject, JiraSearchResult, JiraTransition,
+    BulkOperationType, JiraComment, JiraIssue, JiraSearchResult, JiraTransition,
 };
 use reqwest::{Client, Method, RequestBuilder};
 use serde::{de::DeserializeOwned, Serialize};
@@ -131,18 +131,6 @@ impl JiraClient {
         U: Serialize + ?Sized,
     {
         self.request(Method::PUT, endpoint, Some(body)).await
-    }
-
-    /// Make a DELETE request to the Jira API
-    ///
-    /// # Errors
-    ///
-    /// Returns an error if the request fails or the response cannot be parsed.
-    pub async fn delete<T>(&self, endpoint: &str) -> Result<T>
-    where
-        T: DeserializeOwned,
-    {
-        self.request(Method::DELETE, endpoint, None::<&()>).await
     }
 
     /// Make a generic HTTP request with retry logic
@@ -328,25 +316,6 @@ impl JiraClient {
         self.get(&endpoint).await
     }
 
-    /// Get a Jira project by key
-    ///
-    /// # Errors
-    ///
-    /// Returns an error if the project cannot be found or the request fails.
-    pub async fn get_project(&self, project_key: &str) -> Result<JiraProject> {
-        let endpoint = format!("project/{project_key}");
-        self.get(&endpoint).await
-    }
-
-    /// Get all projects
-    ///
-    /// # Errors
-    ///
-    /// Returns an error if the request fails or the response cannot be parsed.
-    pub async fn get_projects(&self) -> Result<Vec<JiraProject>> {
-        self.get("project").await
-    }
-
     /// Create a new Jira issue
     ///
     /// # Errors
@@ -519,15 +488,6 @@ impl JiraClient {
     ) -> Result<crate::types::jira::JiraIssueType> {
         let endpoint = format!("issuetype/{issue_type_id}");
         self.get(&endpoint).await
-    }
-
-    /// Get all issue types
-    ///
-    /// # Errors
-    ///
-    /// Returns an error if the request fails or the response cannot be parsed.
-    pub async fn get_issue_types(&self) -> Result<Vec<crate::types::jira::JiraIssueType>> {
-        self.get("issuetype").await
     }
 
     /// Get project components

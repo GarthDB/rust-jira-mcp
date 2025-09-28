@@ -10,7 +10,6 @@ use serde_json::json;
 ///
 /// Note: This is a demonstration of the API structure. In practice, you would
 /// use these through the MCP server tools.
-
 fn main() {
     println!("Bulk Operations Example");
     println!("======================");

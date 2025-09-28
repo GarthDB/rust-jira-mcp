@@ -79,23 +79,23 @@ fn test_bulk_operation_types() {
 
     // These should compile without issues
     match update {
-        BulkOperationType::Update => assert!(true),
-        _ => assert!(false),
+        BulkOperationType::Update => {}
+        _ => unreachable!(),
     }
 
     match transition {
-        BulkOperationType::Transition => assert!(true),
-        _ => assert!(false),
+        BulkOperationType::Transition => {}
+        _ => unreachable!(),
     }
 
     match add_comment {
-        BulkOperationType::AddComment => assert!(true),
-        _ => assert!(false),
+        BulkOperationType::AddComment => {}
+        _ => unreachable!(),
     }
 
     match mixed {
-        BulkOperationType::Mixed => assert!(true),
-        _ => assert!(false),
+        BulkOperationType::Mixed => {}
+        _ => unreachable!(),
     }
 }
 
