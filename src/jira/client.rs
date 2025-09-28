@@ -1,9 +1,12 @@
 use crate::config::JiraConfig;
 use crate::error::{JiraError, Result};
-use crate::types::jira::{JiraComment, JiraIssue, JiraProject, JiraSearchResult, JiraTransition};
+use crate::types::jira::{
+    BulkOperationConfig, BulkOperationItem, BulkOperationResult, BulkOperationSummary,
+    BulkOperationType, JiraComment, JiraIssue, JiraSearchResult, JiraTransition,
+};
 use reqwest::{Client, Method, RequestBuilder};
 use serde::{de::DeserializeOwned, Serialize};
-use std::time::Duration;
+use std::time::{Duration, Instant};
 use tracing::{debug, error, info, warn};
 use url::Url;
 
@@ -128,18 +131,6 @@ impl JiraClient {
         U: Serialize + ?Sized,
     {
         self.request(Method::PUT, endpoint, Some(body)).await
-    }
-
-    /// Make a DELETE request to the Jira API
-    ///
-    /// # Errors
-    ///
-    /// Returns an error if the request fails or the response cannot be parsed.
-    pub async fn delete<T>(&self, endpoint: &str) -> Result<T>
-    where
-        T: DeserializeOwned,
-    {
-        self.request(Method::DELETE, endpoint, None::<&()>).await
     }
 
     /// Make a generic HTTP request with retry logic
@@ -325,25 +316,6 @@ impl JiraClient {
         self.get(&endpoint).await
     }
 
-    /// Get a Jira project by key
-    ///
-    /// # Errors
-    ///
-    /// Returns an error if the project cannot be found or the request fails.
-    pub async fn get_project(&self, project_key: &str) -> Result<JiraProject> {
-        let endpoint = format!("project/{project_key}");
-        self.get(&endpoint).await
-    }
-
-    /// Get all projects
-    ///
-    /// # Errors
-    ///
-    /// Returns an error if the request fails or the response cannot be parsed.
-    pub async fn get_projects(&self) -> Result<Vec<JiraProject>> {
-        self.get("project").await
-    }
-
     /// Create a new Jira issue
     ///
     /// # Errors
@@ -518,15 +490,6 @@ impl JiraClient {
         self.get(&endpoint).await
     }
 
-    /// Get all issue types
-    ///
-    /// # Errors
-    ///
-    /// Returns an error if the request fails or the response cannot be parsed.
-    pub async fn get_issue_types(&self) -> Result<Vec<crate::types::jira::JiraIssueType>> {
-        self.get("issuetype").await
-    }
-
     /// Get project components
     ///
     /// # Errors
@@ -598,5 +561,290 @@ impl JiraClient {
             "statuses": statuses,
             "custom_fields": custom_fields
         }))
+    }
+
+    // Bulk Operations
+
+    /// Execute bulk operations on multiple Jira issues
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the bulk operation fails or cannot be processed.
+    pub async fn execute_bulk_operations(
+        &self,
+        operations: Vec<BulkOperationItem>,
+        config: BulkOperationConfig,
+    ) -> Result<BulkOperationSummary> {
+        let start_time = Instant::now();
+        let mut summary = BulkOperationSummary::new();
+
+        info!("Starting bulk operation with {} items", operations.len());
+
+        // Validate that we don't exceed the maximum number of operations
+        if operations.len() > 100 {
+            return Err(JiraError::ApiError {
+                message: "Maximum 100 operations allowed per bulk request".to_string(),
+            });
+        }
+
+        // Process operations in batches
+        let batch_size = config.batch_size.unwrap_or(10);
+        let mut processed = 0;
+
+        for chunk in operations.chunks(batch_size) {
+            let batch_results = self.process_batch(chunk, &config).await;
+
+            for result in batch_results {
+                summary.add_result(result);
+            }
+
+            processed += chunk.len();
+            info!("Processed {}/{} operations", processed, operations.len());
+
+            // Apply rate limiting between batches
+            if let Some(rate_limit_ms) = config.rate_limit_ms {
+                tokio::time::sleep(Duration::from_millis(rate_limit_ms)).await;
+            }
+        }
+
+        summary.duration_ms = start_time.elapsed().as_millis() as u64;
+
+        info!(
+            "Bulk operation completed: {} successful, {} failed, {:.1}% success rate",
+            summary.successful_operations,
+            summary.failed_operations,
+            summary.success_rate()
+        );
+
+        Ok(summary)
+    }
+
+    /// Process a batch of operations
+    async fn process_batch(
+        &self,
+        operations: &[BulkOperationItem],
+        config: &BulkOperationConfig,
+    ) -> Vec<BulkOperationResult> {
+        let mut results = Vec::new();
+
+        for operation in operations {
+            let result = self.execute_single_operation(operation, config).await;
+            results.push(result);
+
+            // Apply rate limiting between individual operations
+            if let Some(rate_limit_ms) = config.rate_limit_ms {
+                tokio::time::sleep(Duration::from_millis(rate_limit_ms)).await;
+            }
+        }
+
+        results
+    }
+
+    /// Execute a single operation within a bulk operation
+    async fn execute_single_operation(
+        &self,
+        operation: &BulkOperationItem,
+        config: &BulkOperationConfig,
+    ) -> BulkOperationResult {
+        let mut retry_count = 0;
+        let max_retries = config.max_retries.unwrap_or(3);
+
+        loop {
+            match self.perform_operation(operation).await {
+                Ok(_) => {
+                    return BulkOperationResult {
+                        issue_key: operation.issue_key.clone(),
+                        success: true,
+                        error_message: None,
+                        operation_type: operation.operation_type.clone(),
+                    };
+                }
+                Err(e) => {
+                    if retry_count < max_retries && self.should_retry_operation(&e) {
+                        retry_count += 1;
+                        let delay = Duration::from_millis(1000 * retry_count as u64);
+                        warn!(
+                            "Retrying operation for {} in {:?} (attempt {}/{})",
+                            operation.issue_key, delay, retry_count, max_retries
+                        );
+                        tokio::time::sleep(delay).await;
+                        continue;
+                    }
+
+                    return BulkOperationResult {
+                        issue_key: operation.issue_key.clone(),
+                        success: false,
+                        error_message: Some(e.to_string()),
+                        operation_type: operation.operation_type.clone(),
+                    };
+                }
+            }
+        }
+    }
+
+    /// Perform the actual operation based on the operation type
+    async fn perform_operation(&self, operation: &BulkOperationItem) -> Result<()> {
+        match operation.operation_type {
+            BulkOperationType::Update => {
+                let fields = &operation.data;
+                self.update_issue(&operation.issue_key, fields).await
+            }
+            BulkOperationType::Transition => {
+                let transition_id = operation
+                    .data
+                    .get("transition_id")
+                    .and_then(|v| v.as_str())
+                    .ok_or_else(|| JiraError::ApiError {
+                        message: "Missing transition_id in operation data".to_string(),
+                    })?;
+                let comment = operation.data.get("comment").and_then(|v| v.as_str());
+                self.transition_issue(&operation.issue_key, transition_id, comment)
+                    .await
+            }
+            BulkOperationType::AddComment => {
+                let comment_body = operation
+                    .data
+                    .get("comment_body")
+                    .and_then(|v| v.as_str())
+                    .ok_or_else(|| JiraError::ApiError {
+                        message: "Missing comment_body in operation data".to_string(),
+                    })?;
+                self.add_comment(&operation.issue_key, comment_body).await?;
+                Ok(())
+            }
+            BulkOperationType::Mixed => {
+                // For mixed operations, we need to determine the operation type from the data
+                if operation.data.get("fields").is_some() {
+                    // This is an update operation
+                    self.update_issue(&operation.issue_key, &operation.data)
+                        .await
+                } else if operation.data.get("transition_id").is_some() {
+                    // This is a transition operation
+                    let transition_id = operation
+                        .data
+                        .get("transition_id")
+                        .and_then(|v| v.as_str())
+                        .ok_or_else(|| JiraError::ApiError {
+                            message: "Missing transition_id in operation data".to_string(),
+                        })?;
+                    let comment = operation.data.get("comment").and_then(|v| v.as_str());
+                    self.transition_issue(&operation.issue_key, transition_id, comment)
+                        .await
+                } else if operation.data.get("comment_body").is_some() {
+                    // This is a comment operation
+                    let comment_body = operation
+                        .data
+                        .get("comment_body")
+                        .and_then(|v| v.as_str())
+                        .ok_or_else(|| JiraError::ApiError {
+                            message: "Missing comment_body in operation data".to_string(),
+                        })?;
+                    self.add_comment(&operation.issue_key, comment_body).await?;
+                    Ok(())
+                } else {
+                    Err(JiraError::ApiError {
+                        message: "Unable to determine operation type from data".to_string(),
+                    })
+                }
+            }
+        }
+    }
+
+    /// Determine if an operation should be retried based on the error
+    fn should_retry_operation(&self, error: &JiraError) -> bool {
+        match error {
+            JiraError::HttpClientError(e) => e.is_timeout(),
+            JiraError::ApiError { message } => {
+                message.contains("timeout")
+                    || message.contains("rate limit")
+                    || message.contains("too many requests")
+            }
+            _ => false,
+        }
+    }
+
+    /// Bulk update multiple issues with the same fields
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the bulk update fails or cannot be processed.
+    pub async fn bulk_update_issues(
+        &self,
+        issue_keys: Vec<String>,
+        fields: serde_json::Value,
+        config: Option<BulkOperationConfig>,
+    ) -> Result<BulkOperationSummary> {
+        let config = config.unwrap_or_default();
+        let operations = issue_keys
+            .into_iter()
+            .map(|issue_key| BulkOperationItem {
+                issue_key,
+                operation_type: BulkOperationType::Update,
+                data: fields.clone(),
+            })
+            .collect();
+
+        self.execute_bulk_operations(operations, config).await
+    }
+
+    /// Bulk transition multiple issues to the same status
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the bulk transition fails or cannot be processed.
+    pub async fn bulk_transition_issues(
+        &self,
+        issue_keys: Vec<String>,
+        transition_id: String,
+        comment: Option<String>,
+        config: Option<BulkOperationConfig>,
+    ) -> Result<BulkOperationSummary> {
+        let config = config.unwrap_or_default();
+        let mut operation_data = serde_json::json!({
+            "transition_id": transition_id
+        });
+
+        if let Some(comment_text) = comment {
+            operation_data["comment"] = serde_json::Value::String(comment_text);
+        }
+
+        let operations = issue_keys
+            .into_iter()
+            .map(|issue_key| BulkOperationItem {
+                issue_key,
+                operation_type: BulkOperationType::Transition,
+                data: operation_data.clone(),
+            })
+            .collect();
+
+        self.execute_bulk_operations(operations, config).await
+    }
+
+    /// Bulk add comments to multiple issues
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the bulk comment operation fails or cannot be processed.
+    pub async fn bulk_add_comments(
+        &self,
+        issue_keys: Vec<String>,
+        comment_body: String,
+        config: Option<BulkOperationConfig>,
+    ) -> Result<BulkOperationSummary> {
+        let config = config.unwrap_or_default();
+        let operation_data = serde_json::json!({
+            "comment_body": comment_body
+        });
+
+        let operations = issue_keys
+            .into_iter()
+            .map(|issue_key| BulkOperationItem {
+                issue_key,
+                operation_type: BulkOperationType::AddComment,
+                data: operation_data.clone(),
+            })
+            .collect();
+
+        self.execute_bulk_operations(operations, config).await
     }
 }

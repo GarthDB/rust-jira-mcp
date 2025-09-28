@@ -204,3 +204,100 @@ pub struct JiraLinkType {
     pub outward: String,
     pub self_url: String,
 }
+
+/// Bulk operation types
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum BulkOperationType {
+    Update,
+    Transition,
+    AddComment,
+    Mixed,
+}
+
+/// Individual operation within a bulk operation
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BulkOperationItem {
+    pub issue_key: String,
+    pub operation_type: BulkOperationType,
+    pub data: serde_json::Value,
+}
+
+/// Bulk operation configuration
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BulkOperationConfig {
+    pub batch_size: Option<usize>,
+    pub continue_on_error: bool,
+    pub rate_limit_ms: Option<u64>,
+    pub max_retries: Option<usize>,
+}
+
+impl Default for BulkOperationConfig {
+    fn default() -> Self {
+        Self {
+            batch_size: Some(10),
+            continue_on_error: true,
+            rate_limit_ms: Some(100),
+            max_retries: Some(3),
+        }
+    }
+}
+
+/// Result of a single operation within a bulk operation
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BulkOperationResult {
+    pub issue_key: String,
+    pub success: bool,
+    pub error_message: Option<String>,
+    pub operation_type: BulkOperationType,
+}
+
+/// Result of a complete bulk operation
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BulkOperationSummary {
+    pub total_operations: usize,
+    pub successful_operations: usize,
+    pub failed_operations: usize,
+    pub results: Vec<BulkOperationResult>,
+    pub duration_ms: u64,
+}
+
+impl BulkOperationSummary {
+    /// Create a new bulk operation summary
+    #[must_use]
+    pub fn new() -> Self {
+        Self {
+            total_operations: 0,
+            successful_operations: 0,
+            failed_operations: 0,
+            results: Vec::new(),
+            duration_ms: 0,
+        }
+    }
+
+    /// Add a result to the summary
+    pub fn add_result(&mut self, result: BulkOperationResult) {
+        self.total_operations += 1;
+        if result.success {
+            self.successful_operations += 1;
+        } else {
+            self.failed_operations += 1;
+        }
+        self.results.push(result);
+    }
+
+    /// Get success rate as a percentage
+    #[must_use]
+    pub fn success_rate(&self) -> f64 {
+        if self.total_operations == 0 {
+            0.0
+        } else {
+            (self.successful_operations as f64 / self.total_operations as f64) * 100.0
+        }
+    }
+}
+
+impl Default for BulkOperationSummary {
+    fn default() -> Self {
+        Self::new()
+    }
+}
