@@ -1,25 +1,56 @@
 use crate::config::JiraConfig;
 use crate::error::Result;
 use crate::mcp::tools::{
-    AddCommentTool, BulkAddCommentsTool, BulkTransitionIssuesTool, BulkUpdateIssuesTool,
-    CreateIssueTool, GetCommentsTool, GetCustomFieldsTool, GetIssueTool, GetIssueTypeMetadataTool,
-    GetIssueTypesTool, GetPrioritiesAndStatusesTool, GetProjectComponentsTool,
-    GetProjectConfigTool, GetProjectMetadataTool, GetTransitionsTool, MixedBulkOperationsTool,
-    SearchIssuesTool, TestAuthTool, TransitionIssueTool, UpdateIssueTool,
-    // Issue Linking Tools
-    GetLinkTypesTool, GetIssueLinksTool, CreateIssueLinkTool, DeleteIssueLinkTool,
-    // File Attachment Tools
-    GetIssueAttachmentsTool, UploadAttachmentTool, DeleteAttachmentTool, DownloadAttachmentTool,
-    // Work Log Tools
-    GetIssueWorkLogsTool, AddWorkLogTool, UpdateWorkLogTool, DeleteWorkLogTool,
-    // Issue Watcher Tools
-    GetIssueWatchersTool, AddIssueWatcherTool, RemoveIssueWatcherTool,
-    // Issue Label Tools
-    GetLabelsTool, CreateLabelTool, UpdateLabelTool, DeleteLabelTool,
-    // Issue Component Tools
-    CreateComponentTool, UpdateComponentTool, DeleteComponentTool,
+    AddCommentTool,
+    AddIssueWatcherTool,
+    AddWorkLogTool,
+    BulkAddCommentsTool,
+    BulkTransitionIssuesTool,
+    BulkUpdateIssuesTool,
     // Issue Cloning Tools
     CloneIssueTool,
+    // Issue Component Tools
+    CreateComponentTool,
+    CreateIssueLinkTool,
+    CreateIssueTool,
+    CreateLabelTool,
+    DeleteAttachmentTool,
+    DeleteComponentTool,
+    DeleteIssueLinkTool,
+    DeleteLabelTool,
+    DeleteWorkLogTool,
+    DownloadAttachmentTool,
+    GetCommentsTool,
+    GetCustomFieldsTool,
+    // File Attachment Tools
+    GetIssueAttachmentsTool,
+    GetIssueLinksTool,
+    GetIssueTool,
+    GetIssueTypeMetadataTool,
+    GetIssueTypesTool,
+    // Issue Watcher Tools
+    GetIssueWatchersTool,
+    // Work Log Tools
+    GetIssueWorkLogsTool,
+    // Issue Label Tools
+    GetLabelsTool,
+    // Issue Linking Tools
+    GetLinkTypesTool,
+    GetPrioritiesAndStatusesTool,
+    GetProjectComponentsTool,
+    GetProjectConfigTool,
+    GetProjectMetadataTool,
+    GetTransitionsTool,
+    MixedBulkOperationsTool,
+    RemoveIssueWatcherTool,
+    SearchIssuesTool,
+    TestAuthTool,
+    TransitionIssueTool,
+    UpdateComponentTool,
+    UpdateIssueTool,
+    UpdateLabelTool,
+    UpdateWorkLogTool,
+    UploadAttachmentTool,
 };
 use crate::mcp::zephyr_tools::{
     CreateZephyrTestCaseTool, CreateZephyrTestExecutionTool, CreateZephyrTestStepTool,

@@ -5,10 +5,10 @@ use crate::types::jira::{
     BulkOperationType, JiraAttachment, JiraComment, JiraComponent, JiraComponentCreateRequest,
     JiraComponentUpdateRequest, JiraIssue, JiraIssueCloneRequest, JiraIssueCloneResponse,
     JiraIssueLink, JiraIssueLinkCreateRequest, JiraLabel, JiraLabelCreateRequest,
-    JiraLabelUpdateRequest, JiraLinkType, JiraSearchResult, JiraTransition,
-    JiraWatchersResponse, JiraWorkLog, JiraWorkLogCreateRequest, JiraWorkLogUpdateRequest,
-    ZephyrTestCase, ZephyrTestCaseCreateRequest, ZephyrTestCaseSearchResult,
-    ZephyrTestCaseUpdateRequest, ZephyrTestCycle, ZephyrTestCycleCreateRequest, ZephyrTestExecution,
+    JiraLabelUpdateRequest, JiraLinkType, JiraSearchResult, JiraTransition, JiraWatchersResponse,
+    JiraWorkLog, JiraWorkLogCreateRequest, JiraWorkLogUpdateRequest, ZephyrTestCase,
+    ZephyrTestCaseCreateRequest, ZephyrTestCaseSearchResult, ZephyrTestCaseUpdateRequest,
+    ZephyrTestCycle, ZephyrTestCycleCreateRequest, ZephyrTestExecution,
     ZephyrTestExecutionCreateRequest, ZephyrTestExecutionUpdateRequest, ZephyrTestPlan,
     ZephyrTestPlanCreateRequest, ZephyrTestStep, ZephyrTestStepCreateRequest,
     ZephyrTestStepUpdateRequest,
@@ -1227,8 +1227,8 @@ impl JiraClient {
 
         let mut result = Vec::new();
         for label in labels {
-            let label: JiraLabel = serde_json::from_value(label.clone())
-                .map_err(JiraError::SerializationError)?;
+            let label: JiraLabel =
+                serde_json::from_value(label.clone()).map_err(JiraError::SerializationError)?;
             result.push(label);
         }
 
@@ -1249,7 +1249,11 @@ impl JiraClient {
     /// # Errors
     ///
     /// Returns an error if the label update fails or the response cannot be parsed.
-    pub async fn update_label(&self, label_name: &str, label: &JiraLabelUpdateRequest) -> Result<JiraLabel> {
+    pub async fn update_label(
+        &self,
+        label_name: &str,
+        label: &JiraLabelUpdateRequest,
+    ) -> Result<JiraLabel> {
         let endpoint = format!("label/{label_name}");
         self.put(&endpoint, label).await
     }
@@ -1272,7 +1276,10 @@ impl JiraClient {
     /// # Errors
     ///
     /// Returns an error if the component creation fails or the response cannot be parsed.
-    pub async fn create_component(&self, component: &JiraComponentCreateRequest) -> Result<JiraComponent> {
+    pub async fn create_component(
+        &self,
+        component: &JiraComponentCreateRequest,
+    ) -> Result<JiraComponent> {
         self.post("component", component).await
     }
 
@@ -1281,7 +1288,11 @@ impl JiraClient {
     /// # Errors
     ///
     /// Returns an error if the component update fails or the response cannot be parsed.
-    pub async fn update_component(&self, component_id: &str, component: &JiraComponentUpdateRequest) -> Result<JiraComponent> {
+    pub async fn update_component(
+        &self,
+        component_id: &str,
+        component: &JiraComponentUpdateRequest,
+    ) -> Result<JiraComponent> {
         let endpoint = format!("component/{component_id}");
         self.put(&endpoint, component).await
     }
@@ -1304,7 +1315,11 @@ impl JiraClient {
     /// # Errors
     ///
     /// Returns an error if the cloning fails or the response cannot be parsed.
-    pub async fn clone_issue(&self, original_issue_key: &str, clone_request: &JiraIssueCloneRequest) -> Result<JiraIssueCloneResponse> {
+    pub async fn clone_issue(
+        &self,
+        original_issue_key: &str,
+        clone_request: &JiraIssueCloneRequest,
+    ) -> Result<JiraIssueCloneResponse> {
         // First, get the original issue
         let original_issue = self.get_issue(original_issue_key).await?;
 
@@ -1323,12 +1338,14 @@ impl JiraClient {
 
         // Add description if provided
         if let Some(description) = &clone_request.description {
-            new_issue_data["fields"]["description"] = serde_json::Value::String(description.clone());
+            new_issue_data["fields"]["description"] =
+                serde_json::Value::String(description.clone());
         }
 
         // Apply field mapping
         if let Some(field_mapping) = &clone_request.field_mapping {
-            self.apply_field_mapping(&original_issue, &mut new_issue_data, field_mapping).await?;
+            self.apply_field_mapping(&original_issue, &mut new_issue_data, field_mapping)
+                .await?;
         }
 
         // Create the new issue
@@ -1352,7 +1369,16 @@ impl JiraClient {
             let mut copied_count = 0;
             for attachment in attachments {
                 if let Ok(content) = self.download_attachment(&attachment.id).await {
-                    if self.upload_attachment(&cloned_issue.key, &attachment.filename, &content, Some(&attachment.mime_type)).await.is_ok() {
+                    if self
+                        .upload_attachment(
+                            &cloned_issue.key,
+                            &attachment.filename,
+                            &content,
+                            Some(&attachment.mime_type),
+                        )
+                        .await
+                        .is_ok()
+                    {
                         copied_count += 1;
                     }
                 }
@@ -1365,7 +1391,11 @@ impl JiraClient {
             let comments = self.get_comments(original_issue_key).await?;
             let mut copied_count = 0;
             for comment in comments {
-                if self.add_comment(&cloned_issue.key, &comment.body).await.is_ok() {
+                if self
+                    .add_comment(&cloned_issue.key, &comment.body)
+                    .await
+                    .is_ok()
+                {
                     copied_count += 1;
                 }
             }
@@ -1383,7 +1413,11 @@ impl JiraClient {
                     started: Some(work_log.created),
                     visibility: None,
                 };
-                if self.add_work_log(&cloned_issue.key, &work_log_request).await.is_ok() {
+                if self
+                    .add_work_log(&cloned_issue.key, &work_log_request)
+                    .await
+                    .is_ok()
+                {
                     copied_count += 1;
                 }
             }
@@ -1395,7 +1429,11 @@ impl JiraClient {
             let watchers_response = self.get_issue_watchers(original_issue_key).await?;
             let mut copied_count = 0;
             for watcher in watchers_response.watchers {
-                if self.add_issue_watcher(&cloned_issue.key, &watcher.account_id).await.is_ok() {
+                if self
+                    .add_issue_watcher(&cloned_issue.key, &watcher.account_id)
+                    .await
+                    .is_ok()
+                {
                     copied_count += 1;
                 }
             }
@@ -1411,7 +1449,16 @@ impl JiraClient {
                 // the complexity of linking to the appropriate issues in the new project
                 if let Some(inward_issue) = &link.inward_issue {
                     if let Some(outward_issue) = &link.outward_issue {
-                        if self.link_issues(&inward_issue.key, &outward_issue.key, &link.link_type.name, None).await.is_ok() {
+                        if self
+                            .link_issues(
+                                &inward_issue.key,
+                                &outward_issue.key,
+                                &link.link_type.name,
+                                None,
+                            )
+                            .await
+                            .is_ok()
+                        {
                             copied_count += 1;
                         }
                     }
@@ -1442,11 +1489,12 @@ impl JiraClient {
                 }
 
                 // Apply custom field mapping if specified
-                let target_field_id = if let Some(ref custom_mapping) = field_mapping.custom_field_mapping {
-                    custom_mapping.get(field_id).unwrap_or(field_id)
-                } else {
-                    field_id
-                };
+                let target_field_id =
+                    if let Some(ref custom_mapping) = field_mapping.custom_field_mapping {
+                        custom_mapping.get(field_id).unwrap_or(field_id)
+                    } else {
+                        field_id
+                    };
 
                 new_issue_data["fields"][target_field_id] = field_value.clone();
             }

@@ -2027,9 +2027,8 @@ impl crate::mcp::server::MCPToolHandler for AddIssueWatcherTool {
 
         self.client.add_issue_watcher(issue_key, account_id).await?;
 
-        let response_text = format!(
-            "Watcher {account_id} added successfully to issue {issue_key}!"
-        );
+        let response_text =
+            format!("Watcher {account_id} added successfully to issue {issue_key}!");
 
         Ok(MCPToolResult {
             content: vec![MCPContent::text(response_text)],
@@ -2072,11 +2071,12 @@ impl crate::mcp::server::MCPToolHandler for RemoveIssueWatcherTool {
 
         info!("Removing watcher {} from issue: {}", account_id, issue_key);
 
-        self.client.remove_issue_watcher(issue_key, account_id).await?;
+        self.client
+            .remove_issue_watcher(issue_key, account_id)
+            .await?;
 
-        let response_text = format!(
-            "Watcher {account_id} removed successfully from issue {issue_key}!"
-        );
+        let response_text =
+            format!("Watcher {account_id} removed successfully from issue {issue_key}!");
 
         Ok(MCPToolResult {
             content: vec![MCPContent::text(response_text)],
@@ -2115,11 +2115,7 @@ impl crate::mcp::server::MCPToolHandler for GetLabelsTool {
             response_text.push_str("No labels found.");
         } else {
             for (i, label) in labels.iter().enumerate() {
-                response_text.push_str(&format!(
-                    "{}. {}\n",
-                    i + 1,
-                    label.name
-                ));
+                response_text.push_str(&format!("{}. {}\n", i + 1, label.name));
             }
         }
 
@@ -2148,12 +2144,11 @@ impl CreateLabelTool {
 #[async_trait::async_trait]
 impl crate::mcp::server::MCPToolHandler for CreateLabelTool {
     async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
-        let name = args
-            .get("name")
-            .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
+        let name = args.get("name").and_then(|v| v.as_str()).ok_or_else(|| {
+            crate::error::JiraError::ApiError {
                 message: "Missing required parameter: name".to_string(),
-            })?;
+            }
+        })?;
 
         info!("Creating label: {}", name);
 
@@ -2245,12 +2240,11 @@ impl DeleteLabelTool {
 #[async_trait::async_trait]
 impl crate::mcp::server::MCPToolHandler for DeleteLabelTool {
     async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
-        let name = args
-            .get("name")
-            .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
+        let name = args.get("name").and_then(|v| v.as_str()).ok_or_else(|| {
+            crate::error::JiraError::ApiError {
                 message: "Missing required parameter: name".to_string(),
-            })?;
+            }
+        })?;
 
         info!("Deleting label: {}", name);
 
@@ -2285,12 +2279,11 @@ impl CreateComponentTool {
 #[async_trait::async_trait]
 impl crate::mcp::server::MCPToolHandler for CreateComponentTool {
     async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
-        let name = args
-            .get("name")
-            .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
+        let name = args.get("name").and_then(|v| v.as_str()).ok_or_else(|| {
+            crate::error::JiraError::ApiError {
                 message: "Missing required parameter: name".to_string(),
-            })?;
+            }
+        })?;
 
         let project = args
             .get("project")
@@ -2319,7 +2312,10 @@ impl crate::mcp::server::MCPToolHandler for CreateComponentTool {
             "Component created successfully!\n\nName: {}\nID: {}\nDescription: {}\nURL: {}",
             created_component.name,
             created_component.id,
-            created_component.description.as_deref().unwrap_or("No description"),
+            created_component
+                .description
+                .as_deref()
+                .unwrap_or("No description"),
             created_component.self_url
         );
 
@@ -2369,13 +2365,19 @@ impl crate::mcp::server::MCPToolHandler for UpdateComponentTool {
             lead_account_id: lead_account_id.map(ToString::to_string),
         };
 
-        let updated_component = self.client.update_component(component_id, &component_request).await?;
+        let updated_component = self
+            .client
+            .update_component(component_id, &component_request)
+            .await?;
 
         let response_text = format!(
             "Component updated successfully!\n\nName: {}\nID: {}\nDescription: {}\nURL: {}",
             updated_component.name,
             updated_component.id,
-            updated_component.description.as_deref().unwrap_or("No description"),
+            updated_component
+                .description
+                .as_deref()
+                .unwrap_or("No description"),
             updated_component.self_url
         );
 
@@ -2473,13 +2475,24 @@ impl crate::mcp::server::MCPToolHandler for CloneIssueTool {
             })?;
 
         let description = args.get("description").and_then(|v| v.as_str());
-        let copy_attachments = args.get("copy_attachments").and_then(serde_json::Value::as_bool);
-        let copy_comments = args.get("copy_comments").and_then(serde_json::Value::as_bool);
-        let copy_work_logs = args.get("copy_work_logs").and_then(serde_json::Value::as_bool);
-        let copy_watchers = args.get("copy_watchers").and_then(serde_json::Value::as_bool);
+        let copy_attachments = args
+            .get("copy_attachments")
+            .and_then(serde_json::Value::as_bool);
+        let copy_comments = args
+            .get("copy_comments")
+            .and_then(serde_json::Value::as_bool);
+        let copy_work_logs = args
+            .get("copy_work_logs")
+            .and_then(serde_json::Value::as_bool);
+        let copy_watchers = args
+            .get("copy_watchers")
+            .and_then(serde_json::Value::as_bool);
         let copy_links = args.get("copy_links").and_then(serde_json::Value::as_bool);
 
-        info!("Cloning issue {} to project {} as {}", original_issue_key, project_key, issue_type);
+        info!(
+            "Cloning issue {} to project {} as {}",
+            original_issue_key, project_key, issue_type
+        );
 
         let clone_request = JiraIssueCloneRequest {
             project_key: project_key.to_string(),
@@ -2494,7 +2507,10 @@ impl crate::mcp::server::MCPToolHandler for CloneIssueTool {
             copy_links,
         };
 
-        let clone_response = self.client.clone_issue(original_issue_key, &clone_request).await?;
+        let clone_response = self
+            .client
+            .clone_issue(original_issue_key, &clone_request)
+            .await?;
 
         let mut response_text = format!(
             "Issue cloned successfully!\n\nOriginal Issue: {}\nCloned Issue: {}\nCloned Issue ID: {}\nCloned Issue URL: {}\n\n",

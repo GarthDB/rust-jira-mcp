@@ -706,7 +706,7 @@ pub struct JiraIssueCloneRequest {
 /// Jira field mapping for cloning
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct JiraFieldMapping {
-    pub copy_fields: Vec<String>, // Field IDs to copy
+    pub copy_fields: Vec<String>,    // Field IDs to copy
     pub exclude_fields: Vec<String>, // Field IDs to exclude
     pub custom_field_mapping: Option<std::collections::HashMap<String, String>>, // Custom field ID mapping
 }
