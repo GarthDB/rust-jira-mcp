@@ -84,22 +84,26 @@ impl crate::mcp::server::MCPToolHandler for CreateZephyrTestStepTool {
                 message: "Missing required parameter: test_case_id".to_string(),
             })?;
 
-        let step = args
-            .get("step")
-            .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
+        let step = args.get("step").and_then(|v| v.as_str()).ok_or_else(|| {
+            crate::error::JiraError::ApiError {
                 message: "Missing required parameter: step".to_string(),
-            })?;
+            }
+        })?;
 
-        let order = args
-            .get("order")
-            .and_then(|v| v.as_i64())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
+        let order = args.get("order").and_then(|v| v.as_i64()).ok_or_else(|| {
+            crate::error::JiraError::ApiError {
                 message: "Missing required parameter: order".to_string(),
-            })? as i32;
+            }
+        })? as i32;
 
-        let data = args.get("data").and_then(|v| v.as_str()).map(|s| s.to_string());
-        let result = args.get("result").and_then(|v| v.as_str()).map(|s| s.to_string());
+        let data = args
+            .get("data")
+            .and_then(|v| v.as_str())
+            .map(|s| s.to_string());
+        let result = args
+            .get("result")
+            .and_then(|v| v.as_str())
+            .map(|s| s.to_string());
 
         let test_step_request = ZephyrTestStepCreateRequest {
             step: step.to_string(),
@@ -111,7 +115,10 @@ impl crate::mcp::server::MCPToolHandler for CreateZephyrTestStepTool {
 
         info!("Creating Zephyr test step for test case: {}", test_case_id);
 
-        let created_step = self.client.create_zephyr_test_step(&test_step_request).await?;
+        let created_step = self
+            .client
+            .create_zephyr_test_step(&test_step_request)
+            .await?;
 
         let response_text = format!(
             "Test step created successfully!\n\nStep: {}\nOrder: {}\nData: {}\nExpected Result: {}\nTest Case ID: {}",
@@ -160,9 +167,18 @@ impl crate::mcp::server::MCPToolHandler for UpdateZephyrTestStepTool {
                 message: "Missing required parameter: step_id".to_string(),
             })?;
 
-        let step = args.get("step").and_then(|v| v.as_str()).map(|s| s.to_string());
-        let data = args.get("data").and_then(|v| v.as_str()).map(|s| s.to_string());
-        let result = args.get("result").and_then(|v| v.as_str()).map(|s| s.to_string());
+        let step = args
+            .get("step")
+            .and_then(|v| v.as_str())
+            .map(|s| s.to_string());
+        let data = args
+            .get("data")
+            .and_then(|v| v.as_str())
+            .map(|s| s.to_string());
+        let result = args
+            .get("result")
+            .and_then(|v| v.as_str())
+            .map(|s| s.to_string());
         let order = args.get("order").and_then(|v| v.as_i64()).map(|v| v as i32);
 
         let test_step_request = ZephyrTestStepUpdateRequest {
@@ -172,7 +188,10 @@ impl crate::mcp::server::MCPToolHandler for UpdateZephyrTestStepTool {
             order,
         };
 
-        info!("Updating Zephyr test step {} for test case: {}", step_id, test_case_id);
+        info!(
+            "Updating Zephyr test step {} for test case: {}",
+            step_id, test_case_id
+        );
 
         let updated_step = self
             .client
@@ -225,9 +244,14 @@ impl crate::mcp::server::MCPToolHandler for DeleteZephyrTestStepTool {
                 message: "Missing required parameter: step_id".to_string(),
             })?;
 
-        info!("Deleting Zephyr test step {} for test case: {}", step_id, test_case_id);
+        info!(
+            "Deleting Zephyr test step {} for test case: {}",
+            step_id, test_case_id
+        );
 
-        self.client.delete_zephyr_test_step(test_case_id, step_id).await?;
+        self.client
+            .delete_zephyr_test_step(test_case_id, step_id)
+            .await?;
 
         let response_text = format!(
             "Test step {} deleted successfully from test case {}!",
@@ -330,12 +354,11 @@ impl CreateZephyrTestCaseTool {
 #[async_trait::async_trait]
 impl crate::mcp::server::MCPToolHandler for CreateZephyrTestCaseTool {
     async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
-        let name = args
-            .get("name")
-            .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
+        let name = args.get("name").and_then(|v| v.as_str()).ok_or_else(|| {
+            crate::error::JiraError::ApiError {
                 message: "Missing required parameter: name".to_string(),
-            })?;
+            }
+        })?;
 
         let project_key = args
             .get("project_key")
@@ -351,9 +374,18 @@ impl crate::mcp::server::MCPToolHandler for CreateZephyrTestCaseTool {
                 message: "Missing required parameter: issue_type".to_string(),
             })?;
 
-        let priority = args.get("priority").and_then(|v| v.as_str()).map(|s| s.to_string());
-        let assignee = args.get("assignee").and_then(|v| v.as_str()).map(|s| s.to_string());
-        let description = args.get("description").and_then(|v| v.as_str()).map(|s| s.to_string());
+        let priority = args
+            .get("priority")
+            .and_then(|v| v.as_str())
+            .map(|s| s.to_string());
+        let assignee = args
+            .get("assignee")
+            .and_then(|v| v.as_str())
+            .map(|s| s.to_string());
+        let description = args
+            .get("description")
+            .and_then(|v| v.as_str())
+            .map(|s| s.to_string());
 
         let test_case_request = ZephyrTestCaseCreateRequest {
             name: name.to_string(),
@@ -370,7 +402,10 @@ impl crate::mcp::server::MCPToolHandler for CreateZephyrTestCaseTool {
 
         info!("Creating Zephyr test case: {}", name);
 
-        let created_test_case = self.client.create_zephyr_test_case(&test_case_request).await?;
+        let created_test_case = self
+            .client
+            .create_zephyr_test_case(&test_case_request)
+            .await?;
 
         let response_text = format!(
             "Test case created successfully!\n\nName: {}\nKey: {}\nProject: {}\nType: {}\nPriority: {}\nAssignee: {}",
@@ -413,7 +448,10 @@ impl crate::mcp::server::MCPToolHandler for GetZephyrTestExecutionsTool {
                 message: "Missing required parameter: test_case_id".to_string(),
             })?;
 
-        info!("Getting Zephyr test executions for test case: {}", test_case_id);
+        info!(
+            "Getting Zephyr test executions for test case: {}",
+            test_case_id
+        );
 
         let test_executions = self.client.get_zephyr_test_executions(test_case_id).await?;
 
@@ -474,17 +512,28 @@ impl crate::mcp::server::MCPToolHandler for CreateZephyrTestExecutionTool {
                 message: "Missing required parameter: project_id".to_string(),
             })?;
 
-        let status = args
-            .get("status")
-            .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
+        let status = args.get("status").and_then(|v| v.as_str()).ok_or_else(|| {
+            crate::error::JiraError::ApiError {
                 message: "Missing required parameter: status".to_string(),
-            })?;
+            }
+        })?;
 
-        let cycle_id = args.get("cycle_id").and_then(|v| v.as_str()).map(|s| s.to_string());
-        let version_id = args.get("version_id").and_then(|v| v.as_str()).map(|s| s.to_string());
-        let assignee = args.get("assignee").and_then(|v| v.as_str()).map(|s| s.to_string());
-        let comment = args.get("comment").and_then(|v| v.as_str()).map(|s| s.to_string());
+        let cycle_id = args
+            .get("cycle_id")
+            .and_then(|v| v.as_str())
+            .map(|s| s.to_string());
+        let version_id = args
+            .get("version_id")
+            .and_then(|v| v.as_str())
+            .map(|s| s.to_string());
+        let assignee = args
+            .get("assignee")
+            .and_then(|v| v.as_str())
+            .map(|s| s.to_string());
+        let comment = args
+            .get("comment")
+            .and_then(|v| v.as_str())
+            .map(|s| s.to_string());
 
         let execution_request = ZephyrTestExecutionCreateRequest {
             test_case_id: test_case_id.to_string(),
@@ -497,9 +546,15 @@ impl crate::mcp::server::MCPToolHandler for CreateZephyrTestExecutionTool {
             step_results: None,
         };
 
-        info!("Creating Zephyr test execution for test case: {}", test_case_id);
+        info!(
+            "Creating Zephyr test execution for test case: {}",
+            test_case_id
+        );
 
-        let created_execution = self.client.create_zephyr_test_execution(&execution_request).await?;
+        let created_execution = self
+            .client
+            .create_zephyr_test_execution(&execution_request)
+            .await?;
 
         let response_text = format!(
             "Test execution created successfully!\n\nTest Case ID: {}\nExecution ID: {}\nStatus: {}\nProject ID: {}\nAssignee: {}\nComment: {}",

@@ -16,11 +16,11 @@ async fn test_zephyr_tools_registration() {
     };
 
     let _server = MCPServer::new(config);
-    
+
     // Test that Zephyr tools are registered
     let tools = MCPServer::list_tools();
     let tool_names: Vec<&String> = tools.iter().map(|t| &t.name).collect();
-    
+
     // Check that Zephyr tools are present
     assert!(tool_names.contains(&&"get_zephyr_test_steps".to_string()));
     assert!(tool_names.contains(&&"create_zephyr_test_step".to_string()));
@@ -37,27 +37,34 @@ async fn test_zephyr_tools_registration() {
 #[tokio::test]
 async fn test_zephyr_tool_schemas() {
     let tools = MCPServer::list_tools();
-    
+
     // Find Zephyr tools and verify their schemas
-    let get_test_steps_tool = tools.iter()
+    let get_test_steps_tool = tools
+        .iter()
         .find(|t| t.name == "get_zephyr_test_steps")
         .expect("get_zephyr_test_steps tool should be registered");
-    
+
     assert_eq!(get_test_steps_tool.name, "get_zephyr_test_steps");
     assert!(get_test_steps_tool.description.contains("test steps"));
-    
+
     // Verify the schema has required fields
     let schema = &get_test_steps_tool.input_schema;
     assert!(schema["properties"]["test_case_id"].is_object());
-    assert!(schema["required"].as_array().unwrap().contains(&json!("test_case_id")));
-    
-    let create_test_step_tool = tools.iter()
+    assert!(schema["required"]
+        .as_array()
+        .unwrap()
+        .contains(&json!("test_case_id")));
+
+    let create_test_step_tool = tools
+        .iter()
         .find(|t| t.name == "create_zephyr_test_step")
         .expect("create_zephyr_test_step tool should be registered");
-    
+
     assert_eq!(create_test_step_tool.name, "create_zephyr_test_step");
-    assert!(create_test_step_tool.description.contains("Create a new test step"));
-    
+    assert!(create_test_step_tool
+        .description
+        .contains("Create a new test step"));
+
     // Verify required fields for creating test steps
     let schema = &create_test_step_tool.input_schema;
     let required_fields = schema["required"].as_array().unwrap();
@@ -69,19 +76,23 @@ async fn test_zephyr_tool_schemas() {
 #[tokio::test]
 async fn test_zephyr_tool_count() {
     let tools = MCPServer::list_tools();
-    
+
     // Count Zephyr tools
-    let zephyr_tools: Vec<&rust_jira_mcp::types::mcp::MCPTool> = tools.iter()
-        .filter(|t| t.name.contains("zephyr"))
-        .collect();
-    
+    let zephyr_tools: Vec<&rust_jira_mcp::types::mcp::MCPTool> =
+        tools.iter().filter(|t| t.name.contains("zephyr")).collect();
+
     // We should have 10 Zephyr tools
-    assert_eq!(zephyr_tools.len(), 10, "Expected 10 Zephyr tools, found {}", zephyr_tools.len());
-    
+    assert_eq!(
+        zephyr_tools.len(),
+        10,
+        "Expected 10 Zephyr tools, found {}",
+        zephyr_tools.len()
+    );
+
     // Verify all expected tool names are present
     let expected_tools = vec![
         "get_zephyr_test_steps",
-        "create_zephyr_test_step", 
+        "create_zephyr_test_step",
         "update_zephyr_test_step",
         "delete_zephyr_test_step",
         "get_zephyr_test_cases",
@@ -91,11 +102,12 @@ async fn test_zephyr_tool_count() {
         "get_zephyr_test_cycles",
         "get_zephyr_test_plans",
     ];
-    
+
     for expected_tool in expected_tools {
         assert!(
             zephyr_tools.iter().any(|t| t.name == expected_tool),
-            "Expected tool '{}' not found", expected_tool
+            "Expected tool '{}' not found",
+            expected_tool
         );
     }
 }

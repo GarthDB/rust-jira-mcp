@@ -1,9 +1,7 @@
 use crate::config::JiraConfig;
 use crate::error::Result;
 use crate::jira::client::JiraClient;
-use crate::types::jira::{
-    BulkOperationConfig, BulkOperationItem, BulkOperationType,
-};
+use crate::types::jira::{BulkOperationConfig, BulkOperationItem, BulkOperationType};
 use crate::types::mcp::{MCPContent, MCPToolResult};
 use serde_json::json;
 use tracing::info;

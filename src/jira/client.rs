@@ -2,11 +2,12 @@ use crate::config::JiraConfig;
 use crate::error::{JiraError, Result};
 use crate::types::jira::{
     BulkOperationConfig, BulkOperationItem, BulkOperationResult, BulkOperationSummary,
-    BulkOperationType, JiraComment, JiraIssue, JiraSearchResult, JiraTransition,
-    ZephyrTestCase, ZephyrTestCaseCreateRequest, ZephyrTestCaseSearchResult, ZephyrTestCaseUpdateRequest,
-    ZephyrTestCycle, ZephyrTestCycleCreateRequest, ZephyrTestExecution, ZephyrTestExecutionCreateRequest,
-    ZephyrTestExecutionUpdateRequest, ZephyrTestPlan, ZephyrTestPlanCreateRequest, ZephyrTestStep,
-    ZephyrTestStepCreateRequest, ZephyrTestStepUpdateRequest,
+    BulkOperationType, JiraComment, JiraIssue, JiraSearchResult, JiraTransition, ZephyrTestCase,
+    ZephyrTestCaseCreateRequest, ZephyrTestCaseSearchResult, ZephyrTestCaseUpdateRequest,
+    ZephyrTestCycle, ZephyrTestCycleCreateRequest, ZephyrTestExecution,
+    ZephyrTestExecutionCreateRequest, ZephyrTestExecutionUpdateRequest, ZephyrTestPlan,
+    ZephyrTestPlanCreateRequest, ZephyrTestStep, ZephyrTestStepCreateRequest,
+    ZephyrTestStepUpdateRequest,
 };
 use reqwest::{Client, Method, RequestBuilder};
 use serde::{de::DeserializeOwned, Serialize};
@@ -870,7 +871,8 @@ impl JiraClient {
     where
         T: DeserializeOwned,
     {
-        self.zephyr_request(Method::GET, endpoint, None::<&()>).await
+        self.zephyr_request(Method::GET, endpoint, None::<&()>)
+            .await
     }
 
     /// Make a POST request to the Zephyr API
@@ -883,7 +885,8 @@ impl JiraClient {
         T: DeserializeOwned,
         U: Serialize + ?Sized,
     {
-        self.zephyr_request(Method::POST, endpoint, Some(body)).await
+        self.zephyr_request(Method::POST, endpoint, Some(body))
+            .await
     }
 
     /// Make a PUT request to the Zephyr API
@@ -908,7 +911,8 @@ impl JiraClient {
     where
         T: DeserializeOwned,
     {
-        self.zephyr_request(Method::DELETE, endpoint, None::<&()>).await
+        self.zephyr_request(Method::DELETE, endpoint, None::<&()>)
+            .await
     }
 
     /// Make a generic HTTP request to Zephyr API with retry logic
@@ -916,7 +920,12 @@ impl JiraClient {
     /// # Errors
     ///
     /// Returns an error if the request fails after all retries or the response cannot be parsed
-    async fn zephyr_request<T, U>(&self, method: Method, endpoint: &str, body: Option<&U>) -> Result<T>
+    async fn zephyr_request<T, U>(
+        &self,
+        method: Method,
+        endpoint: &str,
+        body: Option<&U>,
+    ) -> Result<T>
     where
         T: DeserializeOwned,
         U: Serialize + ?Sized,
@@ -996,9 +1005,10 @@ impl JiraClient {
 
     /// Build a complete URL from the Zephyr endpoint
     fn build_zephyr_url(&self, endpoint: &str) -> Result<Url> {
-        let base_url = Url::parse(&self.zephyr_api_base_url()).map_err(|e| JiraError::ConfigError {
-            message: format!("Invalid Zephyr API base URL: {e}"),
-        })?;
+        let base_url =
+            Url::parse(&self.zephyr_api_base_url()).map_err(|e| JiraError::ConfigError {
+                message: format!("Invalid Zephyr API base URL: {e}"),
+            })?;
 
         base_url.join(endpoint).map_err(|e| JiraError::ConfigError {
             message: format!("Invalid Zephyr endpoint URL: {e}"),
@@ -1065,7 +1075,10 @@ impl JiraClient {
     /// # Errors
     ///
     /// Returns an error if the test step creation fails or the response cannot be parsed
-    pub async fn create_zephyr_test_step(&self, test_step: &ZephyrTestStepCreateRequest) -> Result<ZephyrTestStep> {
+    pub async fn create_zephyr_test_step(
+        &self,
+        test_step: &ZephyrTestStepCreateRequest,
+    ) -> Result<ZephyrTestStep> {
         let endpoint = format!("teststep/{}", test_step.test_case_id);
         self.zephyr_post(&endpoint, test_step).await
     }
@@ -1145,7 +1158,10 @@ impl JiraClient {
     /// # Errors
     ///
     /// Returns an error if the test case creation fails or the response cannot be parsed
-    pub async fn create_zephyr_test_case(&self, test_case: &ZephyrTestCaseCreateRequest) -> Result<ZephyrTestCase> {
+    pub async fn create_zephyr_test_case(
+        &self,
+        test_case: &ZephyrTestCaseCreateRequest,
+    ) -> Result<ZephyrTestCase> {
         self.zephyr_post("testcase", test_case).await
     }
 
@@ -1183,7 +1199,10 @@ impl JiraClient {
     /// # Errors
     ///
     /// Returns an error if the request fails or the response cannot be parsed
-    pub async fn get_zephyr_test_executions(&self, test_case_id: &str) -> Result<Vec<ZephyrTestExecution>> {
+    pub async fn get_zephyr_test_executions(
+        &self,
+        test_case_id: &str,
+    ) -> Result<Vec<ZephyrTestExecution>> {
         let endpoint = format!("execution/testcase/{}", test_case_id);
         let response: serde_json::Value = self.zephyr_get(&endpoint).await?;
 
@@ -1210,7 +1229,10 @@ impl JiraClient {
     /// # Errors
     ///
     /// Returns an error if the test execution creation fails or the response cannot be parsed
-    pub async fn create_zephyr_test_execution(&self, execution: &ZephyrTestExecutionCreateRequest) -> Result<ZephyrTestExecution> {
+    pub async fn create_zephyr_test_execution(
+        &self,
+        execution: &ZephyrTestExecutionCreateRequest,
+    ) -> Result<ZephyrTestExecution> {
         self.zephyr_post("execution", execution).await
     }
 
@@ -1276,7 +1298,10 @@ impl JiraClient {
     ///
     /// Returns an error if the test cycle creation fails or the response cannot be parsed
     #[allow(dead_code)]
-    pub async fn create_zephyr_test_cycle(&self, cycle: &ZephyrTestCycleCreateRequest) -> Result<ZephyrTestCycle> {
+    pub async fn create_zephyr_test_cycle(
+        &self,
+        cycle: &ZephyrTestCycleCreateRequest,
+    ) -> Result<ZephyrTestCycle> {
         self.zephyr_post("cycle", cycle).await
     }
 
@@ -1342,7 +1367,10 @@ impl JiraClient {
     ///
     /// Returns an error if the test plan creation fails or the response cannot be parsed
     #[allow(dead_code)]
-    pub async fn create_zephyr_test_plan(&self, plan: &ZephyrTestPlanCreateRequest) -> Result<ZephyrTestPlan> {
+    pub async fn create_zephyr_test_plan(
+        &self,
+        plan: &ZephyrTestPlanCreateRequest,
+    ) -> Result<ZephyrTestPlan> {
         self.zephyr_post("testplan", plan).await
     }
 
