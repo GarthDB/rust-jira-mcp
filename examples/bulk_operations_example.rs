@@ -1,3 +1,5 @@
+#![allow(clippy::too_many_lines, clippy::uninlined_format_args)]
+
 use rust_jira_mcp::types::jira::{BulkOperationConfig, BulkOperationItem, BulkOperationType};
 use serde_json::json;
 

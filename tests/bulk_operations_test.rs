@@ -11,7 +11,7 @@ async fn test_bulk_operation_summary() {
     assert_eq!(summary.total_operations, 0);
     assert_eq!(summary.successful_operations, 0);
     assert_eq!(summary.failed_operations, 0);
-    assert_eq!(summary.success_rate(), 0.0);
+    assert!((summary.success_rate() - 0.0).abs() < f64::EPSILON);
 
     // Add some results
     summary.add_result(rust_jira_mcp::types::jira::BulkOperationResult {
@@ -39,7 +39,7 @@ async fn test_bulk_operation_summary() {
     assert_eq!(summary.total_operations, 3);
     assert_eq!(summary.successful_operations, 2);
     assert_eq!(summary.failed_operations, 1);
-    assert_eq!(summary.success_rate(), 66.66666666666666);
+    assert!((summary.success_rate() - 66.666_666_666_666_66).abs() < f64::EPSILON);
 }
 
 #[test]

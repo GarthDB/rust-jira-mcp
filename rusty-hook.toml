@@ -1,15 +1,15 @@
 [hooks]
 pre-commit = [
+    "cargo fmt",
     "cargo clippy --all-targets --all-features -- -D warnings -W clippy::pedantic",
-    "cargo fmt --check",
     "./scripts/check-allows.sh",
     "cargo test --all-targets --all-features"
 ]
 
 [hooks.pre-push]
 commands = [
+    "cargo fmt",
     "cargo clippy --all-targets --all-features -- -D warnings -W clippy::pedantic",
-    "cargo fmt --check",
     "./scripts/check-allows.sh",
     "cargo test --all-targets --all-features"
 ]

@@ -1,3 +1,5 @@
+#![allow(clippy::format_push_string)]
+
 use crate::config::JiraConfig;
 use crate::error::Result;
 use crate::jira::client::JiraClient;
@@ -15,6 +17,7 @@ pub struct GetZephyrTestStepsTool {
 
 impl GetZephyrTestStepsTool {
     #[must_use]
+    #[allow(clippy::missing_panics_doc)]
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -36,7 +39,7 @@ impl crate::mcp::server::MCPToolHandler for GetZephyrTestStepsTool {
 
         let test_steps = self.client.get_zephyr_test_steps(test_case_id).await?;
 
-        let mut response_text = format!("Test Steps for Test Case {}:\n\n", test_case_id);
+        let mut response_text = format!("Test Steps for Test Case {test_case_id}:\n\n");
 
         if test_steps.is_empty() {
             response_text.push_str("No test steps found.");
@@ -67,6 +70,7 @@ pub struct CreateZephyrTestStepTool {
 
 impl CreateZephyrTestStepTool {
     #[must_use]
+    #[allow(clippy::missing_panics_doc)]
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -90,20 +94,23 @@ impl crate::mcp::server::MCPToolHandler for CreateZephyrTestStepTool {
             }
         })?;
 
-        let order = args.get("order").and_then(|v| v.as_i64()).ok_or_else(|| {
-            crate::error::JiraError::ApiError {
-                message: "Missing required parameter: order".to_string(),
-            }
-        })? as i32;
+        let order = i32::try_from(
+            args.get("order")
+                .and_then(serde_json::Value::as_i64)
+                .ok_or_else(|| crate::error::JiraError::ApiError {
+                    message: "Missing required parameter: order".to_string(),
+                })?,
+        )
+        .unwrap_or(0);
 
         let data = args
             .get("data")
             .and_then(|v| v.as_str())
-            .map(|s| s.to_string());
+            .map(ToString::to_string);
         let result = args
             .get("result")
             .and_then(|v| v.as_str())
-            .map(|s| s.to_string());
+            .map(ToString::to_string);
 
         let test_step_request = ZephyrTestStepCreateRequest {
             step: step.to_string(),
@@ -143,6 +150,7 @@ pub struct UpdateZephyrTestStepTool {
 
 impl UpdateZephyrTestStepTool {
     #[must_use]
+    #[allow(clippy::missing_panics_doc)]
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -170,16 +178,19 @@ impl crate::mcp::server::MCPToolHandler for UpdateZephyrTestStepTool {
         let step = args
             .get("step")
             .and_then(|v| v.as_str())
-            .map(|s| s.to_string());
+            .map(ToString::to_string);
         let data = args
             .get("data")
             .and_then(|v| v.as_str())
-            .map(|s| s.to_string());
+            .map(ToString::to_string);
         let result = args
             .get("result")
             .and_then(|v| v.as_str())
-            .map(|s| s.to_string());
-        let order = args.get("order").and_then(|v| v.as_i64()).map(|v| v as i32);
+            .map(ToString::to_string);
+        let order = args
+            .get("order")
+            .and_then(serde_json::Value::as_i64)
+            .map(|v| i32::try_from(v).unwrap_or(0));
 
         let test_step_request = ZephyrTestStepUpdateRequest {
             step,
@@ -220,6 +231,7 @@ pub struct DeleteZephyrTestStepTool {
 
 impl DeleteZephyrTestStepTool {
     #[must_use]
+    #[allow(clippy::missing_panics_doc)]
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -253,10 +265,8 @@ impl crate::mcp::server::MCPToolHandler for DeleteZephyrTestStepTool {
             .delete_zephyr_test_step(test_case_id, step_id)
             .await?;
 
-        let response_text = format!(
-            "Test step {} deleted successfully from test case {}!",
-            step_id, test_case_id
-        );
+        let response_text =
+            format!("Test step {step_id} deleted successfully from test case {test_case_id}!");
 
         Ok(MCPToolResult {
             content: vec![MCPContent::text(response_text)],
@@ -272,6 +282,7 @@ pub struct GetZephyrTestCasesTool {
 
 impl GetZephyrTestCasesTool {
     #[must_use]
+    #[allow(clippy::missing_panics_doc)]
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -291,13 +302,13 @@ impl crate::mcp::server::MCPToolHandler for GetZephyrTestCasesTool {
 
         let start_at = args
             .get("start_at")
-            .and_then(|v| v.as_i64())
-            .map(|v| v as i32);
+            .and_then(serde_json::Value::as_i64)
+            .map(|v| i32::try_from(v).unwrap_or(0));
 
         let max_results = args
             .get("max_results")
-            .and_then(|v| v.as_i64())
-            .map(|v| v as i32);
+            .and_then(serde_json::Value::as_i64)
+            .map(|v| i32::try_from(v).unwrap_or(0));
 
         info!("Getting Zephyr test cases for project: {}", project_key);
 
@@ -344,6 +355,7 @@ pub struct CreateZephyrTestCaseTool {
 
 impl CreateZephyrTestCaseTool {
     #[must_use]
+    #[allow(clippy::missing_panics_doc)]
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -377,15 +389,15 @@ impl crate::mcp::server::MCPToolHandler for CreateZephyrTestCaseTool {
         let priority = args
             .get("priority")
             .and_then(|v| v.as_str())
-            .map(|s| s.to_string());
+            .map(ToString::to_string);
         let assignee = args
             .get("assignee")
             .and_then(|v| v.as_str())
-            .map(|s| s.to_string());
+            .map(ToString::to_string);
         let description = args
             .get("description")
             .and_then(|v| v.as_str())
-            .map(|s| s.to_string());
+            .map(ToString::to_string);
 
         let test_case_request = ZephyrTestCaseCreateRequest {
             name: name.to_string(),
@@ -431,6 +443,7 @@ pub struct GetZephyrTestExecutionsTool {
 
 impl GetZephyrTestExecutionsTool {
     #[must_use]
+    #[allow(clippy::missing_panics_doc)]
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -455,7 +468,7 @@ impl crate::mcp::server::MCPToolHandler for GetZephyrTestExecutionsTool {
 
         let test_executions = self.client.get_zephyr_test_executions(test_case_id).await?;
 
-        let mut response_text = format!("Test Executions for Test Case {}:\n\n", test_case_id);
+        let mut response_text = format!("Test Executions for Test Case {test_case_id}:\n\n");
 
         if test_executions.is_empty() {
             response_text.push_str("No test executions found.");
@@ -488,6 +501,7 @@ pub struct CreateZephyrTestExecutionTool {
 
 impl CreateZephyrTestExecutionTool {
     #[must_use]
+    #[allow(clippy::missing_panics_doc)]
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -521,19 +535,19 @@ impl crate::mcp::server::MCPToolHandler for CreateZephyrTestExecutionTool {
         let cycle_id = args
             .get("cycle_id")
             .and_then(|v| v.as_str())
-            .map(|s| s.to_string());
+            .map(ToString::to_string);
         let version_id = args
             .get("version_id")
             .and_then(|v| v.as_str())
-            .map(|s| s.to_string());
+            .map(ToString::to_string);
         let assignee = args
             .get("assignee")
             .and_then(|v| v.as_str())
-            .map(|s| s.to_string());
+            .map(ToString::to_string);
         let comment = args
             .get("comment")
             .and_then(|v| v.as_str())
-            .map(|s| s.to_string());
+            .map(ToString::to_string);
 
         let execution_request = ZephyrTestExecutionCreateRequest {
             test_case_id: test_case_id.to_string(),
@@ -580,6 +594,7 @@ pub struct GetZephyrTestCyclesTool {
 
 impl GetZephyrTestCyclesTool {
     #[must_use]
+    #[allow(clippy::missing_panics_doc)]
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -601,7 +616,7 @@ impl crate::mcp::server::MCPToolHandler for GetZephyrTestCyclesTool {
 
         let test_cycles = self.client.get_zephyr_test_cycles(project_key).await?;
 
-        let mut response_text = format!("Test Cycles for Project {}:\n\n", project_key);
+        let mut response_text = format!("Test Cycles for Project {project_key}:\n\n");
 
         if test_cycles.is_empty() {
             response_text.push_str("No test cycles found.");
@@ -634,6 +649,7 @@ pub struct GetZephyrTestPlansTool {
 
 impl GetZephyrTestPlansTool {
     #[must_use]
+    #[allow(clippy::missing_panics_doc)]
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -655,7 +671,7 @@ impl crate::mcp::server::MCPToolHandler for GetZephyrTestPlansTool {
 
         let test_plans = self.client.get_zephyr_test_plans(project_key).await?;
 
-        let mut response_text = format!("Test Plans for Project {}:\n\n", project_key);
+        let mut response_text = format!("Test Plans for Project {project_key}:\n\n");
 
         if test_plans.is_empty() {
             response_text.push_str("No test plans found.");

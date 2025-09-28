@@ -106,8 +106,7 @@ async fn test_zephyr_tool_count() {
     for expected_tool in expected_tools {
         assert!(
             zephyr_tools.iter().any(|t| t.name == expected_tool),
-            "Expected tool '{}' not found",
-            expected_tool
+            "Expected tool '{expected_tool}' not found"
         );
     }
 }

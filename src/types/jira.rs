@@ -435,6 +435,90 @@ pub struct JiraLinkType {
     pub self_url: String,
 }
 
+/// Jira issue link representation
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JiraIssueLink {
+    pub id: String,
+    pub self_url: String,
+    pub link_type: JiraLinkType,
+    pub inward_issue: Option<JiraIssue>,
+    pub outward_issue: Option<JiraIssue>,
+}
+
+/// Jira issue link creation request
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JiraIssueLinkCreateRequest {
+    pub link_type: JiraIssueLinkType,
+    pub inward_issue: Option<JiraIssueLinkTarget>,
+    pub outward_issue: Option<JiraIssueLinkTarget>,
+    pub comment: Option<JiraIssueLinkComment>,
+}
+
+/// Jira issue link type for creation
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JiraIssueLinkType {
+    pub name: String,
+}
+
+/// Jira issue link target
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JiraIssueLinkTarget {
+    pub key: String,
+}
+
+/// Jira issue link comment
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JiraIssueLinkComment {
+    pub body: String,
+    pub visibility: Option<JiraCommentVisibility>,
+}
+
+/// Jira comment visibility
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JiraCommentVisibility {
+    pub r#type: String,
+    pub value: String,
+}
+
+/// Jira attachment representation
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JiraAttachment {
+    pub id: String,
+    pub self_url: String,
+    pub filename: String,
+    pub author: JiraUser,
+    pub created: String,
+    pub size: i64,
+    pub mime_type: String,
+    pub content: Option<String>,
+}
+
+/// Jira attachment creation request
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JiraAttachmentCreateRequest {
+    pub filename: String,
+    pub content: String, // Base64 encoded content
+    pub mime_type: Option<String>,
+}
+
+/// Jira work log creation request
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JiraWorkLogCreateRequest {
+    pub comment: Option<String>,
+    pub time_spent: String,      // e.g., "1h 30m", "2d", "3w"
+    pub started: Option<String>, // ISO 8601 datetime
+    pub visibility: Option<JiraCommentVisibility>,
+}
+
+/// Jira work log update request
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JiraWorkLogUpdateRequest {
+    pub comment: Option<String>,
+    pub time_spent: Option<String>,
+    pub started: Option<String>,
+    pub visibility: Option<JiraCommentVisibility>,
+}
+
 /// Bulk operation types
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum BulkOperationType {
@@ -521,7 +605,9 @@ impl BulkOperationSummary {
         if self.total_operations == 0 {
             0.0
         } else {
-            (self.successful_operations as f64 / self.total_operations as f64) * 100.0
+            #[allow(clippy::cast_precision_loss)]
+            let result = (self.successful_operations as f64 / self.total_operations as f64) * 100.0;
+            result
         }
     }
 }
