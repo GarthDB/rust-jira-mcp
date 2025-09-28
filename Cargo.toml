@@ -1,0 +1,62 @@
+[package]
+name = "rust-jira-mcp"
+version = "0.1.0"
+edition = "2021"
+authors = ["GarthDB <garthdb@example.com>"]
+description = "A high-performance Rust-based MCP server for Jira API integration"
+license = "MIT"
+repository = "https://github.com/GarthDB/rust-jira-mcp"
+keywords = ["mcp", "jira", "api", "server", "model-context-protocol"]
+categories = ["api-bindings", "development-tools"]
+
+[[bin]]
+name = "rust-jira-mcp"
+path = "src/main.rs"
+
+[dependencies]
+# MCP Protocol - using serde_json for now, will find proper MCP crate
+# mcp = "0.1.0"  # Will need to find the correct crate name
+
+# HTTP Client
+reqwest = { version = "0.11", features = ["json", "rustls-tls"] }
+tokio = { version = "1.0", features = ["full"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Configuration
+config = "0.14"
+dotenvy = "0.15"
+
+# Error Handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Validation
+validator = { version = "0.18", features = ["derive"] }
+
+# Utilities
+url = "2.5"
+uuid = { version = "1.0", features = ["v4"] }
+chrono = { version = "0.4", features = ["serde"] }
+dirs = "5.0"
+
+# Async utilities
+futures = "0.3"
+async-trait = "0.1"
+
+[dev-dependencies]
+tokio-test = "0.4"
+mockito = "1.0"
+tempfile = "3.0"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"

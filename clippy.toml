@@ -1,0 +1,5 @@
+# Clippy configuration for pedantic warnings
+# This ensures we catch all potential issues without being overly restrictive
+
+# Disable nursery lints as requested
+disallowed-macros = ["clippy::nursery"]
