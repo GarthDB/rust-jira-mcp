@@ -1,7 +1,9 @@
 use crate::config::JiraConfig;
 use crate::error::Result;
 use crate::mcp::tools::{
-    AddCommentTool, CreateIssueTool, GetCommentsTool, GetIssueTool, GetTransitionsTool,
+    AddCommentTool, CreateIssueTool, GetCommentsTool, GetCustomFieldsTool, GetIssueTool,
+    GetIssueTypeMetadataTool, GetIssueTypesTool, GetPrioritiesAndStatusesTool,
+    GetProjectComponentsTool, GetProjectConfigTool, GetProjectMetadataTool, GetTransitionsTool,
     SearchIssuesTool, TestAuthTool, TransitionIssueTool, UpdateIssueTool,
 };
 use crate::types::mcp::{
@@ -67,6 +69,36 @@ impl MCPServer {
         tools.insert(
             "transition_jira_issue".to_string(),
             Box::new(TransitionIssueTool::new(config.clone())),
+        );
+
+        // Project Configuration and Metadata tools
+        tools.insert(
+            "get_project_config".to_string(),
+            Box::new(GetProjectConfigTool::new(config.clone())),
+        );
+        tools.insert(
+            "get_project_issue_types".to_string(),
+            Box::new(GetIssueTypesTool::new(config.clone())),
+        );
+        tools.insert(
+            "get_issue_type_metadata".to_string(),
+            Box::new(GetIssueTypeMetadataTool::new(config.clone())),
+        );
+        tools.insert(
+            "get_project_components".to_string(),
+            Box::new(GetProjectComponentsTool::new(config.clone())),
+        );
+        tools.insert(
+            "get_priorities_and_statuses".to_string(),
+            Box::new(GetPrioritiesAndStatusesTool::new(config.clone())),
+        );
+        tools.insert(
+            "get_custom_fields".to_string(),
+            Box::new(GetCustomFieldsTool::new(config.clone())),
+        );
+        tools.insert(
+            "get_project_metadata".to_string(),
+            Box::new(GetProjectMetadataTool::new(config.clone())),
         );
 
         Self {
@@ -456,6 +488,93 @@ impl MCPServer {
                         }
                     },
                     "required": ["issue_key", "transition_id"]
+                }),
+            },
+            // Project Configuration and Metadata tools
+            MCPTool {
+                name: "get_project_config".to_string(),
+                description: "Get project configuration details".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "project_key": {
+                            "type": "string",
+                            "description": "The key of the project to get configuration for"
+                        }
+                    },
+                    "required": ["project_key"]
+                }),
+            },
+            MCPTool {
+                name: "get_project_issue_types".to_string(),
+                description: "Get issue types for a specific project".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "project_key": {
+                            "type": "string",
+                            "description": "The key of the project to get issue types for"
+                        }
+                    },
+                    "required": ["project_key"]
+                }),
+            },
+            MCPTool {
+                name: "get_issue_type_metadata".to_string(),
+                description: "Get detailed metadata for a specific issue type".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "issue_type_id": {
+                            "type": "string",
+                            "description": "The ID of the issue type to get metadata for"
+                        }
+                    },
+                    "required": ["issue_type_id"]
+                }),
+            },
+            MCPTool {
+                name: "get_project_components".to_string(),
+                description: "Get components for a specific project".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "project_key": {
+                            "type": "string",
+                            "description": "The key of the project to get components for"
+                        }
+                    },
+                    "required": ["project_key"]
+                }),
+            },
+            MCPTool {
+                name: "get_priorities_and_statuses".to_string(),
+                description: "Get all priorities and statuses available in Jira".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {}
+                }),
+            },
+            MCPTool {
+                name: "get_custom_fields".to_string(),
+                description: "Get all custom fields available in Jira".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {}
+                }),
+            },
+            MCPTool {
+                name: "get_project_metadata".to_string(),
+                description: "Get comprehensive project metadata including configuration, issue types, components, priorities, statuses, and custom fields".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "project_key": {
+                            "type": "string",
+                            "description": "The key of the project to get comprehensive metadata for"
+                        }
+                    },
+                    "required": ["project_key"]
                 }),
             },
         ]
