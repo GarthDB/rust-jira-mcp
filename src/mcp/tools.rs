@@ -57,12 +57,11 @@ impl SearchIssuesTool {
 #[async_trait::async_trait]
 impl crate::mcp::server::MCPToolHandler for SearchIssuesTool {
     async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
-        let jql = args
-            .get("jql")
-            .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
+        let jql = args.get("jql").and_then(|v| v.as_str()).ok_or_else(|| {
+            crate::error::JiraError::ApiError {
                 message: "Missing required parameter: jql".to_string(),
-            })?;
+            }
+        })?;
 
         let start_at = args
             .get("start_at")
@@ -76,7 +75,10 @@ impl crate::mcp::server::MCPToolHandler for SearchIssuesTool {
 
         info!("Searching Jira issues with JQL: {}", jql);
 
-        let search_result = self.client.search_issues(jql, start_at, max_results).await?;
+        let search_result = self
+            .client
+            .search_issues(jql, start_at, max_results)
+            .await?;
 
         let response_text = format!(
             "Found {} issues (showing {} of {} total)\n\n",
@@ -90,7 +92,8 @@ impl crate::mcp::server::MCPToolHandler for SearchIssuesTool {
             issue_details.push_str(&format!(
                 "• {} - {}\n",
                 issue.key,
-                issue.fields
+                issue
+                    .fields
                     .get("summary")
                     .and_then(|v| v.as_str())
                     .unwrap_or("No summary")
@@ -176,7 +179,10 @@ impl crate::mcp::server::MCPToolHandler for UpdateIssueTool {
                 message: "Missing required parameter: fields".to_string(),
             })?;
 
-        info!("Updating Jira issue {} with fields: {:?}", issue_id_or_key, fields);
+        info!(
+            "Updating Jira issue {} with fields: {:?}",
+            issue_id_or_key, fields
+        );
 
         self.client.update_issue(issue_id_or_key, fields).await?;
 
@@ -431,18 +437,18 @@ impl crate::mcp::server::MCPToolHandler for TransitionIssueTool {
                 message: "Missing required parameter: transition_id".to_string(),
             })?;
 
-        let comment = args
-            .get("comment")
-            .and_then(|v| v.as_str());
+        let comment = args.get("comment").and_then(|v| v.as_str());
 
-        info!("Transitioning Jira issue {} to transition {}", issue_key, transition_id);
-
-        self.client.transition_issue(issue_key, transition_id, comment).await?;
-
-        let response_text = format!(
-            "Issue {} transitioned successfully!",
-            issue_key
+        info!(
+            "Transitioning Jira issue {} to transition {}",
+            issue_key, transition_id
         );
+
+        self.client
+            .transition_issue(issue_key, transition_id, comment)
+            .await?;
+
+        let response_text = format!("Issue {} transitioned successfully!", issue_key);
 
         Ok(MCPToolResult {
             content: vec![MCPContent::text(response_text)],
