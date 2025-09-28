@@ -105,13 +105,12 @@ impl crate::mcp::server::MCPToolHandler for SearchIssuesTool {
                     .get("summary")
                     .and_then(|v| v.as_str())
                     .unwrap_or("No summary")
-            ).unwrap();
+            )
+            .unwrap();
         }
 
         Ok(MCPToolResult {
-            content: vec![MCPContent::text(format!(
-                "{response_text}{issue_details}"
-            ))],
+            content: vec![MCPContent::text(format!("{response_text}{issue_details}"))],
             is_error: Some(false),
         })
     }
@@ -1344,10 +1343,7 @@ impl crate::mcp::server::MCPToolHandler for GetIssueLinksTool {
             response_text.push_str("No issue links found.");
         } else {
             for (i, link) in issue_links.iter().enumerate() {
-                  let inward_issue = link
-                    .inward_issue
-                    .as_ref()
-                    .map_or("N/A", |i| i.key.as_str());
+                let inward_issue = link.inward_issue.as_ref().map_or("N/A", |i| i.key.as_str());
                 let outward_issue = link
                     .outward_issue
                     .as_ref()
@@ -1583,9 +1579,8 @@ impl crate::mcp::server::MCPToolHandler for UploadAttachmentTool {
             .upload_attachment(issue_key, filename, &content_bytes, mime_type)
             .await?;
 
-        let mut response_text = format!(
-            "Attachment uploaded successfully to issue {issue_key}!\n\n"
-        );
+        let mut response_text =
+            format!("Attachment uploaded successfully to issue {issue_key}!\n\n");
 
         for (i, attachment) in attachments.iter().enumerate() {
             response_text.push_str(&format!(
@@ -1923,9 +1918,8 @@ impl crate::mcp::server::MCPToolHandler for DeleteWorkLogTool {
 
         self.client.delete_work_log(issue_key, work_log_id).await?;
 
-        let response_text = format!(
-            "Work log {work_log_id} deleted successfully from issue {issue_key}!"
-        );
+        let response_text =
+            format!("Work log {work_log_id} deleted successfully from issue {issue_key}!");
 
         Ok(MCPToolResult {
             content: vec![MCPContent::text(response_text)],

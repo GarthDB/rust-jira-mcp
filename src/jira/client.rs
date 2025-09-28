@@ -720,8 +720,8 @@ impl JiraClient {
             let response_text = response.text().await.map_err(JiraError::HttpClientError)?;
             debug!("Attachment upload response: {}", response_text);
 
-            let attachments: Vec<JiraAttachment> = serde_json::from_str(&response_text)
-                .map_err(JiraError::SerializationError)?;
+            let attachments: Vec<JiraAttachment> =
+                serde_json::from_str(&response_text).map_err(JiraError::SerializationError)?;
 
             Ok(attachments)
         } else {

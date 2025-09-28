@@ -94,11 +94,14 @@ impl crate::mcp::server::MCPToolHandler for CreateZephyrTestStepTool {
             }
         })?;
 
-        let order = i32::try_from(args.get("order").and_then(serde_json::Value::as_i64).ok_or_else(|| {
-            crate::error::JiraError::ApiError {
-                message: "Missing required parameter: order".to_string(),
-            }
-        })?).unwrap_or(0);
+        let order = i32::try_from(
+            args.get("order")
+                .and_then(serde_json::Value::as_i64)
+                .ok_or_else(|| crate::error::JiraError::ApiError {
+                    message: "Missing required parameter: order".to_string(),
+                })?,
+        )
+        .unwrap_or(0);
 
         let data = args
             .get("data")
@@ -184,7 +187,10 @@ impl crate::mcp::server::MCPToolHandler for UpdateZephyrTestStepTool {
             .get("result")
             .and_then(|v| v.as_str())
             .map(ToString::to_string);
-        let order = args.get("order").and_then(serde_json::Value::as_i64).map(|v| i32::try_from(v).unwrap_or(0));
+        let order = args
+            .get("order")
+            .and_then(serde_json::Value::as_i64)
+            .map(|v| i32::try_from(v).unwrap_or(0));
 
         let test_step_request = ZephyrTestStepUpdateRequest {
             step,
@@ -259,9 +265,8 @@ impl crate::mcp::server::MCPToolHandler for DeleteZephyrTestStepTool {
             .delete_zephyr_test_step(test_case_id, step_id)
             .await?;
 
-        let response_text = format!(
-            "Test step {step_id} deleted successfully from test case {test_case_id}!"
-        );
+        let response_text =
+            format!("Test step {step_id} deleted successfully from test case {test_case_id}!");
 
         Ok(MCPToolResult {
             content: vec![MCPContent::text(response_text)],
