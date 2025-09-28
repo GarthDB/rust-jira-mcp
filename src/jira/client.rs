@@ -1103,6 +1103,7 @@ impl JiraClient {
     /// # Errors
     ///
     /// Returns an error if the test case cannot be found or the request fails
+    #[allow(dead_code)]
     pub async fn get_zephyr_test_case(&self, test_case_id: &str) -> Result<ZephyrTestCase> {
         let endpoint = format!("testcase/{}", test_case_id);
         self.zephyr_get(&endpoint).await
@@ -1153,6 +1154,7 @@ impl JiraClient {
     /// # Errors
     ///
     /// Returns an error if the test case update fails or the response cannot be parsed
+    #[allow(dead_code)]
     pub async fn update_zephyr_test_case(
         &self,
         test_case_id: &str,
@@ -1167,6 +1169,7 @@ impl JiraClient {
     /// # Errors
     ///
     /// Returns an error if the test case deletion fails
+    #[allow(dead_code)]
     pub async fn delete_zephyr_test_case(&self, test_case_id: &str) -> Result<()> {
         let endpoint = format!("testcase/{}", test_case_id);
         let _: serde_json::Value = self.zephyr_delete(&endpoint).await?;
@@ -1216,6 +1219,7 @@ impl JiraClient {
     /// # Errors
     ///
     /// Returns an error if the test execution update fails or the response cannot be parsed
+    #[allow(dead_code)]
     pub async fn update_zephyr_test_execution(
         &self,
         execution_id: &str,
@@ -1230,6 +1234,7 @@ impl JiraClient {
     /// # Errors
     ///
     /// Returns an error if the test execution deletion fails
+    #[allow(dead_code)]
     pub async fn delete_zephyr_test_execution(&self, execution_id: &str) -> Result<()> {
         let endpoint = format!("execution/{}", execution_id);
         let _: serde_json::Value = self.zephyr_delete(&endpoint).await?;
@@ -1270,6 +1275,7 @@ impl JiraClient {
     /// # Errors
     ///
     /// Returns an error if the test cycle creation fails or the response cannot be parsed
+    #[allow(dead_code)]
     pub async fn create_zephyr_test_cycle(&self, cycle: &ZephyrTestCycleCreateRequest) -> Result<ZephyrTestCycle> {
         self.zephyr_post("cycle", cycle).await
     }
@@ -1279,6 +1285,7 @@ impl JiraClient {
     /// # Errors
     ///
     /// Returns an error if the test cycle update fails or the response cannot be parsed
+    #[allow(dead_code)]
     pub async fn update_zephyr_test_cycle(
         &self,
         cycle_id: &str,
@@ -1293,6 +1300,7 @@ impl JiraClient {
     /// # Errors
     ///
     /// Returns an error if the test cycle deletion fails
+    #[allow(dead_code)]
     pub async fn delete_zephyr_test_cycle(&self, cycle_id: &str) -> Result<()> {
         let endpoint = format!("cycle/{}", cycle_id);
         let _: serde_json::Value = self.zephyr_delete(&endpoint).await?;
@@ -1333,6 +1341,7 @@ impl JiraClient {
     /// # Errors
     ///
     /// Returns an error if the test plan creation fails or the response cannot be parsed
+    #[allow(dead_code)]
     pub async fn create_zephyr_test_plan(&self, plan: &ZephyrTestPlanCreateRequest) -> Result<ZephyrTestPlan> {
         self.zephyr_post("testplan", plan).await
     }
@@ -1342,6 +1351,7 @@ impl JiraClient {
     /// # Errors
     ///
     /// Returns an error if the test plan update fails or the response cannot be parsed
+    #[allow(dead_code)]
     pub async fn update_zephyr_test_plan(
         &self,
         plan_id: &str,
@@ -1356,6 +1366,7 @@ impl JiraClient {
     /// # Errors
     ///
     /// Returns an error if the test plan deletion fails
+    #[allow(dead_code)]
     pub async fn delete_zephyr_test_plan(&self, plan_id: &str) -> Result<()> {
         let endpoint = format!("testplan/{}", plan_id);
         let _: serde_json::Value = self.zephyr_delete(&endpoint).await?;

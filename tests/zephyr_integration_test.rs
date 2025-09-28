@@ -15,7 +15,7 @@ async fn test_zephyr_tools_registration() {
         log_file: None,
     };
 
-    let server = MCPServer::new(config);
+    let _server = MCPServer::new(config);
     
     // Test that Zephyr tools are registered
     let tools = MCPServer::list_tools();

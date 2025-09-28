@@ -3,9 +3,6 @@ use crate::error::Result;
 use crate::jira::client::JiraClient;
 use crate::types::jira::{
     BulkOperationConfig, BulkOperationItem, BulkOperationType,
-    ZephyrTestCaseCreateRequest, ZephyrTestCaseUpdateRequest, ZephyrTestCycleCreateRequest,
-    ZephyrTestExecutionCreateRequest, ZephyrTestExecutionUpdateRequest, ZephyrTestPlanCreateRequest,
-    ZephyrTestStepCreateRequest, ZephyrTestStepUpdateRequest,
 };
 use crate::types::mcp::{MCPContent, MCPToolResult};
 use serde_json::json;

@@ -2,9 +2,8 @@ use crate::config::JiraConfig;
 use crate::error::Result;
 use crate::jira::client::JiraClient;
 use crate::types::jira::{
-    ZephyrTestCaseCreateRequest, ZephyrTestCaseUpdateRequest, ZephyrTestCycleCreateRequest,
-    ZephyrTestExecutionCreateRequest, ZephyrTestExecutionUpdateRequest, ZephyrTestPlanCreateRequest,
-    ZephyrTestStepCreateRequest, ZephyrTestStepUpdateRequest,
+    ZephyrTestCaseCreateRequest, ZephyrTestExecutionCreateRequest, ZephyrTestStepCreateRequest,
+    ZephyrTestStepUpdateRequest,
 };
 use crate::types::mcp::{MCPContent, MCPToolResult};
 use tracing::info;
