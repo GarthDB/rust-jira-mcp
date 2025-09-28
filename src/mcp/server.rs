@@ -1,11 +1,56 @@
 use crate::config::JiraConfig;
 use crate::error::Result;
 use crate::mcp::tools::{
-    AddCommentTool, BulkAddCommentsTool, BulkTransitionIssuesTool, BulkUpdateIssuesTool,
-    CreateIssueTool, GetCommentsTool, GetCustomFieldsTool, GetIssueTool, GetIssueTypeMetadataTool,
-    GetIssueTypesTool, GetPrioritiesAndStatusesTool, GetProjectComponentsTool,
-    GetProjectConfigTool, GetProjectMetadataTool, GetTransitionsTool, MixedBulkOperationsTool,
-    SearchIssuesTool, TestAuthTool, TransitionIssueTool, UpdateIssueTool,
+    AddCommentTool,
+    AddIssueWatcherTool,
+    AddWorkLogTool,
+    BulkAddCommentsTool,
+    BulkTransitionIssuesTool,
+    BulkUpdateIssuesTool,
+    // Issue Cloning Tools
+    CloneIssueTool,
+    // Issue Component Tools
+    CreateComponentTool,
+    CreateIssueLinkTool,
+    CreateIssueTool,
+    CreateLabelTool,
+    DeleteAttachmentTool,
+    DeleteComponentTool,
+    DeleteIssueLinkTool,
+    DeleteLabelTool,
+    DeleteWorkLogTool,
+    DownloadAttachmentTool,
+    GetCommentsTool,
+    GetCustomFieldsTool,
+    // File Attachment Tools
+    GetIssueAttachmentsTool,
+    GetIssueLinksTool,
+    GetIssueTool,
+    GetIssueTypeMetadataTool,
+    GetIssueTypesTool,
+    // Issue Watcher Tools
+    GetIssueWatchersTool,
+    // Work Log Tools
+    GetIssueWorkLogsTool,
+    // Issue Label Tools
+    GetLabelsTool,
+    // Issue Linking Tools
+    GetLinkTypesTool,
+    GetPrioritiesAndStatusesTool,
+    GetProjectComponentsTool,
+    GetProjectConfigTool,
+    GetProjectMetadataTool,
+    GetTransitionsTool,
+    MixedBulkOperationsTool,
+    RemoveIssueWatcherTool,
+    SearchIssuesTool,
+    TestAuthTool,
+    TransitionIssueTool,
+    UpdateComponentTool,
+    UpdateIssueTool,
+    UpdateLabelTool,
+    UpdateWorkLogTool,
+    UploadAttachmentTool,
 };
 use crate::mcp::zephyr_tools::{
     CreateZephyrTestCaseTool, CreateZephyrTestExecutionTool, CreateZephyrTestStepTool,
@@ -125,6 +170,112 @@ impl MCPServer {
         tools.insert(
             "mixed_bulk_operations".to_string(),
             Box::new(MixedBulkOperationsTool::new(config.clone())),
+        );
+
+        // Issue Linking tools
+        tools.insert(
+            "get_jira_link_types".to_string(),
+            Box::new(GetLinkTypesTool::new(config.clone())),
+        );
+        tools.insert(
+            "get_jira_issue_links".to_string(),
+            Box::new(GetIssueLinksTool::new(config.clone())),
+        );
+        tools.insert(
+            "create_jira_issue_link".to_string(),
+            Box::new(CreateIssueLinkTool::new(config.clone())),
+        );
+        tools.insert(
+            "delete_jira_issue_link".to_string(),
+            Box::new(DeleteIssueLinkTool::new(config.clone())),
+        );
+
+        // File Attachment tools
+        tools.insert(
+            "get_jira_issue_attachments".to_string(),
+            Box::new(GetIssueAttachmentsTool::new(config.clone())),
+        );
+        tools.insert(
+            "upload_jira_attachment".to_string(),
+            Box::new(UploadAttachmentTool::new(config.clone())),
+        );
+        tools.insert(
+            "delete_jira_attachment".to_string(),
+            Box::new(DeleteAttachmentTool::new(config.clone())),
+        );
+        tools.insert(
+            "download_jira_attachment".to_string(),
+            Box::new(DownloadAttachmentTool::new(config.clone())),
+        );
+
+        // Work Log tools
+        tools.insert(
+            "get_jira_issue_work_logs".to_string(),
+            Box::new(GetIssueWorkLogsTool::new(config.clone())),
+        );
+        tools.insert(
+            "add_jira_work_log".to_string(),
+            Box::new(AddWorkLogTool::new(config.clone())),
+        );
+        tools.insert(
+            "update_jira_work_log".to_string(),
+            Box::new(UpdateWorkLogTool::new(config.clone())),
+        );
+        tools.insert(
+            "delete_jira_work_log".to_string(),
+            Box::new(DeleteWorkLogTool::new(config.clone())),
+        );
+
+        // Issue Watcher tools
+        tools.insert(
+            "get_jira_issue_watchers".to_string(),
+            Box::new(GetIssueWatchersTool::new(config.clone())),
+        );
+        tools.insert(
+            "add_jira_issue_watcher".to_string(),
+            Box::new(AddIssueWatcherTool::new(config.clone())),
+        );
+        tools.insert(
+            "remove_jira_issue_watcher".to_string(),
+            Box::new(RemoveIssueWatcherTool::new(config.clone())),
+        );
+
+        // Issue Label tools
+        tools.insert(
+            "get_jira_labels".to_string(),
+            Box::new(GetLabelsTool::new(config.clone())),
+        );
+        tools.insert(
+            "create_jira_label".to_string(),
+            Box::new(CreateLabelTool::new(config.clone())),
+        );
+        tools.insert(
+            "update_jira_label".to_string(),
+            Box::new(UpdateLabelTool::new(config.clone())),
+        );
+        tools.insert(
+            "delete_jira_label".to_string(),
+            Box::new(DeleteLabelTool::new(config.clone())),
+        );
+
+        // Issue Component tools
+        tools.insert(
+            "create_jira_component".to_string(),
+            Box::new(CreateComponentTool::new(config.clone())),
+        );
+        tools.insert(
+            "update_jira_component".to_string(),
+            Box::new(UpdateComponentTool::new(config.clone())),
+        );
+        tools.insert(
+            "delete_jira_component".to_string(),
+            Box::new(DeleteComponentTool::new(config.clone())),
+        );
+
+        // Issue Cloning tools
+        tools.insert(
+            "clone_jira_issue".to_string(),
+            Box::new(CloneIssueTool::new(config.clone())),
         );
 
         // Zephyr Test Management tools
@@ -1009,6 +1160,455 @@ impl MCPServer {
                         }
                     },
                     "required": ["project_key"]
+                }),
+            },
+            // Issue Linking tools
+            MCPTool {
+                name: "get_jira_link_types".to_string(),
+                description: "Get all available issue link types in Jira".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {}
+                }),
+            },
+            MCPTool {
+                name: "get_jira_issue_links".to_string(),
+                description: "Get all links for a specific Jira issue".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "issue_key": {
+                            "type": "string",
+                            "description": "The key of the issue to get links for"
+                        }
+                    },
+                    "required": ["issue_key"]
+                }),
+            },
+            MCPTool {
+                name: "create_jira_issue_link".to_string(),
+                description: "Create a link between two Jira issues".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "link_type": {
+                            "type": "string",
+                            "description": "The name of the link type"
+                        },
+                        "inward_issue": {
+                            "type": "string",
+                            "description": "The key of the inward issue"
+                        },
+                        "outward_issue": {
+                            "type": "string",
+                            "description": "The key of the outward issue"
+                        },
+                        "comment": {
+                            "type": "string",
+                            "description": "Optional comment for the link"
+                        }
+                    },
+                    "required": ["link_type", "inward_issue", "outward_issue"]
+                }),
+            },
+            MCPTool {
+                name: "delete_jira_issue_link".to_string(),
+                description: "Delete a link between Jira issues".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "link_id": {
+                            "type": "string",
+                            "description": "The ID of the link to delete"
+                        }
+                    },
+                    "required": ["link_id"]
+                }),
+            },
+            // File Attachment tools
+            MCPTool {
+                name: "get_jira_issue_attachments".to_string(),
+                description: "Get all attachments for a specific Jira issue".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "issue_key": {
+                            "type": "string",
+                            "description": "The key of the issue to get attachments for"
+                        }
+                    },
+                    "required": ["issue_key"]
+                }),
+            },
+            MCPTool {
+                name: "upload_jira_attachment".to_string(),
+                description: "Upload a file attachment to a Jira issue".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "issue_key": {
+                            "type": "string",
+                            "description": "The key of the issue to attach the file to"
+                        },
+                        "filename": {
+                            "type": "string",
+                            "description": "The name of the file"
+                        },
+                        "content": {
+                            "type": "string",
+                            "description": "The file content as base64 encoded string"
+                        }
+                    },
+                    "required": ["issue_key", "filename", "content"]
+                }),
+            },
+            MCPTool {
+                name: "delete_jira_attachment".to_string(),
+                description: "Delete an attachment from a Jira issue".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "attachment_id": {
+                            "type": "string",
+                            "description": "The ID of the attachment to delete"
+                        }
+                    },
+                    "required": ["attachment_id"]
+                }),
+            },
+            MCPTool {
+                name: "download_jira_attachment".to_string(),
+                description: "Download an attachment from a Jira issue".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "attachment_id": {
+                            "type": "string",
+                            "description": "The ID of the attachment to download"
+                        }
+                    },
+                    "required": ["attachment_id"]
+                }),
+            },
+            // Work Log tools
+            MCPTool {
+                name: "get_jira_issue_work_logs".to_string(),
+                description: "Get all work log entries for a specific Jira issue".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "issue_key": {
+                            "type": "string",
+                            "description": "The key of the issue to get work logs for"
+                        }
+                    },
+                    "required": ["issue_key"]
+                }),
+            },
+            MCPTool {
+                name: "add_jira_work_log".to_string(),
+                description: "Add a work log entry to a Jira issue".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "issue_key": {
+                            "type": "string",
+                            "description": "The key of the issue to add work log to"
+                        },
+                        "time_spent": {
+                            "type": "string",
+                            "description": "The time spent (e.g., '1h 30m', '2d', '3w')"
+                        },
+                        "comment": {
+                            "type": "string",
+                            "description": "Optional comment for the work log"
+                        },
+                        "started": {
+                            "type": "string",
+                            "description": "Optional start time in ISO 8601 format"
+                        }
+                    },
+                    "required": ["issue_key", "time_spent"]
+                }),
+            },
+            MCPTool {
+                name: "update_jira_work_log".to_string(),
+                description: "Update an existing work log entry".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "issue_key": {
+                            "type": "string",
+                            "description": "The key of the issue containing the work log"
+                        },
+                        "work_log_id": {
+                            "type": "string",
+                            "description": "The ID of the work log to update"
+                        },
+                        "time_spent": {
+                            "type": "string",
+                            "description": "The updated time spent"
+                        },
+                        "comment": {
+                            "type": "string",
+                            "description": "The updated comment"
+                        },
+                        "started": {
+                            "type": "string",
+                            "description": "The updated start time"
+                        }
+                    },
+                    "required": ["issue_key", "work_log_id"]
+                }),
+            },
+            MCPTool {
+                name: "delete_jira_work_log".to_string(),
+                description: "Delete a work log entry from a Jira issue".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "issue_key": {
+                            "type": "string",
+                            "description": "The key of the issue containing the work log"
+                        },
+                        "work_log_id": {
+                            "type": "string",
+                            "description": "The ID of the work log to delete"
+                        }
+                    },
+                    "required": ["issue_key", "work_log_id"]
+                }),
+            },
+            // Issue Watcher tools
+            MCPTool {
+                name: "get_jira_issue_watchers".to_string(),
+                description: "Get all watchers for a specific Jira issue".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "issue_key": {
+                            "type": "string",
+                            "description": "The key of the issue to get watchers for"
+                        }
+                    },
+                    "required": ["issue_key"]
+                }),
+            },
+            MCPTool {
+                name: "add_jira_issue_watcher".to_string(),
+                description: "Add a watcher to a Jira issue".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "issue_key": {
+                            "type": "string",
+                            "description": "The key of the issue to add watcher to"
+                        },
+                        "account_id": {
+                            "type": "string",
+                            "description": "The account ID of the user to add as watcher"
+                        }
+                    },
+                    "required": ["issue_key", "account_id"]
+                }),
+            },
+            MCPTool {
+                name: "remove_jira_issue_watcher".to_string(),
+                description: "Remove a watcher from a Jira issue".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "issue_key": {
+                            "type": "string",
+                            "description": "The key of the issue to remove watcher from"
+                        },
+                        "account_id": {
+                            "type": "string",
+                            "description": "The account ID of the user to remove as watcher"
+                        }
+                    },
+                    "required": ["issue_key", "account_id"]
+                }),
+            },
+            // Issue Label tools
+            MCPTool {
+                name: "get_jira_labels".to_string(),
+                description: "Get all available labels in Jira".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {}
+                }),
+            },
+            MCPTool {
+                name: "create_jira_label".to_string(),
+                description: "Create a new label in Jira".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string",
+                            "description": "The name of the label to create"
+                        }
+                    },
+                    "required": ["name"]
+                }),
+            },
+            MCPTool {
+                name: "update_jira_label".to_string(),
+                description: "Update an existing label in Jira".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "old_name": {
+                            "type": "string",
+                            "description": "The current name of the label"
+                        },
+                        "new_name": {
+                            "type": "string",
+                            "description": "The new name for the label"
+                        }
+                    },
+                    "required": ["old_name", "new_name"]
+                }),
+            },
+            MCPTool {
+                name: "delete_jira_label".to_string(),
+                description: "Delete a label from Jira".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string",
+                            "description": "The name of the label to delete"
+                        }
+                    },
+                    "required": ["name"]
+                }),
+            },
+            // Issue Component tools
+            MCPTool {
+                name: "create_jira_component".to_string(),
+                description: "Create a new component in a Jira project".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string",
+                            "description": "The name of the component"
+                        },
+                        "project": {
+                            "type": "string",
+                            "description": "The key of the project to create the component in"
+                        },
+                        "description": {
+                            "type": "string",
+                            "description": "Optional description for the component"
+                        },
+                        "assignee_type": {
+                            "type": "string",
+                            "description": "Optional assignee type for the component"
+                        },
+                        "lead_account_id": {
+                            "type": "string",
+                            "description": "Optional lead account ID for the component"
+                        }
+                    },
+                    "required": ["name", "project"]
+                }),
+            },
+            MCPTool {
+                name: "update_jira_component".to_string(),
+                description: "Update an existing component in Jira".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "component_id": {
+                            "type": "string",
+                            "description": "The ID of the component to update"
+                        },
+                        "name": {
+                            "type": "string",
+                            "description": "The updated name of the component"
+                        },
+                        "description": {
+                            "type": "string",
+                            "description": "The updated description"
+                        },
+                        "assignee_type": {
+                            "type": "string",
+                            "description": "The updated assignee type"
+                        },
+                        "lead_account_id": {
+                            "type": "string",
+                            "description": "The updated lead account ID"
+                        }
+                    },
+                    "required": ["component_id"]
+                }),
+            },
+            MCPTool {
+                name: "delete_jira_component".to_string(),
+                description: "Delete a component from Jira".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "component_id": {
+                            "type": "string",
+                            "description": "The ID of the component to delete"
+                        }
+                    },
+                    "required": ["component_id"]
+                }),
+            },
+            // Issue Cloning tools
+            MCPTool {
+                name: "clone_jira_issue".to_string(),
+                description: "Clone an existing Jira issue with optional copying of attachments, comments, work logs, watchers, and links".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "original_issue_key": {
+                            "type": "string",
+                            "description": "The key of the issue to clone"
+                        },
+                        "project_key": {
+                            "type": "string",
+                            "description": "The key of the project to create the cloned issue in"
+                        },
+                        "issue_type": {
+                            "type": "string",
+                            "description": "The issue type for the cloned issue"
+                        },
+                        "summary": {
+                            "type": "string",
+                            "description": "The summary for the cloned issue"
+                        },
+                        "description": {
+                            "type": "string",
+                            "description": "Optional description for the cloned issue"
+                        },
+                        "copy_attachments": {
+                            "type": "boolean",
+                            "description": "Whether to copy attachments from the original issue"
+                        },
+                        "copy_comments": {
+                            "type": "boolean",
+                            "description": "Whether to copy comments from the original issue"
+                        },
+                        "copy_work_logs": {
+                            "type": "boolean",
+                            "description": "Whether to copy work logs from the original issue"
+                        },
+                        "copy_watchers": {
+                            "type": "boolean",
+                            "description": "Whether to copy watchers from the original issue"
+                        },
+                        "copy_links": {
+                            "type": "boolean",
+                            "description": "Whether to copy links from the original issue"
+                        }
+                    },
+                    "required": ["original_issue_key", "project_key", "issue_type", "summary"]
                 }),
             },
         ]

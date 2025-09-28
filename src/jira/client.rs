@@ -2,9 +2,11 @@ use crate::config::JiraConfig;
 use crate::error::{JiraError, Result};
 use crate::types::jira::{
     BulkOperationConfig, BulkOperationItem, BulkOperationResult, BulkOperationSummary,
-    BulkOperationType, JiraAttachment, JiraComment, JiraIssue, JiraIssueLink,
-    JiraIssueLinkCreateRequest, JiraLinkType, JiraSearchResult, JiraTransition, JiraWorkLog,
-    JiraWorkLogCreateRequest, JiraWorkLogUpdateRequest, ZephyrTestCase,
+    BulkOperationType, JiraAttachment, JiraComment, JiraComponent, JiraComponentCreateRequest,
+    JiraComponentUpdateRequest, JiraIssue, JiraIssueCloneRequest, JiraIssueCloneResponse,
+    JiraIssueLink, JiraIssueLinkCreateRequest, JiraLabel, JiraLabelCreateRequest,
+    JiraLabelUpdateRequest, JiraLinkType, JiraSearchResult, JiraTransition, JiraWatchersResponse,
+    JiraWorkLog, JiraWorkLogCreateRequest, JiraWorkLogUpdateRequest, ZephyrTestCase,
     ZephyrTestCaseCreateRequest, ZephyrTestCaseSearchResult, ZephyrTestCaseUpdateRequest,
     ZephyrTestCycle, ZephyrTestCycleCreateRequest, ZephyrTestExecution,
     ZephyrTestExecutionCreateRequest, ZephyrTestExecutionUpdateRequest, ZephyrTestPlan,
@@ -145,7 +147,6 @@ impl JiraClient {
     /// # Errors
     ///
     /// Returns an error if the request fails or the response cannot be parsed.
-    #[allow(dead_code)]
     pub async fn delete<T>(&self, endpoint: &str) -> Result<T>
     where
         T: DeserializeOwned,
@@ -560,7 +561,6 @@ impl JiraClient {
     }
 
     // Issue Linking Operations
-    #[allow(dead_code)]
     /// Get all available link types
     ///
     /// # Errors
@@ -855,6 +855,7 @@ impl JiraClient {
     /// # Errors
     ///
     /// Returns an error if the work log cannot be found or the request fails.
+    #[allow(dead_code)]
     pub async fn get_work_log(&self, issue_key: &str, work_log_id: &str) -> Result<JiraWorkLog> {
         let endpoint = format!("issue/{issue_key}/worklog/{work_log_id}");
         self.get(&endpoint).await
@@ -1170,6 +1171,336 @@ impl JiraClient {
             .collect();
 
         self.execute_bulk_operations(operations, config).await
+    }
+
+    // Issue Watcher Operations
+
+    /// Get watchers for a specific issue
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the request fails or the response cannot be parsed.
+    pub async fn get_issue_watchers(&self, issue_key: &str) -> Result<JiraWatchersResponse> {
+        let endpoint = format!("issue/{issue_key}/watchers");
+        self.get(&endpoint).await
+    }
+
+    /// Add a watcher to an issue
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the watcher addition fails.
+    pub async fn add_issue_watcher(&self, issue_key: &str, account_id: &str) -> Result<()> {
+        let endpoint = format!("issue/{issue_key}/watchers");
+        let watcher_request = serde_json::json!({
+            "accountId": account_id
+        });
+        let _: serde_json::Value = self.post(&endpoint, &watcher_request).await?;
+        Ok(())
+    }
+
+    /// Remove a watcher from an issue
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the watcher removal fails.
+    pub async fn remove_issue_watcher(&self, issue_key: &str, account_id: &str) -> Result<()> {
+        let endpoint = format!("issue/{issue_key}/watchers?accountId={account_id}");
+        let _: serde_json::Value = self.delete(&endpoint).await?;
+        Ok(())
+    }
+
+    // Issue Label Operations
+
+    /// Get all available labels
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the request fails or the response cannot be parsed.
+    pub async fn get_labels(&self) -> Result<Vec<JiraLabel>> {
+        let endpoint = "label";
+        let response: serde_json::Value = self.get(endpoint).await?;
+
+        let labels = response.as_array().ok_or_else(|| JiraError::ApiError {
+            message: "Invalid labels response format".to_string(),
+        })?;
+
+        let mut result = Vec::new();
+        for label in labels {
+            let label: JiraLabel =
+                serde_json::from_value(label.clone()).map_err(JiraError::SerializationError)?;
+            result.push(label);
+        }
+
+        Ok(result)
+    }
+
+    /// Create a new label
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the label creation fails or the response cannot be parsed.
+    pub async fn create_label(&self, label: &JiraLabelCreateRequest) -> Result<JiraLabel> {
+        self.post("label", label).await
+    }
+
+    /// Update an existing label
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the label update fails or the response cannot be parsed.
+    pub async fn update_label(
+        &self,
+        label_name: &str,
+        label: &JiraLabelUpdateRequest,
+    ) -> Result<JiraLabel> {
+        let endpoint = format!("label/{label_name}");
+        self.put(&endpoint, label).await
+    }
+
+    /// Delete a label
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the label deletion fails.
+    pub async fn delete_label(&self, label_name: &str) -> Result<()> {
+        let endpoint = format!("label/{label_name}");
+        let _: serde_json::Value = self.delete(&endpoint).await?;
+        Ok(())
+    }
+
+    // Issue Component Operations
+
+    /// Create a new component
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the component creation fails or the response cannot be parsed.
+    pub async fn create_component(
+        &self,
+        component: &JiraComponentCreateRequest,
+    ) -> Result<JiraComponent> {
+        self.post("component", component).await
+    }
+
+    /// Update an existing component
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the component update fails or the response cannot be parsed.
+    pub async fn update_component(
+        &self,
+        component_id: &str,
+        component: &JiraComponentUpdateRequest,
+    ) -> Result<JiraComponent> {
+        let endpoint = format!("component/{component_id}");
+        self.put(&endpoint, component).await
+    }
+
+    /// Delete a component
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the component deletion fails.
+    pub async fn delete_component(&self, component_id: &str) -> Result<()> {
+        let endpoint = format!("component/{component_id}");
+        let _: serde_json::Value = self.delete(&endpoint).await?;
+        Ok(())
+    }
+
+    // Issue Cloning Operations
+
+    /// Clone an issue with field mapping and optional copying of related data
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the cloning fails or the response cannot be parsed.
+    pub async fn clone_issue(
+        &self,
+        original_issue_key: &str,
+        clone_request: &JiraIssueCloneRequest,
+    ) -> Result<JiraIssueCloneResponse> {
+        // First, get the original issue
+        let original_issue = self.get_issue(original_issue_key).await?;
+
+        // Build the new issue data based on field mapping
+        let mut new_issue_data = serde_json::json!({
+            "fields": {
+                "project": {
+                    "key": clone_request.project_key
+                },
+                "issuetype": {
+                    "name": clone_request.issue_type
+                },
+                "summary": clone_request.summary
+            }
+        });
+
+        // Add description if provided
+        if let Some(description) = &clone_request.description {
+            new_issue_data["fields"]["description"] =
+                serde_json::Value::String(description.clone());
+        }
+
+        // Apply field mapping
+        if let Some(field_mapping) = &clone_request.field_mapping {
+            self.apply_field_mapping(&original_issue, &mut new_issue_data, field_mapping)
+                .await?;
+        }
+
+        // Create the new issue
+        let cloned_issue = self.create_issue(&new_issue_data).await?;
+
+        let mut response = JiraIssueCloneResponse {
+            original_issue_key: original_issue_key.to_string(),
+            cloned_issue_key: cloned_issue.key.clone(),
+            cloned_issue_id: cloned_issue.id.clone(),
+            cloned_issue_url: cloned_issue.self_url.clone(),
+            copied_attachments: None,
+            copied_comments: None,
+            copied_work_logs: None,
+            copied_watchers: None,
+            copied_links: None,
+        };
+
+        // Copy attachments if requested
+        if clone_request.copy_attachments.unwrap_or(false) {
+            let attachments = self.get_issue_attachments(original_issue_key).await?;
+            let mut copied_count = 0;
+            for attachment in attachments {
+                if let Ok(content) = self.download_attachment(&attachment.id).await {
+                    if self
+                        .upload_attachment(
+                            &cloned_issue.key,
+                            &attachment.filename,
+                            &content,
+                            Some(&attachment.mime_type),
+                        )
+                        .await
+                        .is_ok()
+                    {
+                        copied_count += 1;
+                    }
+                }
+            }
+            response.copied_attachments = Some(copied_count);
+        }
+
+        // Copy comments if requested
+        if clone_request.copy_comments.unwrap_or(false) {
+            let comments = self.get_comments(original_issue_key).await?;
+            let mut copied_count = 0;
+            for comment in comments {
+                if self
+                    .add_comment(&cloned_issue.key, &comment.body)
+                    .await
+                    .is_ok()
+                {
+                    copied_count += 1;
+                }
+            }
+            response.copied_comments = Some(copied_count);
+        }
+
+        // Copy work logs if requested
+        if clone_request.copy_work_logs.unwrap_or(false) {
+            let work_logs = self.get_issue_work_logs(original_issue_key).await?;
+            let mut copied_count = 0;
+            for work_log in work_logs {
+                let work_log_request = JiraWorkLogCreateRequest {
+                    comment: work_log.comment,
+                    time_spent: work_log.time_spent,
+                    started: Some(work_log.created),
+                    visibility: None,
+                };
+                if self
+                    .add_work_log(&cloned_issue.key, &work_log_request)
+                    .await
+                    .is_ok()
+                {
+                    copied_count += 1;
+                }
+            }
+            response.copied_work_logs = Some(copied_count);
+        }
+
+        // Copy watchers if requested
+        if clone_request.copy_watchers.unwrap_or(false) {
+            let watchers_response = self.get_issue_watchers(original_issue_key).await?;
+            let mut copied_count = 0;
+            for watcher in watchers_response.watchers {
+                if self
+                    .add_issue_watcher(&cloned_issue.key, &watcher.account_id)
+                    .await
+                    .is_ok()
+                {
+                    copied_count += 1;
+                }
+            }
+            response.copied_watchers = Some(copied_count);
+        }
+
+        // Copy links if requested
+        if clone_request.copy_links.unwrap_or(false) {
+            let links = self.get_issue_links(original_issue_key).await?;
+            let mut copied_count = 0;
+            for link in links {
+                // Note: This is a simplified implementation - in practice, you'd need to handle
+                // the complexity of linking to the appropriate issues in the new project
+                if let Some(inward_issue) = &link.inward_issue {
+                    if let Some(outward_issue) = &link.outward_issue {
+                        if self
+                            .link_issues(
+                                &inward_issue.key,
+                                &outward_issue.key,
+                                &link.link_type.name,
+                                None,
+                            )
+                            .await
+                            .is_ok()
+                        {
+                            copied_count += 1;
+                        }
+                    }
+                }
+            }
+            response.copied_links = Some(copied_count);
+        }
+
+        Ok(response)
+    }
+
+    /// Apply field mapping when cloning an issue
+    #[allow(dead_code, clippy::unused_async)]
+    async fn apply_field_mapping(
+        &self,
+        original_issue: &JiraIssue,
+        new_issue_data: &mut serde_json::Value,
+        field_mapping: &crate::types::jira::JiraFieldMapping,
+    ) -> Result<()> {
+        let original_fields = &original_issue.fields;
+
+        // Copy specified fields
+        for field_id in &field_mapping.copy_fields {
+            if let Some(field_value) = original_fields.get(field_id) {
+                // Skip excluded fields
+                if field_mapping.exclude_fields.contains(field_id) {
+                    continue;
+                }
+
+                // Apply custom field mapping if specified
+                let target_field_id =
+                    if let Some(ref custom_mapping) = field_mapping.custom_field_mapping {
+                        custom_mapping.get(field_id).unwrap_or(field_id)
+                    } else {
+                        field_id
+                    };
+
+                new_issue_data["fields"][target_field_id] = field_value.clone();
+            }
+        }
+
+        Ok(())
     }
 
     // Zephyr Test Management Operations

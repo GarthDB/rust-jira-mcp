@@ -617,3 +617,136 @@ impl Default for BulkOperationSummary {
         Self::new()
     }
 }
+
+// Issue Watcher Types
+
+/// Jira issue watcher representation
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JiraWatcher {
+    pub account_id: String,
+    pub display_name: String,
+    pub email_address: Option<String>,
+    pub active: bool,
+    pub time_zone: Option<String>,
+}
+
+/// Jira watchers response
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JiraWatchersResponse {
+    pub self_url: String,
+    pub is_watching: bool,
+    pub watch_count: i32,
+    pub watchers: Vec<JiraWatcher>,
+}
+
+/// Jira add watcher request
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JiraAddWatcherRequest {
+    pub account_id: String,
+}
+
+// Issue Label Types
+
+/// Jira label representation
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JiraLabel {
+    pub name: String,
+}
+
+/// Jira label creation request
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JiraLabelCreateRequest {
+    pub name: String,
+}
+
+/// Jira label update request
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JiraLabelUpdateRequest {
+    pub name: String,
+}
+
+// Issue Component Types (extending existing JiraComponent)
+
+/// Jira component creation request
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JiraComponentCreateRequest {
+    pub name: String,
+    pub description: Option<String>,
+    pub project: String,
+    pub assignee_type: Option<String>,
+    pub lead_account_id: Option<String>,
+}
+
+/// Jira component update request
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JiraComponentUpdateRequest {
+    pub name: Option<String>,
+    pub description: Option<String>,
+    pub assignee_type: Option<String>,
+    pub lead_account_id: Option<String>,
+}
+
+// Issue Cloning Types
+
+/// Jira issue clone request
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JiraIssueCloneRequest {
+    pub project_key: String,
+    pub issue_type: String,
+    pub summary: String,
+    pub description: Option<String>,
+    pub field_mapping: Option<JiraFieldMapping>,
+    pub copy_attachments: Option<bool>,
+    pub copy_comments: Option<bool>,
+    pub copy_work_logs: Option<bool>,
+    pub copy_watchers: Option<bool>,
+    pub copy_links: Option<bool>,
+}
+
+/// Jira field mapping for cloning
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JiraFieldMapping {
+    pub copy_fields: Vec<String>,    // Field IDs to copy
+    pub exclude_fields: Vec<String>, // Field IDs to exclude
+    pub custom_field_mapping: Option<std::collections::HashMap<String, String>>, // Custom field ID mapping
+}
+
+/// Jira issue clone response
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JiraIssueCloneResponse {
+    pub original_issue_key: String,
+    pub cloned_issue_key: String,
+    pub cloned_issue_id: String,
+    pub cloned_issue_url: String,
+    pub copied_attachments: Option<i32>,
+    pub copied_comments: Option<i32>,
+    pub copied_work_logs: Option<i32>,
+    pub copied_watchers: Option<i32>,
+    pub copied_links: Option<i32>,
+}
+
+impl Default for JiraFieldMapping {
+    fn default() -> Self {
+        Self {
+            copy_fields: vec![
+                "summary".to_string(),
+                "description".to_string(),
+                "priority".to_string(),
+                "labels".to_string(),
+                "components".to_string(),
+                "fixVersions".to_string(),
+                "environment".to_string(),
+                "duedate".to_string(),
+            ],
+            exclude_fields: vec![
+                "assignee".to_string(),
+                "reporter".to_string(),
+                "created".to_string(),
+                "updated".to_string(),
+                "status".to_string(),
+                "resolution".to_string(),
+            ],
+            custom_field_mapping: None,
+        }
+    }
+}
