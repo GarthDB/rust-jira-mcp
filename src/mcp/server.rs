@@ -1,6 +1,9 @@
 use crate::config::JiraConfig;
 use crate::error::Result;
-use crate::mcp::tools::{CreateIssueTool, SearchIssuesTool, TestAuthTool, UpdateIssueTool};
+use crate::mcp::tools::{
+    AddCommentTool, CreateIssueTool, GetCommentsTool, GetIssueTool, GetTransitionsTool,
+    SearchIssuesTool, TestAuthTool, TransitionIssueTool, UpdateIssueTool,
+};
 use crate::types::mcp::{
     CallToolParams, CallToolResult, InitializeParams, InitializeResult, JsonRpcError,
     JsonRpcRequest, JsonRpcResponse, ListToolsParams, ListToolsResult, MCPTool, MCPToolCall,
@@ -45,7 +48,26 @@ impl MCPServer {
             "update_jira_issue".to_string(),
             Box::new(UpdateIssueTool::new(config.clone())),
         );
-        // Add more tools as we implement them
+        tools.insert(
+            "get_jira_issue".to_string(),
+            Box::new(GetIssueTool::new(config.clone())),
+        );
+        tools.insert(
+            "get_jira_comments".to_string(),
+            Box::new(GetCommentsTool::new(config.clone())),
+        );
+        tools.insert(
+            "add_jira_comment".to_string(),
+            Box::new(AddCommentTool::new(config.clone())),
+        );
+        tools.insert(
+            "get_jira_transitions".to_string(),
+            Box::new(GetTransitionsTool::new(config.clone())),
+        );
+        tools.insert(
+            "transition_jira_issue".to_string(),
+            Box::new(TransitionIssueTool::new(config.clone())),
+        );
 
         Self {
             config,
@@ -352,6 +374,88 @@ impl MCPServer {
                         }
                     },
                     "required": ["issue_id_or_key", "fields"]
+                }),
+            },
+            MCPTool {
+                name: "get_jira_issue".to_string(),
+                description: "Get details of a specific Jira issue".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "issue_key": {
+                            "type": "string",
+                            "description": "The key of the issue to retrieve"
+                        }
+                    },
+                    "required": ["issue_key"]
+                }),
+            },
+            MCPTool {
+                name: "get_jira_comments".to_string(),
+                description: "Get all comments for a Jira issue".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "issue_key": {
+                            "type": "string",
+                            "description": "The key of the issue to get comments for"
+                        }
+                    },
+                    "required": ["issue_key"]
+                }),
+            },
+            MCPTool {
+                name: "add_jira_comment".to_string(),
+                description: "Add a comment to a Jira issue".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "issue_key": {
+                            "type": "string",
+                            "description": "The key of the issue to add a comment to"
+                        },
+                        "comment_body": {
+                            "type": "string",
+                            "description": "The comment text to add"
+                        }
+                    },
+                    "required": ["issue_key", "comment_body"]
+                }),
+            },
+            MCPTool {
+                name: "get_jira_transitions".to_string(),
+                description: "Get available transitions for a Jira issue".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "issue_key": {
+                            "type": "string",
+                            "description": "The key of the issue to get transitions for"
+                        }
+                    },
+                    "required": ["issue_key"]
+                }),
+            },
+            MCPTool {
+                name: "transition_jira_issue".to_string(),
+                description: "Transition a Jira issue to a new status".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "issue_key": {
+                            "type": "string",
+                            "description": "The key of the issue to transition"
+                        },
+                        "transition_id": {
+                            "type": "string",
+                            "description": "The ID of the transition to apply"
+                        },
+                        "comment": {
+                            "type": "string",
+                            "description": "Optional comment to add during transition"
+                        }
+                    },
+                    "required": ["issue_key", "transition_id"]
                 }),
             },
         ]
