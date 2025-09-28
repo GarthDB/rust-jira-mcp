@@ -251,11 +251,12 @@ async fn test_jira_work_log_creation() {
 #[tokio::test]
 async fn test_zephyr_test_step_creation() {
     let test_step = ZephyrTestStep {
-        id: "12345".to_string(),
+        id: Some("12345".to_string()),
         step: "Click the login button".to_string(),
         data: Some("Expected: User should be redirected to dashboard".to_string()),
         result: Some("PASS".to_string()),
         order: 1,
+        test_case_id: Some("TC-123".to_string()),
     };
 
     assert_eq!(test_step.step, "Click the login button");

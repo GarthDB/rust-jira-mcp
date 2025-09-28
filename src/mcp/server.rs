@@ -7,6 +7,12 @@ use crate::mcp::tools::{
     GetProjectConfigTool, GetProjectMetadataTool, GetTransitionsTool, MixedBulkOperationsTool,
     SearchIssuesTool, TestAuthTool, TransitionIssueTool, UpdateIssueTool,
 };
+use crate::mcp::zephyr_tools::{
+    CreateZephyrTestCaseTool, CreateZephyrTestExecutionTool, CreateZephyrTestStepTool,
+    DeleteZephyrTestStepTool, GetZephyrTestCasesTool, GetZephyrTestCyclesTool,
+    GetZephyrTestExecutionsTool, GetZephyrTestPlansTool, GetZephyrTestStepsTool,
+    UpdateZephyrTestStepTool,
+};
 use crate::types::mcp::{
     CallToolParams, CallToolResult, InitializeParams, InitializeResult, JsonRpcError,
     JsonRpcRequest, JsonRpcResponse, ListToolsParams, ListToolsResult, MCPTool, MCPToolCall,
@@ -118,6 +124,48 @@ impl MCPServer {
         tools.insert(
             "mixed_bulk_operations".to_string(),
             Box::new(MixedBulkOperationsTool::new(config.clone())),
+        );
+
+        // Zephyr Test Management tools
+        tools.insert(
+            "get_zephyr_test_steps".to_string(),
+            Box::new(GetZephyrTestStepsTool::new(config.clone())),
+        );
+        tools.insert(
+            "create_zephyr_test_step".to_string(),
+            Box::new(CreateZephyrTestStepTool::new(config.clone())),
+        );
+        tools.insert(
+            "update_zephyr_test_step".to_string(),
+            Box::new(UpdateZephyrTestStepTool::new(config.clone())),
+        );
+        tools.insert(
+            "delete_zephyr_test_step".to_string(),
+            Box::new(DeleteZephyrTestStepTool::new(config.clone())),
+        );
+        tools.insert(
+            "get_zephyr_test_cases".to_string(),
+            Box::new(GetZephyrTestCasesTool::new(config.clone())),
+        );
+        tools.insert(
+            "create_zephyr_test_case".to_string(),
+            Box::new(CreateZephyrTestCaseTool::new(config.clone())),
+        );
+        tools.insert(
+            "get_zephyr_test_executions".to_string(),
+            Box::new(GetZephyrTestExecutionsTool::new(config.clone())),
+        );
+        tools.insert(
+            "create_zephyr_test_execution".to_string(),
+            Box::new(CreateZephyrTestExecutionTool::new(config.clone())),
+        );
+        tools.insert(
+            "get_zephyr_test_cycles".to_string(),
+            Box::new(GetZephyrTestCyclesTool::new(config.clone())),
+        );
+        tools.insert(
+            "get_zephyr_test_plans".to_string(),
+            Box::new(GetZephyrTestPlansTool::new(config.clone())),
         );
 
         Self {
@@ -726,6 +774,239 @@ impl MCPServer {
                         }
                     },
                     "required": ["operations"]
+                }),
+            },
+            // Zephyr Test Management tools
+            MCPTool {
+                name: "get_zephyr_test_steps".to_string(),
+                description: "Get test steps for a Zephyr test case".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "test_case_id": {
+                            "type": "string",
+                            "description": "The ID of the test case to get steps for"
+                        }
+                    },
+                    "required": ["test_case_id"]
+                }),
+            },
+            MCPTool {
+                name: "create_zephyr_test_step".to_string(),
+                description: "Create a new test step in a Zephyr test case".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "test_case_id": {
+                            "type": "string",
+                            "description": "The ID of the test case to add the step to"
+                        },
+                        "step": {
+                            "type": "string",
+                            "description": "The test step description"
+                        },
+                        "order": {
+                            "type": "integer",
+                            "description": "The order of the test step"
+                        },
+                        "data": {
+                            "type": "string",
+                            "description": "Optional test data for the step"
+                        },
+                        "result": {
+                            "type": "string",
+                            "description": "Optional expected result for the step"
+                        }
+                    },
+                    "required": ["test_case_id", "step", "order"]
+                }),
+            },
+            MCPTool {
+                name: "update_zephyr_test_step".to_string(),
+                description: "Update an existing test step in a Zephyr test case".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "test_case_id": {
+                            "type": "string",
+                            "description": "The ID of the test case containing the step"
+                        },
+                        "step_id": {
+                            "type": "string",
+                            "description": "The ID of the test step to update"
+                        },
+                        "step": {
+                            "type": "string",
+                            "description": "The updated test step description"
+                        },
+                        "order": {
+                            "type": "integer",
+                            "description": "The updated order of the test step"
+                        },
+                        "data": {
+                            "type": "string",
+                            "description": "The updated test data for the step"
+                        },
+                        "result": {
+                            "type": "string",
+                            "description": "The updated expected result for the step"
+                        }
+                    },
+                    "required": ["test_case_id", "step_id"]
+                }),
+            },
+            MCPTool {
+                name: "delete_zephyr_test_step".to_string(),
+                description: "Delete a test step from a Zephyr test case".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "test_case_id": {
+                            "type": "string",
+                            "description": "The ID of the test case containing the step"
+                        },
+                        "step_id": {
+                            "type": "string",
+                            "description": "The ID of the test step to delete"
+                        }
+                    },
+                    "required": ["test_case_id", "step_id"]
+                }),
+            },
+            MCPTool {
+                name: "get_zephyr_test_cases".to_string(),
+                description: "Search for Zephyr test cases in a project".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "project_key": {
+                            "type": "string",
+                            "description": "The key of the project to search test cases in"
+                        },
+                        "start_at": {
+                            "type": "integer",
+                            "description": "The index of the first item to return"
+                        },
+                        "max_results": {
+                            "type": "integer",
+                            "description": "The maximum number of items to return"
+                        }
+                    },
+                    "required": ["project_key"]
+                }),
+            },
+            MCPTool {
+                name: "create_zephyr_test_case".to_string(),
+                description: "Create a new Zephyr test case".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string",
+                            "description": "The name of the test case"
+                        },
+                        "project_key": {
+                            "type": "string",
+                            "description": "The key of the project to create the test case in"
+                        },
+                        "issue_type": {
+                            "type": "string",
+                            "description": "The issue type for the test case"
+                        },
+                        "priority": {
+                            "type": "string",
+                            "description": "Optional priority for the test case"
+                        },
+                        "assignee": {
+                            "type": "string",
+                            "description": "Optional assignee for the test case"
+                        },
+                        "description": {
+                            "type": "string",
+                            "description": "Optional description for the test case"
+                        }
+                    },
+                    "required": ["name", "project_key", "issue_type"]
+                }),
+            },
+            MCPTool {
+                name: "get_zephyr_test_executions".to_string(),
+                description: "Get test executions for a Zephyr test case".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "test_case_id": {
+                            "type": "string",
+                            "description": "The ID of the test case to get executions for"
+                        }
+                    },
+                    "required": ["test_case_id"]
+                }),
+            },
+            MCPTool {
+                name: "create_zephyr_test_execution".to_string(),
+                description: "Create a new test execution in Zephyr".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "test_case_id": {
+                            "type": "string",
+                            "description": "The ID of the test case to execute"
+                        },
+                        "project_id": {
+                            "type": "string",
+                            "description": "The ID of the project"
+                        },
+                        "status": {
+                            "type": "string",
+                            "description": "The execution status"
+                        },
+                        "cycle_id": {
+                            "type": "string",
+                            "description": "Optional test cycle ID"
+                        },
+                        "version_id": {
+                            "type": "string",
+                            "description": "Optional version ID"
+                        },
+                        "assignee": {
+                            "type": "string",
+                            "description": "Optional assignee for the execution"
+                        },
+                        "comment": {
+                            "type": "string",
+                            "description": "Optional comment for the execution"
+                        }
+                    },
+                    "required": ["test_case_id", "project_id", "status"]
+                }),
+            },
+            MCPTool {
+                name: "get_zephyr_test_cycles".to_string(),
+                description: "Get test cycles for a Zephyr project".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "project_key": {
+                            "type": "string",
+                            "description": "The key of the project to get test cycles for"
+                        }
+                    },
+                    "required": ["project_key"]
+                }),
+            },
+            MCPTool {
+                name: "get_zephyr_test_plans".to_string(),
+                description: "Get test plans for a Zephyr project".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "project_key": {
+                            "type": "string",
+                            "description": "The key of the project to get test plans for"
+                        }
+                    },
+                    "required": ["project_key"]
                 }),
             },
         ]

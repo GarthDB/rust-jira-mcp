@@ -188,11 +188,241 @@ pub struct JiraWorkLog {
 /// Zephyr test step representation
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ZephyrTestStep {
-    pub id: String,
+    pub id: Option<String>,
     pub step: String,
     pub data: Option<String>,
     pub result: Option<String>,
     pub order: i32,
+    pub test_case_id: Option<String>,
+}
+
+/// Zephyr test case representation
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ZephyrTestCase {
+    pub id: Option<String>,
+    pub key: Option<String>,
+    pub name: String,
+    pub project_key: String,
+    pub issue_type: String,
+    pub status: Option<String>,
+    pub priority: Option<String>,
+    pub assignee: Option<String>,
+    pub description: Option<String>,
+    pub labels: Option<Vec<String>>,
+    pub components: Option<Vec<String>>,
+    pub fix_versions: Option<Vec<String>>,
+    pub custom_fields: Option<std::collections::HashMap<String, serde_json::Value>>,
+}
+
+/// Zephyr test execution representation
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ZephyrTestExecution {
+    pub id: Option<String>,
+    pub test_case_id: String,
+    pub test_case_key: Option<String>,
+    pub execution_id: Option<String>,
+    pub cycle_id: Option<String>,
+    pub version_id: Option<String>,
+    pub project_id: String,
+    pub status: String,
+    pub assignee: Option<String>,
+    pub executed_by: Option<String>,
+    pub executed_on: Option<String>,
+    pub comment: Option<String>,
+    pub execution_time: Option<i64>,
+    pub defects: Option<Vec<String>>,
+    pub step_results: Option<Vec<ZephyrStepResult>>,
+}
+
+/// Zephyr test step result representation
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ZephyrStepResult {
+    pub id: Option<String>,
+    pub step_id: String,
+    pub status: String,
+    pub comment: Option<String>,
+    pub executed_by: Option<String>,
+    pub executed_on: Option<String>,
+    pub defects: Option<Vec<String>>,
+    pub attachments: Option<Vec<ZephyrAttachment>>,
+}
+
+/// Zephyr attachment representation
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ZephyrAttachment {
+    pub id: String,
+    pub name: String,
+    pub url: String,
+    pub content_type: Option<String>,
+    pub size: Option<i64>,
+}
+
+/// Zephyr test cycle representation
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ZephyrTestCycle {
+    pub id: Option<String>,
+    pub name: String,
+    pub description: Option<String>,
+    pub project_key: String,
+    pub version_id: Option<String>,
+    pub environment: Option<String>,
+    pub created_by: Option<String>,
+    pub created_on: Option<String>,
+    pub modified_by: Option<String>,
+    pub modified_on: Option<String>,
+    pub status: Option<String>,
+    pub test_executions: Option<Vec<ZephyrTestExecution>>,
+}
+
+/// Zephyr test plan representation
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ZephyrTestPlan {
+    pub id: Option<String>,
+    pub name: String,
+    pub description: Option<String>,
+    pub project_key: String,
+    pub version_id: Option<String>,
+    pub created_by: Option<String>,
+    pub created_on: Option<String>,
+    pub modified_by: Option<String>,
+    pub modified_on: Option<String>,
+    pub status: Option<String>,
+    pub test_cycles: Option<Vec<ZephyrTestCycle>>,
+}
+
+/// Zephyr test step creation request
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ZephyrTestStepCreateRequest {
+    pub step: String,
+    pub data: Option<String>,
+    pub result: Option<String>,
+    pub order: i32,
+    pub test_case_id: String,
+}
+
+/// Zephyr test step update request
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ZephyrTestStepUpdateRequest {
+    pub step: Option<String>,
+    pub data: Option<String>,
+    pub result: Option<String>,
+    pub order: Option<i32>,
+}
+
+/// Zephyr test execution creation request
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ZephyrTestExecutionCreateRequest {
+    pub test_case_id: String,
+    pub cycle_id: Option<String>,
+    pub version_id: Option<String>,
+    pub project_id: String,
+    pub status: String,
+    pub assignee: Option<String>,
+    pub comment: Option<String>,
+    pub step_results: Option<Vec<ZephyrStepResultCreateRequest>>,
+}
+
+/// Zephyr test step result creation request
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ZephyrStepResultCreateRequest {
+    pub step_id: String,
+    pub status: String,
+    pub comment: Option<String>,
+    pub defects: Option<Vec<String>>,
+}
+
+/// Zephyr test execution update request
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ZephyrTestExecutionUpdateRequest {
+    pub status: Option<String>,
+    pub assignee: Option<String>,
+    pub comment: Option<String>,
+    pub execution_time: Option<i64>,
+    pub defects: Option<Vec<String>>,
+    pub step_results: Option<Vec<ZephyrStepResultUpdateRequest>>,
+}
+
+/// Zephyr test step result update request
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ZephyrStepResultUpdateRequest {
+    pub step_id: String,
+    pub status: Option<String>,
+    pub comment: Option<String>,
+    pub defects: Option<Vec<String>>,
+}
+
+/// Zephyr test case creation request
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ZephyrTestCaseCreateRequest {
+    pub name: String,
+    pub project_key: String,
+    pub issue_type: String,
+    pub priority: Option<String>,
+    pub assignee: Option<String>,
+    pub description: Option<String>,
+    pub labels: Option<Vec<String>>,
+    pub components: Option<Vec<String>>,
+    pub fix_versions: Option<Vec<String>>,
+    pub custom_fields: Option<std::collections::HashMap<String, serde_json::Value>>,
+}
+
+/// Zephyr test case update request
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ZephyrTestCaseUpdateRequest {
+    pub name: Option<String>,
+    pub priority: Option<String>,
+    pub assignee: Option<String>,
+    pub description: Option<String>,
+    pub labels: Option<Vec<String>>,
+    pub components: Option<Vec<String>>,
+    pub fix_versions: Option<Vec<String>>,
+    pub custom_fields: Option<std::collections::HashMap<String, serde_json::Value>>,
+}
+
+/// Zephyr test cycle creation request
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ZephyrTestCycleCreateRequest {
+    pub name: String,
+    pub description: Option<String>,
+    pub project_key: String,
+    pub version_id: Option<String>,
+    pub environment: Option<String>,
+}
+
+/// Zephyr test plan creation request
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ZephyrTestPlanCreateRequest {
+    pub name: String,
+    pub description: Option<String>,
+    pub project_key: String,
+    pub version_id: Option<String>,
+}
+
+/// Zephyr search result for test cases
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ZephyrTestCaseSearchResult {
+    pub total: i32,
+    pub start_at: i32,
+    pub max_results: i32,
+    pub test_cases: Vec<ZephyrTestCase>,
+}
+
+/// Zephyr search result for test executions
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ZephyrTestExecutionSearchResult {
+    pub total: i32,
+    pub start_at: i32,
+    pub max_results: i32,
+    pub test_executions: Vec<ZephyrTestExecution>,
+}
+
+/// Zephyr search result for test steps
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ZephyrTestStepSearchResult {
+    pub total: i32,
+    pub start_at: i32,
+    pub max_results: i32,
+    pub test_steps: Vec<ZephyrTestStep>,
 }
 
 /// Jira link type representation
