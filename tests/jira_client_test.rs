@@ -1,3 +1,4 @@
+use reqwest::StatusCode;
 use rust_jira_mcp::config::JiraConfig;
 use rust_jira_mcp::jira::client::JiraClient;
 use rust_jira_mcp::types::jira::*;
@@ -41,12 +42,12 @@ async fn test_auth_header_generation() {
 #[tokio::test]
 async fn test_url_building() {
     let config = test_config();
-    let _client = JiraClient::new(config).expect("Failed to create JiraClient");
+    let client = JiraClient::new(config).expect("Failed to create JiraClient");
 
     // Test URL building logic by checking the internal build_url method
     // This is a bit of a hack since build_url is private, but we can test it indirectly
     // through the public API methods
-    let result = _client.get_issue("TEST-123").await;
+    let result = client.get_issue("TEST-123").await;
     // We expect this to fail with a network error since we're not actually making a request
     assert!(result.is_err());
 }
@@ -57,7 +58,6 @@ async fn test_should_retry_logic() {
     let _client = JiraClient::new(config).expect("Failed to create JiraClient");
 
     // Test retry logic for various status codes
-    use reqwest::StatusCode;
 
     // Should retry
     assert!(JiraClient::should_retry(StatusCode::TOO_MANY_REQUESTS));
@@ -353,7 +353,7 @@ async fn test_config_validation() {
     // Test config with empty email (should still work for unit tests)
     let config_with_empty_email = JiraConfig {
         api_base_url: "https://test-jira.example.com/rest/api/2".to_string(),
-        email: "".to_string(),
+        email: String::new(),
         personal_access_token: "valid-token".to_string(),
         default_project: Some("TEST".to_string()),
         max_results: Some(50),

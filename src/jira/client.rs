@@ -145,6 +145,7 @@ impl JiraClient {
     /// # Errors
     ///
     /// Returns an error if the request fails or the response cannot be parsed.
+    #[allow(dead_code)]
     pub async fn delete<T>(&self, endpoint: &str) -> Result<T>
     where
         T: DeserializeOwned,
@@ -207,7 +208,8 @@ impl JiraClient {
                     if retry_count < max_retries && Self::should_retry(status) {
                         retry_count += 1;
                         // retry_count is always positive (starts at 0, only incremented)
-                        let delay = Duration::from_millis(1000 * retry_count as u64);
+                        #[allow(clippy::cast_sign_loss)]
+                        let delay = Duration::from_millis(1000 * retry_count.max(0) as u64);
                         warn!(
                             "Retrying request in {:?} (attempt {}/{})",
                             delay, retry_count, max_retries
@@ -224,7 +226,8 @@ impl JiraClient {
                     if retry_count < max_retries && e.is_timeout() {
                         retry_count += 1;
                         // retry_count is always positive (starts at 0, only incremented)
-                        let delay = Duration::from_millis(1000 * retry_count as u64);
+                        #[allow(clippy::cast_sign_loss)]
+                        let delay = Duration::from_millis(1000 * retry_count.max(0) as u64);
                         warn!(
                             "Retrying request after timeout in {:?} (attempt {}/{})",
                             delay, retry_count, max_retries
@@ -557,7 +560,7 @@ impl JiraClient {
     }
 
     // Issue Linking Operations
-
+    #[allow(dead_code)]
     /// Get all available link types
     ///
     /// # Errors
@@ -573,7 +576,7 @@ impl JiraClient {
     ///
     /// Returns an error if the request fails or the response cannot be parsed.
     pub async fn get_issue_links(&self, issue_key: &str) -> Result<Vec<JiraIssueLink>> {
-        let endpoint = format!("issue/{}/remotelink", issue_key);
+        let endpoint = format!("issue/{issue_key}/remotelink");
         let response: serde_json::Value = self.get(&endpoint).await?;
 
         let links = response.as_array().ok_or_else(|| JiraError::ApiError {
@@ -607,7 +610,7 @@ impl JiraClient {
     ///
     /// Returns an error if the link deletion fails.
     pub async fn delete_issue_link(&self, link_id: &str) -> Result<()> {
-        let endpoint = format!("issueLink/{}", link_id);
+        let endpoint = format!("issueLink/{link_id}");
         let _: serde_json::Value = self.delete(&endpoint).await?;
         Ok(())
     }
@@ -683,7 +686,7 @@ impl JiraClient {
         content: &[u8],
         mime_type: Option<&str>,
     ) -> Result<Vec<JiraAttachment>> {
-        let endpoint = format!("issue/{}/attachments", issue_key);
+        let endpoint = format!("issue/{issue_key}/attachments");
         let url = self.build_url(&endpoint)?;
 
         // Apply rate limiting
@@ -718,7 +721,7 @@ impl JiraClient {
             debug!("Attachment upload response: {}", response_text);
 
             let attachments: Vec<JiraAttachment> = serde_json::from_str(&response_text)
-                .map_err(|e| JiraError::SerializationError(e))?;
+                .map_err(JiraError::SerializationError)?;
 
             Ok(attachments)
         } else {
@@ -738,7 +741,7 @@ impl JiraClient {
     ///
     /// Returns an error if the attachment deletion fails.
     pub async fn delete_attachment(&self, attachment_id: &str) -> Result<()> {
-        let endpoint = format!("attachment/{}", attachment_id);
+        let endpoint = format!("attachment/{attachment_id}");
         let _: serde_json::Value = self.delete(&endpoint).await?;
         Ok(())
     }
@@ -749,7 +752,7 @@ impl JiraClient {
     ///
     /// Returns an error if the attachment download fails.
     pub async fn download_attachment(&self, attachment_id: &str) -> Result<Vec<u8>> {
-        let endpoint = format!("attachment/{}", attachment_id);
+        let endpoint = format!("attachment/{attachment_id}");
         let url = self.build_url(&endpoint)?;
 
         // Apply rate limiting
@@ -787,7 +790,7 @@ impl JiraClient {
     ///
     /// Returns an error if the request fails or the response cannot be parsed.
     pub async fn get_issue_work_logs(&self, issue_key: &str) -> Result<Vec<JiraWorkLog>> {
-        let endpoint = format!("issue/{}/worklog", issue_key);
+        let endpoint = format!("issue/{issue_key}/worklog");
         let response: serde_json::Value = self.get(&endpoint).await?;
 
         let work_logs = response
@@ -817,7 +820,7 @@ impl JiraClient {
         issue_key: &str,
         work_log: &JiraWorkLogCreateRequest,
     ) -> Result<JiraWorkLog> {
-        let endpoint = format!("issue/{}/worklog", issue_key);
+        let endpoint = format!("issue/{issue_key}/worklog");
         self.post(&endpoint, work_log).await
     }
 
@@ -832,7 +835,7 @@ impl JiraClient {
         work_log_id: &str,
         work_log: &JiraWorkLogUpdateRequest,
     ) -> Result<JiraWorkLog> {
-        let endpoint = format!("issue/{}/worklog/{}", issue_key, work_log_id);
+        let endpoint = format!("issue/{issue_key}/worklog/{work_log_id}");
         self.put(&endpoint, work_log).await
     }
 
@@ -842,7 +845,7 @@ impl JiraClient {
     ///
     /// Returns an error if the work log deletion fails.
     pub async fn delete_work_log(&self, issue_key: &str, work_log_id: &str) -> Result<()> {
-        let endpoint = format!("issue/{}/worklog/{}", issue_key, work_log_id);
+        let endpoint = format!("issue/{issue_key}/worklog/{work_log_id}");
         let _: serde_json::Value = self.delete(&endpoint).await?;
         Ok(())
     }
@@ -853,7 +856,7 @@ impl JiraClient {
     ///
     /// Returns an error if the work log cannot be found or the request fails.
     pub async fn get_work_log(&self, issue_key: &str, work_log_id: &str) -> Result<JiraWorkLog> {
-        let endpoint = format!("issue/{}/worklog/{}", issue_key, work_log_id);
+        let endpoint = format!("issue/{issue_key}/worklog/{work_log_id}");
         self.get(&endpoint).await
     }
 
@@ -927,7 +930,7 @@ impl JiraClient {
             }
         }
 
-        summary.duration_ms = start_time.elapsed().as_millis() as u64;
+        summary.duration_ms = u64::try_from(start_time.elapsed().as_millis()).unwrap_or(u64::MAX);
 
         info!(
             "Bulk operation completed: {} successful, {} failed, {:.1}% success rate",
@@ -971,7 +974,7 @@ impl JiraClient {
 
         loop {
             match self.perform_operation(operation).await {
-                Ok(_) => {
+                Ok(()) => {
                     return BulkOperationResult {
                         issue_key: operation.issue_key.clone(),
                         success: true,
@@ -980,9 +983,10 @@ impl JiraClient {
                     };
                 }
                 Err(e) => {
-                    if retry_count < max_retries && self.should_retry_operation(&e) {
+                    if retry_count < max_retries && Self::should_retry_operation(self, &e) {
                         retry_count += 1;
-                        let delay = Duration::from_millis(1000 * retry_count as u64);
+                        #[allow(clippy::cast_sign_loss)]
+                        let delay = Duration::from_millis(1000 * retry_count.max(0) as u64);
                         warn!(
                             "Retrying operation for {} in {:?} (attempt {}/{})",
                             operation.issue_key, delay, retry_count, max_retries
@@ -1071,7 +1075,7 @@ impl JiraClient {
     }
 
     /// Determine if an operation should be retried based on the error
-    fn should_retry_operation(&self, error: &JiraError) -> bool {
+    fn should_retry_operation(_self: &Self, error: &JiraError) -> bool {
         match error {
             JiraError::HttpClientError(e) => e.is_timeout(),
             JiraError::ApiError { message } => {
@@ -1287,7 +1291,8 @@ impl JiraClient {
                     // Retry on certain status codes
                     if retry_count < max_retries && Self::should_retry(status) {
                         retry_count += 1;
-                        let delay = Duration::from_millis(1000 * retry_count as u64);
+                        #[allow(clippy::cast_sign_loss)]
+                        let delay = Duration::from_millis(1000 * retry_count.max(0) as u64);
                         warn!(
                             "Retrying Zephyr request in {:?} (attempt {}/{})",
                             delay, retry_count, max_retries
@@ -1303,7 +1308,8 @@ impl JiraClient {
 
                     if retry_count < max_retries && e.is_timeout() {
                         retry_count += 1;
-                        let delay = Duration::from_millis(1000 * retry_count as u64);
+                        #[allow(clippy::cast_sign_loss)]
+                        let delay = Duration::from_millis(1000 * retry_count.max(0) as u64);
                         warn!(
                             "Retrying Zephyr request after timeout in {:?} (attempt {}/{})",
                             delay, retry_count, max_retries
@@ -1364,7 +1370,7 @@ impl JiraClient {
     ///
     /// Returns an error if the request fails or the response cannot be parsed
     pub async fn get_zephyr_test_steps(&self, test_case_id: &str) -> Result<Vec<ZephyrTestStep>> {
-        let endpoint = format!("teststep/{}", test_case_id);
+        let endpoint = format!("teststep/{test_case_id}");
         let response: serde_json::Value = self.zephyr_get(&endpoint).await?;
 
         // Extract test steps from the response
@@ -1409,7 +1415,7 @@ impl JiraClient {
         step_id: &str,
         test_step: &ZephyrTestStepUpdateRequest,
     ) -> Result<ZephyrTestStep> {
-        let endpoint = format!("teststep/{}/{}", test_case_id, step_id);
+        let endpoint = format!("teststep/{test_case_id}/{step_id}");
         self.zephyr_put(&endpoint, test_step).await
     }
 
@@ -1419,7 +1425,7 @@ impl JiraClient {
     ///
     /// Returns an error if the test step deletion fails
     pub async fn delete_zephyr_test_step(&self, test_case_id: &str, step_id: &str) -> Result<()> {
-        let endpoint = format!("teststep/{}/{}", test_case_id, step_id);
+        let endpoint = format!("teststep/{test_case_id}/{step_id}");
         let _: serde_json::Value = self.zephyr_delete(&endpoint).await?;
         Ok(())
     }
@@ -1433,7 +1439,7 @@ impl JiraClient {
     /// Returns an error if the test case cannot be found or the request fails
     #[allow(dead_code)]
     pub async fn get_zephyr_test_case(&self, test_case_id: &str) -> Result<ZephyrTestCase> {
-        let endpoint = format!("testcase/{}", test_case_id);
+        let endpoint = format!("testcase/{test_case_id}");
         self.zephyr_get(&endpoint).await
     }
 
@@ -1464,7 +1470,7 @@ impl JiraClient {
             .collect::<Vec<_>>()
             .join("&");
 
-        let endpoint = format!("testcase?{}", query_string);
+        let endpoint = format!("testcase?{query_string}");
         self.zephyr_get(&endpoint).await
     }
 
@@ -1491,7 +1497,7 @@ impl JiraClient {
         test_case_id: &str,
         test_case: &ZephyrTestCaseUpdateRequest,
     ) -> Result<ZephyrTestCase> {
-        let endpoint = format!("testcase/{}", test_case_id);
+        let endpoint = format!("testcase/{test_case_id}");
         self.zephyr_put(&endpoint, test_case).await
     }
 
@@ -1502,7 +1508,7 @@ impl JiraClient {
     /// Returns an error if the test case deletion fails
     #[allow(dead_code)]
     pub async fn delete_zephyr_test_case(&self, test_case_id: &str) -> Result<()> {
-        let endpoint = format!("testcase/{}", test_case_id);
+        let endpoint = format!("testcase/{test_case_id}");
         let _: serde_json::Value = self.zephyr_delete(&endpoint).await?;
         Ok(())
     }
@@ -1518,7 +1524,7 @@ impl JiraClient {
         &self,
         test_case_id: &str,
     ) -> Result<Vec<ZephyrTestExecution>> {
-        let endpoint = format!("execution/testcase/{}", test_case_id);
+        let endpoint = format!("execution/testcase/{test_case_id}");
         let response: serde_json::Value = self.zephyr_get(&endpoint).await?;
 
         // Extract test executions from the response
@@ -1562,7 +1568,7 @@ impl JiraClient {
         execution_id: &str,
         execution: &ZephyrTestExecutionUpdateRequest,
     ) -> Result<ZephyrTestExecution> {
-        let endpoint = format!("execution/{}", execution_id);
+        let endpoint = format!("execution/{execution_id}");
         self.zephyr_put(&endpoint, execution).await
     }
 
@@ -1573,7 +1579,7 @@ impl JiraClient {
     /// Returns an error if the test execution deletion fails
     #[allow(dead_code)]
     pub async fn delete_zephyr_test_execution(&self, execution_id: &str) -> Result<()> {
-        let endpoint = format!("execution/{}", execution_id);
+        let endpoint = format!("execution/{execution_id}");
         let _: serde_json::Value = self.zephyr_delete(&endpoint).await?;
         Ok(())
     }
@@ -1586,7 +1592,7 @@ impl JiraClient {
     ///
     /// Returns an error if the request fails or the response cannot be parsed
     pub async fn get_zephyr_test_cycles(&self, project_key: &str) -> Result<Vec<ZephyrTestCycle>> {
-        let endpoint = format!("cycle?projectKey={}", project_key);
+        let endpoint = format!("cycle?projectKey={project_key}");
         let response: serde_json::Value = self.zephyr_get(&endpoint).await?;
 
         // Extract test cycles from the response
@@ -1631,7 +1637,7 @@ impl JiraClient {
         cycle_id: &str,
         cycle: &ZephyrTestCycleCreateRequest,
     ) -> Result<ZephyrTestCycle> {
-        let endpoint = format!("cycle/{}", cycle_id);
+        let endpoint = format!("cycle/{cycle_id}");
         self.zephyr_put(&endpoint, cycle).await
     }
 
@@ -1642,7 +1648,7 @@ impl JiraClient {
     /// Returns an error if the test cycle deletion fails
     #[allow(dead_code)]
     pub async fn delete_zephyr_test_cycle(&self, cycle_id: &str) -> Result<()> {
-        let endpoint = format!("cycle/{}", cycle_id);
+        let endpoint = format!("cycle/{cycle_id}");
         let _: serde_json::Value = self.zephyr_delete(&endpoint).await?;
         Ok(())
     }
@@ -1655,7 +1661,7 @@ impl JiraClient {
     ///
     /// Returns an error if the request fails or the response cannot be parsed
     pub async fn get_zephyr_test_plans(&self, project_key: &str) -> Result<Vec<ZephyrTestPlan>> {
-        let endpoint = format!("testplan?projectKey={}", project_key);
+        let endpoint = format!("testplan?projectKey={project_key}");
         let response: serde_json::Value = self.zephyr_get(&endpoint).await?;
 
         // Extract test plans from the response
@@ -1700,7 +1706,7 @@ impl JiraClient {
         plan_id: &str,
         plan: &ZephyrTestPlanCreateRequest,
     ) -> Result<ZephyrTestPlan> {
-        let endpoint = format!("testplan/{}", plan_id);
+        let endpoint = format!("testplan/{plan_id}");
         self.zephyr_put(&endpoint, plan).await
     }
 
@@ -1711,7 +1717,7 @@ impl JiraClient {
     /// Returns an error if the test plan deletion fails
     #[allow(dead_code)]
     pub async fn delete_zephyr_test_plan(&self, plan_id: &str) -> Result<()> {
-        let endpoint = format!("testplan/{}", plan_id);
+        let endpoint = format!("testplan/{plan_id}");
         let _: serde_json::Value = self.zephyr_delete(&endpoint).await?;
         Ok(())
     }

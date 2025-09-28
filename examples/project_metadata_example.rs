@@ -1,3 +1,5 @@
+#![allow(clippy::too_many_lines, clippy::uninlined_format_args, clippy::wildcard_imports)]
+
 use rust_jira_mcp::config::JiraConfig;
 use rust_jira_mcp::mcp::server::MCPToolHandler;
 use rust_jira_mcp::mcp::tools::*;

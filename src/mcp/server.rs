@@ -37,6 +37,7 @@ pub trait MCPToolHandler {
 impl MCPServer {
     /// Create a new MCP server with the given configuration.
     #[must_use]
+    #[allow(clippy::too_many_lines)]
     pub fn new(config: JiraConfig) -> Self {
         let mut tools: HashMap<String, Box<dyn MCPToolHandler + Send + Sync>> = HashMap::new();
 
@@ -400,6 +401,7 @@ impl MCPServer {
     }
 
     #[must_use]
+    #[allow(clippy::too_many_lines)]
     pub fn list_tools() -> Vec<MCPTool> {
         vec![
             MCPTool {

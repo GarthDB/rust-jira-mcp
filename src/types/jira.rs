@@ -605,7 +605,9 @@ impl BulkOperationSummary {
         if self.total_operations == 0 {
             0.0
         } else {
-            (self.successful_operations as f64 / self.total_operations as f64) * 100.0
+            #[allow(clippy::cast_precision_loss)]
+            let result = (self.successful_operations as f64 / self.total_operations as f64) * 100.0;
+            result
         }
     }
 }
