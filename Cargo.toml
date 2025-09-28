@@ -37,11 +37,11 @@ anyhow = "1.0"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
-# Validation
-validator = { version = "0.18", features = ["derive"] }
+# Validation - removed unused validator dependency that had security vulnerabilities
 
 # Utilities
 url = "2.5"
+urlencoding = "2.1"
 uuid = { version = "1.0", features = ["v4"] }
 chrono = { version = "0.4", features = ["serde"] }
 dirs = "5.0"
