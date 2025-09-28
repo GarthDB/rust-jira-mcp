@@ -1237,3 +1237,667 @@ impl crate::mcp::server::MCPToolHandler for MixedBulkOperationsTool {
         })
     }
 }
+
+// Issue Linking Tools
+
+// Get Link Types Tool
+pub struct GetLinkTypesTool {
+    client: JiraClient,
+}
+
+impl GetLinkTypesTool {
+    #[must_use]
+    pub fn new(config: JiraConfig) -> Self {
+        Self {
+            client: JiraClient::new(config).expect("Failed to create JiraClient"),
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl crate::mcp::server::MCPToolHandler for GetLinkTypesTool {
+    async fn handle(&self, _args: serde_json::Value) -> Result<MCPToolResult> {
+        info!("Getting available link types");
+
+        let link_types = self.client.get_link_types().await?;
+
+        let mut response_text = "Available Link Types:\n\n".to_string();
+
+        if link_types.is_empty() {
+            response_text.push_str("No link types found.");
+        } else {
+            for (i, link_type) in link_types.iter().enumerate() {
+                response_text.push_str(&format!(
+                    "{}. {} (ID: {})\n   Inward: {}\n   Outward: {}\n\n",
+                    i + 1,
+                    link_type.name,
+                    link_type.id,
+                    link_type.inward,
+                    link_type.outward
+                ));
+            }
+        }
+
+        Ok(MCPToolResult {
+            content: vec![MCPContent::text(response_text)],
+            is_error: Some(false),
+        })
+    }
+}
+
+// Get Issue Links Tool
+pub struct GetIssueLinksTool {
+    client: JiraClient,
+}
+
+impl GetIssueLinksTool {
+    #[must_use]
+    pub fn new(config: JiraConfig) -> Self {
+        Self {
+            client: JiraClient::new(config).expect("Failed to create JiraClient"),
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl crate::mcp::server::MCPToolHandler for GetIssueLinksTool {
+    async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
+        let issue_key = args
+            .get("issue_key")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: issue_key".to_string(),
+            })?;
+
+        info!("Getting issue links for: {}", issue_key);
+
+        let issue_links = self.client.get_issue_links(issue_key).await?;
+
+        let mut response_text = format!("Issue Links for {}:\n\n", issue_key);
+
+        if issue_links.is_empty() {
+            response_text.push_str("No issue links found.");
+        } else {
+            for (i, link) in issue_links.iter().enumerate() {
+                let inward_issue = link
+                    .inward_issue
+                    .as_ref()
+                    .map(|i| i.key.as_str())
+                    .unwrap_or("N/A");
+                let outward_issue = link
+                    .outward_issue
+                    .as_ref()
+                    .map(|i| i.key.as_str())
+                    .unwrap_or("N/A");
+
+                response_text.push_str(&format!(
+                    "{}. {} (ID: {})\n   Inward Issue: {}\n   Outward Issue: {}\n\n",
+                    i + 1,
+                    link.link_type.name,
+                    link.id,
+                    inward_issue,
+                    outward_issue
+                ));
+            }
+        }
+
+        Ok(MCPToolResult {
+            content: vec![MCPContent::text(response_text)],
+            is_error: Some(false),
+        })
+    }
+}
+
+// Create Issue Link Tool
+pub struct CreateIssueLinkTool {
+    client: JiraClient,
+}
+
+impl CreateIssueLinkTool {
+    #[must_use]
+    pub fn new(config: JiraConfig) -> Self {
+        Self {
+            client: JiraClient::new(config).expect("Failed to create JiraClient"),
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl crate::mcp::server::MCPToolHandler for CreateIssueLinkTool {
+    async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
+        let inward_issue_key = args
+            .get("inward_issue_key")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: inward_issue_key".to_string(),
+            })?;
+
+        let outward_issue_key = args
+            .get("outward_issue_key")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: outward_issue_key".to_string(),
+            })?;
+
+        let link_type_name = args
+            .get("link_type_name")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: link_type_name".to_string(),
+            })?;
+
+        let comment = args.get("comment").and_then(|v| v.as_str());
+
+        info!(
+            "Creating issue link: {} -> {} ({})",
+            inward_issue_key, outward_issue_key, link_type_name
+        );
+
+        self.client
+            .link_issues(inward_issue_key, outward_issue_key, link_type_name, comment)
+            .await?;
+
+        let response_text = format!(
+            "Issue link created successfully!\n\nInward Issue: {}\nOutward Issue: {}\nLink Type: {}",
+            inward_issue_key, outward_issue_key, link_type_name
+        );
+
+        Ok(MCPToolResult {
+            content: vec![MCPContent::text(response_text)],
+            is_error: Some(false),
+        })
+    }
+}
+
+// Delete Issue Link Tool
+pub struct DeleteIssueLinkTool {
+    client: JiraClient,
+}
+
+impl DeleteIssueLinkTool {
+    #[must_use]
+    pub fn new(config: JiraConfig) -> Self {
+        Self {
+            client: JiraClient::new(config).expect("Failed to create JiraClient"),
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl crate::mcp::server::MCPToolHandler for DeleteIssueLinkTool {
+    async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
+        let link_id = args
+            .get("link_id")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: link_id".to_string(),
+            })?;
+
+        info!("Deleting issue link: {}", link_id);
+
+        self.client.delete_issue_link(link_id).await?;
+
+        let response_text = format!("Issue link {} deleted successfully!", link_id);
+
+        Ok(MCPToolResult {
+            content: vec![MCPContent::text(response_text)],
+            is_error: Some(false),
+        })
+    }
+}
+
+// File Attachment Tools
+
+// Get Issue Attachments Tool
+pub struct GetIssueAttachmentsTool {
+    client: JiraClient,
+}
+
+impl GetIssueAttachmentsTool {
+    #[must_use]
+    pub fn new(config: JiraConfig) -> Self {
+        Self {
+            client: JiraClient::new(config).expect("Failed to create JiraClient"),
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl crate::mcp::server::MCPToolHandler for GetIssueAttachmentsTool {
+    async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
+        let issue_key = args
+            .get("issue_key")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: issue_key".to_string(),
+            })?;
+
+        info!("Getting attachments for issue: {}", issue_key);
+
+        let attachments = self.client.get_issue_attachments(issue_key).await?;
+
+        let mut response_text = format!("Attachments for issue {}:\n\n", issue_key);
+
+        if attachments.is_empty() {
+            response_text.push_str("No attachments found.");
+        } else {
+            for (i, attachment) in attachments.iter().enumerate() {
+                response_text.push_str(&format!(
+                    "{}. {} (ID: {})\n   Size: {} bytes\n   MIME Type: {}\n   Author: {}\n   Created: {}\n   URL: {}\n\n",
+                    i + 1,
+                    attachment.filename,
+                    attachment.id,
+                    attachment.size,
+                    attachment.mime_type,
+                    attachment.author.display_name,
+                    attachment.created,
+                    attachment.self_url
+                ));
+            }
+        }
+
+        Ok(MCPToolResult {
+            content: vec![MCPContent::text(response_text)],
+            is_error: Some(false),
+        })
+    }
+}
+
+// Upload Attachment Tool
+pub struct UploadAttachmentTool {
+    client: JiraClient,
+}
+
+impl UploadAttachmentTool {
+    #[must_use]
+    pub fn new(config: JiraConfig) -> Self {
+        Self {
+            client: JiraClient::new(config).expect("Failed to create JiraClient"),
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl crate::mcp::server::MCPToolHandler for UploadAttachmentTool {
+    async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
+        let issue_key = args
+            .get("issue_key")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: issue_key".to_string(),
+            })?;
+
+        let filename = args
+            .get("filename")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: filename".to_string(),
+            })?;
+
+        let content = args
+            .get("content")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: content (base64 encoded)".to_string(),
+            })?;
+
+        let mime_type = args.get("mime_type").and_then(|v| v.as_str());
+
+        // Decode base64 content
+        use base64::{Engine as _, engine::general_purpose};
+        let content_bytes = general_purpose::STANDARD.decode(content).map_err(|e| crate::error::JiraError::ApiError {
+            message: format!("Failed to decode base64 content: {}", e),
+        })?;
+
+        info!("Uploading attachment to issue: {}", issue_key);
+
+        let attachments = self
+            .client
+            .upload_attachment(issue_key, filename, &content_bytes, mime_type)
+            .await?;
+
+        let mut response_text = format!(
+            "Attachment uploaded successfully to issue {}!\n\n",
+            issue_key
+        );
+
+        for (i, attachment) in attachments.iter().enumerate() {
+            response_text.push_str(&format!(
+                "{}. {} (ID: {})\n   Size: {} bytes\n   MIME Type: {}\n   URL: {}\n\n",
+                i + 1,
+                attachment.filename,
+                attachment.id,
+                attachment.size,
+                attachment.mime_type,
+                attachment.self_url
+            ));
+        }
+
+        Ok(MCPToolResult {
+            content: vec![MCPContent::text(response_text)],
+            is_error: Some(false),
+        })
+    }
+}
+
+// Delete Attachment Tool
+pub struct DeleteAttachmentTool {
+    client: JiraClient,
+}
+
+impl DeleteAttachmentTool {
+    #[must_use]
+    pub fn new(config: JiraConfig) -> Self {
+        Self {
+            client: JiraClient::new(config).expect("Failed to create JiraClient"),
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl crate::mcp::server::MCPToolHandler for DeleteAttachmentTool {
+    async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
+        let attachment_id = args
+            .get("attachment_id")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: attachment_id".to_string(),
+            })?;
+
+        info!("Deleting attachment: {}", attachment_id);
+
+        self.client.delete_attachment(attachment_id).await?;
+
+        let response_text = format!("Attachment {} deleted successfully!", attachment_id);
+
+        Ok(MCPToolResult {
+            content: vec![MCPContent::text(response_text)],
+            is_error: Some(false),
+        })
+    }
+}
+
+// Download Attachment Tool
+pub struct DownloadAttachmentTool {
+    client: JiraClient,
+}
+
+impl DownloadAttachmentTool {
+    #[must_use]
+    pub fn new(config: JiraConfig) -> Self {
+        Self {
+            client: JiraClient::new(config).expect("Failed to create JiraClient"),
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl crate::mcp::server::MCPToolHandler for DownloadAttachmentTool {
+    async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
+        let attachment_id = args
+            .get("attachment_id")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: attachment_id".to_string(),
+            })?;
+
+        info!("Downloading attachment: {}", attachment_id);
+
+        let content = self.client.download_attachment(attachment_id).await?;
+        use base64::{Engine as _, engine::general_purpose};
+        let content_base64 = general_purpose::STANDARD.encode(&content);
+
+        let response_text = format!(
+            "Attachment {} downloaded successfully!\n\nSize: {} bytes\nBase64 Content:\n{}",
+            attachment_id,
+            content.len(),
+            content_base64
+        );
+
+        Ok(MCPToolResult {
+            content: vec![MCPContent::text(response_text)],
+            is_error: Some(false),
+        })
+    }
+}
+
+// Work Log Tools
+
+// Get Issue Work Logs Tool
+pub struct GetIssueWorkLogsTool {
+    client: JiraClient,
+}
+
+impl GetIssueWorkLogsTool {
+    #[must_use]
+    pub fn new(config: JiraConfig) -> Self {
+        Self {
+            client: JiraClient::new(config).expect("Failed to create JiraClient"),
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl crate::mcp::server::MCPToolHandler for GetIssueWorkLogsTool {
+    async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
+        let issue_key = args
+            .get("issue_key")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: issue_key".to_string(),
+            })?;
+
+        info!("Getting work logs for issue: {}", issue_key);
+
+        let work_logs = self.client.get_issue_work_logs(issue_key).await?;
+
+        let mut response_text = format!("Work Logs for issue {}:\n\n", issue_key);
+
+        if work_logs.is_empty() {
+            response_text.push_str("No work logs found.");
+        } else {
+            let mut total_time = 0;
+            for (i, work_log) in work_logs.iter().enumerate() {
+                total_time += work_log.time_spent_seconds;
+                response_text.push_str(&format!(
+                    "{}. {} (ID: {})\n   Time Spent: {} ({} seconds)\n   Author: {}\n   Started: {}\n   Comment: {}\n\n",
+                    i + 1,
+                    work_log.time_spent,
+                    work_log.id,
+                    work_log.time_spent,
+                    work_log.time_spent_seconds,
+                    work_log.author.display_name,
+                    work_log.created,
+                    work_log.comment.as_deref().unwrap_or("No comment")
+                ));
+            }
+            
+            // Convert total seconds to hours and minutes
+            let total_hours = total_time / 3600;
+            let total_minutes = (total_time % 3600) / 60;
+            response_text.push_str(&format!(
+                "Total Time Logged: {} hours {} minutes ({} seconds)",
+                total_hours, total_minutes, total_time
+            ));
+        }
+
+        Ok(MCPToolResult {
+            content: vec![MCPContent::text(response_text)],
+            is_error: Some(false),
+        })
+    }
+}
+
+// Add Work Log Tool
+pub struct AddWorkLogTool {
+    client: JiraClient,
+}
+
+impl AddWorkLogTool {
+    #[must_use]
+    pub fn new(config: JiraConfig) -> Self {
+        Self {
+            client: JiraClient::new(config).expect("Failed to create JiraClient"),
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl crate::mcp::server::MCPToolHandler for AddWorkLogTool {
+    async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
+        let issue_key = args
+            .get("issue_key")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: issue_key".to_string(),
+            })?;
+
+        let time_spent = args
+            .get("time_spent")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: time_spent".to_string(),
+            })?;
+
+        let comment = args.get("comment").and_then(|v| v.as_str());
+        let started = args.get("started").and_then(|v| v.as_str());
+
+        let work_log = crate::types::jira::JiraWorkLogCreateRequest {
+            comment: comment.map(|s| s.to_string()),
+            time_spent: time_spent.to_string(),
+            started: started.map(|s| s.to_string()),
+            visibility: None,
+        };
+
+        info!("Adding work log to issue: {}", issue_key);
+
+        let created_work_log = self.client.add_work_log(issue_key, &work_log).await?;
+
+        let response_text = format!(
+            "Work log added successfully!\n\nIssue: {}\nWork Log ID: {}\nTime Spent: {} ({} seconds)\nAuthor: {}\nCreated: {}\nComment: {}",
+            issue_key,
+            created_work_log.id,
+            created_work_log.time_spent,
+            created_work_log.time_spent_seconds,
+            created_work_log.author.display_name,
+            created_work_log.created,
+            created_work_log.comment.as_deref().unwrap_or("No comment")
+        );
+
+        Ok(MCPToolResult {
+            content: vec![MCPContent::text(response_text)],
+            is_error: Some(false),
+        })
+    }
+}
+
+// Update Work Log Tool
+pub struct UpdateWorkLogTool {
+    client: JiraClient,
+}
+
+impl UpdateWorkLogTool {
+    #[must_use]
+    pub fn new(config: JiraConfig) -> Self {
+        Self {
+            client: JiraClient::new(config).expect("Failed to create JiraClient"),
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl crate::mcp::server::MCPToolHandler for UpdateWorkLogTool {
+    async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
+        let issue_key = args
+            .get("issue_key")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: issue_key".to_string(),
+            })?;
+
+        let work_log_id = args
+            .get("work_log_id")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: work_log_id".to_string(),
+            })?;
+
+        let time_spent = args.get("time_spent").and_then(|v| v.as_str());
+        let comment = args.get("comment").and_then(|v| v.as_str());
+        let started = args.get("started").and_then(|v| v.as_str());
+
+        let work_log = crate::types::jira::JiraWorkLogUpdateRequest {
+            comment: comment.map(|s| s.to_string()),
+            time_spent: time_spent.map(|s| s.to_string()),
+            started: started.map(|s| s.to_string()),
+            visibility: None,
+        };
+
+        info!("Updating work log {} for issue: {}", work_log_id, issue_key);
+
+        let updated_work_log = self.client.update_work_log(issue_key, work_log_id, &work_log).await?;
+
+        let response_text = format!(
+            "Work log updated successfully!\n\nIssue: {}\nWork Log ID: {}\nTime Spent: {} ({} seconds)\nAuthor: {}\nUpdated: {}\nComment: {}",
+            issue_key,
+            updated_work_log.id,
+            updated_work_log.time_spent,
+            updated_work_log.time_spent_seconds,
+            updated_work_log.author.display_name,
+            updated_work_log.updated.as_deref().unwrap_or("Unknown"),
+            updated_work_log.comment.as_deref().unwrap_or("No comment")
+        );
+
+        Ok(MCPToolResult {
+            content: vec![MCPContent::text(response_text)],
+            is_error: Some(false),
+        })
+    }
+}
+
+// Delete Work Log Tool
+pub struct DeleteWorkLogTool {
+    client: JiraClient,
+}
+
+impl DeleteWorkLogTool {
+    #[must_use]
+    pub fn new(config: JiraConfig) -> Self {
+        Self {
+            client: JiraClient::new(config).expect("Failed to create JiraClient"),
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl crate::mcp::server::MCPToolHandler for DeleteWorkLogTool {
+    async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
+        let issue_key = args
+            .get("issue_key")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: issue_key".to_string(),
+            })?;
+
+        let work_log_id = args
+            .get("work_log_id")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: work_log_id".to_string(),
+            })?;
+
+        info!("Deleting work log {} for issue: {}", work_log_id, issue_key);
+
+        self.client.delete_work_log(issue_key, work_log_id).await?;
+
+        let response_text = format!(
+            "Work log {} deleted successfully from issue {}!",
+            work_log_id, issue_key
+        );
+
+        Ok(MCPToolResult {
+            content: vec![MCPContent::text(response_text)],
+            is_error: Some(false),
+        })
+    }
+}

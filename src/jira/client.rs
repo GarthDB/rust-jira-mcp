@@ -2,12 +2,13 @@ use crate::config::JiraConfig;
 use crate::error::{JiraError, Result};
 use crate::types::jira::{
     BulkOperationConfig, BulkOperationItem, BulkOperationResult, BulkOperationSummary,
-    BulkOperationType, JiraComment, JiraIssue, JiraSearchResult, JiraTransition, ZephyrTestCase,
-    ZephyrTestCaseCreateRequest, ZephyrTestCaseSearchResult, ZephyrTestCaseUpdateRequest,
-    ZephyrTestCycle, ZephyrTestCycleCreateRequest, ZephyrTestExecution,
-    ZephyrTestExecutionCreateRequest, ZephyrTestExecutionUpdateRequest, ZephyrTestPlan,
-    ZephyrTestPlanCreateRequest, ZephyrTestStep, ZephyrTestStepCreateRequest,
-    ZephyrTestStepUpdateRequest,
+    BulkOperationType, JiraAttachment, JiraComment, JiraIssue, JiraIssueLink,
+    JiraIssueLinkCreateRequest, JiraLinkType, JiraSearchResult, JiraTransition, JiraWorkLog,
+    JiraWorkLogCreateRequest, JiraWorkLogUpdateRequest, ZephyrTestCase, ZephyrTestCaseCreateRequest,
+    ZephyrTestCaseSearchResult, ZephyrTestCaseUpdateRequest, ZephyrTestCycle,
+    ZephyrTestCycleCreateRequest, ZephyrTestExecution, ZephyrTestExecutionCreateRequest,
+    ZephyrTestExecutionUpdateRequest, ZephyrTestPlan, ZephyrTestPlanCreateRequest, ZephyrTestStep,
+    ZephyrTestStepCreateRequest, ZephyrTestStepUpdateRequest,
 };
 use reqwest::{Client, Method, RequestBuilder};
 use serde::{de::DeserializeOwned, Serialize};
@@ -136,6 +137,18 @@ impl JiraClient {
         U: Serialize + ?Sized,
     {
         self.request(Method::PUT, endpoint, Some(body)).await
+    }
+
+    /// Make a DELETE request to the Jira API
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the request fails or the response cannot be parsed.
+    pub async fn delete<T>(&self, endpoint: &str) -> Result<T>
+    where
+        T: DeserializeOwned,
+    {
+        self.request(Method::DELETE, endpoint, None::<&()>).await
     }
 
     /// Make a generic HTTP request with retry logic
@@ -540,6 +553,304 @@ impl JiraClient {
         })?;
 
         Ok(fields.clone())
+    }
+
+    // Issue Linking Operations
+
+    /// Get all available link types
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the request fails or the response cannot be parsed.
+    pub async fn get_link_types(&self) -> Result<Vec<JiraLinkType>> {
+        self.get("issueLinkType").await
+    }
+
+    /// Get issue links for a specific issue
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the request fails or the response cannot be parsed.
+    pub async fn get_issue_links(&self, issue_key: &str) -> Result<Vec<JiraIssueLink>> {
+        let endpoint = format!("issue/{}/remotelink", issue_key);
+        let response: serde_json::Value = self.get(&endpoint).await?;
+
+        let links = response.as_array().ok_or_else(|| JiraError::ApiError {
+            message: "Invalid issue links response format".to_string(),
+        })?;
+
+        let mut result = Vec::new();
+        for link in links {
+            let issue_link: JiraIssueLink =
+                serde_json::from_value(link.clone()).map_err(JiraError::SerializationError)?;
+            result.push(issue_link);
+        }
+
+        Ok(result)
+    }
+
+    /// Create a link between two issues
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the link creation fails or the response cannot be parsed.
+    pub async fn create_issue_link(&self, link_request: &JiraIssueLinkCreateRequest) -> Result<()> {
+        let endpoint = "issueLink";
+        let _: serde_json::Value = self.post(endpoint, link_request).await?;
+        Ok(())
+    }
+
+    /// Delete an issue link
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the link deletion fails.
+    pub async fn delete_issue_link(&self, link_id: &str) -> Result<()> {
+        let endpoint = format!("issueLink/{}", link_id);
+        let _: serde_json::Value = self.delete(&endpoint).await?;
+        Ok(())
+    }
+
+    /// Link two issues with a specific link type
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the link creation fails.
+    pub async fn link_issues(
+        &self,
+        inward_issue_key: &str,
+        outward_issue_key: &str,
+        link_type_name: &str,
+        comment: Option<&str>,
+    ) -> Result<()> {
+        let link_request = JiraIssueLinkCreateRequest {
+            link_type: crate::types::jira::JiraIssueLinkType {
+                name: link_type_name.to_string(),
+            },
+            inward_issue: Some(crate::types::jira::JiraIssueLinkTarget {
+                key: inward_issue_key.to_string(),
+            }),
+            outward_issue: Some(crate::types::jira::JiraIssueLinkTarget {
+                key: outward_issue_key.to_string(),
+            }),
+            comment: comment.map(|c| crate::types::jira::JiraIssueLinkComment {
+                body: c.to_string(),
+                visibility: None,
+            }),
+        };
+
+        self.create_issue_link(&link_request).await
+    }
+
+    // File Attachment Operations
+
+    /// Get attachments for a specific issue
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the request fails or the response cannot be parsed.
+    pub async fn get_issue_attachments(&self, issue_key: &str) -> Result<Vec<JiraAttachment>> {
+        let issue = self.get_issue(issue_key).await?;
+        
+        let attachments = issue
+            .fields
+            .get("attachment")
+            .and_then(|a| a.as_array())
+            .ok_or_else(|| JiraError::ApiError {
+                message: "No attachments field found in issue".to_string(),
+            })?;
+
+        let mut result = Vec::new();
+        for attachment in attachments {
+            let attachment: JiraAttachment =
+                serde_json::from_value(attachment.clone()).map_err(JiraError::SerializationError)?;
+            result.push(attachment);
+        }
+
+        Ok(result)
+    }
+
+    /// Upload an attachment to a Jira issue
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the attachment upload fails or the response cannot be parsed.
+    pub async fn upload_attachment(
+        &self,
+        issue_key: &str,
+        filename: &str,
+        content: &[u8],
+        mime_type: Option<&str>,
+    ) -> Result<Vec<JiraAttachment>> {
+        let endpoint = format!("issue/{}/attachments", issue_key);
+        let url = self.build_url(&endpoint)?;
+
+        // Apply rate limiting
+        self.rate_limiter.wait_if_needed().await;
+
+        let mut request = self
+            .client
+            .request(Method::POST, url.as_str())
+            .header("Authorization", self.auth_header())
+            .header("X-Atlassian-Token", "no-check"); // Required for file uploads
+
+        // Create multipart form data
+        let mut form = reqwest::multipart::Form::new();
+        form = form.part("file", reqwest::multipart::Part::bytes(content.to_vec()).file_name(filename.to_string()));
+        
+        if let Some(mime) = mime_type {
+            form = form.part("mimeType", reqwest::multipart::Part::text(mime.to_string()));
+        }
+
+        request = request.multipart(form);
+
+        info!("Uploading attachment to issue: {}", issue_key);
+
+        let response = request.send().await.map_err(JiraError::HttpClientError)?;
+        let status = response.status();
+
+        if status.is_success() {
+            let response_text = response.text().await.map_err(JiraError::HttpClientError)?;
+            debug!("Attachment upload response: {}", response_text);
+
+            let attachments: Vec<JiraAttachment> = serde_json::from_str(&response_text)
+                .map_err(|e| JiraError::SerializationError(e))?;
+
+            Ok(attachments)
+        } else {
+            let error_text = response.text().await.map_err(JiraError::HttpClientError)?;
+            error!("Attachment upload failed {}: {}", status, error_text);
+
+            let error_json: serde_json::Value = serde_json::from_str(&error_text)
+                .unwrap_or_else(|_| serde_json::Value::Object(serde_json::Map::new()));
+
+            Err(JiraError::from_jira_response(status, &error_json))
+        }
+    }
+
+    /// Delete an attachment
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the attachment deletion fails.
+    pub async fn delete_attachment(&self, attachment_id: &str) -> Result<()> {
+        let endpoint = format!("attachment/{}", attachment_id);
+        let _: serde_json::Value = self.delete(&endpoint).await?;
+        Ok(())
+    }
+
+    /// Download an attachment
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the attachment download fails.
+    pub async fn download_attachment(&self, attachment_id: &str) -> Result<Vec<u8>> {
+        let endpoint = format!("attachment/{}", attachment_id);
+        let url = self.build_url(&endpoint)?;
+
+        // Apply rate limiting
+        self.rate_limiter.wait_if_needed().await;
+
+        let request = self
+            .client
+            .request(Method::GET, url.as_str())
+            .header("Authorization", self.auth_header());
+
+        info!("Downloading attachment: {}", attachment_id);
+
+        let response = request.send().await.map_err(JiraError::HttpClientError)?;
+        let status = response.status();
+
+        if status.is_success() {
+            let bytes = response.bytes().await.map_err(JiraError::HttpClientError)?;
+            Ok(bytes.to_vec())
+        } else {
+            let error_text = response.text().await.map_err(JiraError::HttpClientError)?;
+            error!("Attachment download failed {}: {}", status, error_text);
+
+            let error_json: serde_json::Value = serde_json::from_str(&error_text)
+                .unwrap_or_else(|_| serde_json::Value::Object(serde_json::Map::new()));
+
+            Err(JiraError::from_jira_response(status, &error_json))
+        }
+    }
+
+    // Work Log Operations
+
+    /// Get work logs for a specific issue
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the request fails or the response cannot be parsed.
+    pub async fn get_issue_work_logs(&self, issue_key: &str) -> Result<Vec<JiraWorkLog>> {
+        let endpoint = format!("issue/{}/worklog", issue_key);
+        let response: serde_json::Value = self.get(&endpoint).await?;
+
+        let work_logs = response
+            .get("worklogs")
+            .and_then(|w| w.as_array())
+            .ok_or_else(|| JiraError::ApiError {
+                message: "Invalid work logs response format".to_string(),
+            })?;
+
+        let mut result = Vec::new();
+        for work_log in work_logs {
+            let work_log: JiraWorkLog =
+                serde_json::from_value(work_log.clone()).map_err(JiraError::SerializationError)?;
+            result.push(work_log);
+        }
+
+        Ok(result)
+    }
+
+    /// Add a work log entry to an issue
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the work log creation fails or the response cannot be parsed.
+    pub async fn add_work_log(
+        &self,
+        issue_key: &str,
+        work_log: &JiraWorkLogCreateRequest,
+    ) -> Result<JiraWorkLog> {
+        let endpoint = format!("issue/{}/worklog", issue_key);
+        self.post(&endpoint, work_log).await
+    }
+
+    /// Update an existing work log entry
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the work log update fails or the response cannot be parsed.
+    pub async fn update_work_log(
+        &self,
+        issue_key: &str,
+        work_log_id: &str,
+        work_log: &JiraWorkLogUpdateRequest,
+    ) -> Result<JiraWorkLog> {
+        let endpoint = format!("issue/{}/worklog/{}", issue_key, work_log_id);
+        self.put(&endpoint, work_log).await
+    }
+
+    /// Delete a work log entry
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the work log deletion fails.
+    pub async fn delete_work_log(&self, issue_key: &str, work_log_id: &str) -> Result<()> {
+        let endpoint = format!("issue/{}/worklog/{}", issue_key, work_log_id);
+        let _: serde_json::Value = self.delete(&endpoint).await?;
+        Ok(())
+    }
+
+    /// Get a specific work log entry
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the work log cannot be found or the request fails.
+    pub async fn get_work_log(&self, issue_key: &str, work_log_id: &str) -> Result<JiraWorkLog> {
+        let endpoint = format!("issue/{}/worklog/{}", issue_key, work_log_id);
+        self.get(&endpoint).await
     }
 
     /// Get project metadata including all configuration details
