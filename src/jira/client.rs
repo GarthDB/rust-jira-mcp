@@ -4,11 +4,12 @@ use crate::types::jira::{
     BulkOperationConfig, BulkOperationItem, BulkOperationResult, BulkOperationSummary,
     BulkOperationType, JiraAttachment, JiraComment, JiraIssue, JiraIssueLink,
     JiraIssueLinkCreateRequest, JiraLinkType, JiraSearchResult, JiraTransition, JiraWorkLog,
-    JiraWorkLogCreateRequest, JiraWorkLogUpdateRequest, ZephyrTestCase, ZephyrTestCaseCreateRequest,
-    ZephyrTestCaseSearchResult, ZephyrTestCaseUpdateRequest, ZephyrTestCycle,
-    ZephyrTestCycleCreateRequest, ZephyrTestExecution, ZephyrTestExecutionCreateRequest,
-    ZephyrTestExecutionUpdateRequest, ZephyrTestPlan, ZephyrTestPlanCreateRequest, ZephyrTestStep,
-    ZephyrTestStepCreateRequest, ZephyrTestStepUpdateRequest,
+    JiraWorkLogCreateRequest, JiraWorkLogUpdateRequest, ZephyrTestCase,
+    ZephyrTestCaseCreateRequest, ZephyrTestCaseSearchResult, ZephyrTestCaseUpdateRequest,
+    ZephyrTestCycle, ZephyrTestCycleCreateRequest, ZephyrTestExecution,
+    ZephyrTestExecutionCreateRequest, ZephyrTestExecutionUpdateRequest, ZephyrTestPlan,
+    ZephyrTestPlanCreateRequest, ZephyrTestStep, ZephyrTestStepCreateRequest,
+    ZephyrTestStepUpdateRequest,
 };
 use reqwest::{Client, Method, RequestBuilder};
 use serde::{de::DeserializeOwned, Serialize};
@@ -651,7 +652,7 @@ impl JiraClient {
     /// Returns an error if the request fails or the response cannot be parsed.
     pub async fn get_issue_attachments(&self, issue_key: &str) -> Result<Vec<JiraAttachment>> {
         let issue = self.get_issue(issue_key).await?;
-        
+
         let attachments = issue
             .fields
             .get("attachment")
@@ -662,8 +663,8 @@ impl JiraClient {
 
         let mut result = Vec::new();
         for attachment in attachments {
-            let attachment: JiraAttachment =
-                serde_json::from_value(attachment.clone()).map_err(JiraError::SerializationError)?;
+            let attachment: JiraAttachment = serde_json::from_value(attachment.clone())
+                .map_err(JiraError::SerializationError)?;
             result.push(attachment);
         }
 
@@ -696,8 +697,11 @@ impl JiraClient {
 
         // Create multipart form data
         let mut form = reqwest::multipart::Form::new();
-        form = form.part("file", reqwest::multipart::Part::bytes(content.to_vec()).file_name(filename.to_string()));
-        
+        form = form.part(
+            "file",
+            reqwest::multipart::Part::bytes(content.to_vec()).file_name(filename.to_string()),
+        );
+
         if let Some(mime) = mime_type {
             form = form.part("mimeType", reqwest::multipart::Part::text(mime.to_string()));
         }

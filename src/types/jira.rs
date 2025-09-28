@@ -505,7 +505,7 @@ pub struct JiraAttachmentCreateRequest {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct JiraWorkLogCreateRequest {
     pub comment: Option<String>,
-    pub time_spent: String, // e.g., "1h 30m", "2d", "3w"
+    pub time_spent: String,      // e.g., "1h 30m", "2d", "3w"
     pub started: Option<String>, // ISO 8601 datetime
     pub visibility: Option<JiraCommentVisibility>,
 }

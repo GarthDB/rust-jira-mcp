@@ -1544,9 +1544,11 @@ impl crate::mcp::server::MCPToolHandler for UploadAttachmentTool {
         let mime_type = args.get("mime_type").and_then(|v| v.as_str());
 
         // Decode base64 content
-        use base64::{Engine as _, engine::general_purpose};
-        let content_bytes = general_purpose::STANDARD.decode(content).map_err(|e| crate::error::JiraError::ApiError {
-            message: format!("Failed to decode base64 content: {}", e),
+        use base64::{engine::general_purpose, Engine as _};
+        let content_bytes = general_purpose::STANDARD.decode(content).map_err(|e| {
+            crate::error::JiraError::ApiError {
+                message: format!("Failed to decode base64 content: {}", e),
+            }
         })?;
 
         info!("Uploading attachment to issue: {}", issue_key);
@@ -1644,7 +1646,7 @@ impl crate::mcp::server::MCPToolHandler for DownloadAttachmentTool {
         info!("Downloading attachment: {}", attachment_id);
 
         let content = self.client.download_attachment(attachment_id).await?;
-        use base64::{Engine as _, engine::general_purpose};
+        use base64::{engine::general_purpose, Engine as _};
         let content_base64 = general_purpose::STANDARD.encode(&content);
 
         let response_text = format!(
@@ -1711,7 +1713,7 @@ impl crate::mcp::server::MCPToolHandler for GetIssueWorkLogsTool {
                     work_log.comment.as_deref().unwrap_or("No comment")
                 ));
             }
-            
+
             // Convert total seconds to hours and minutes
             let total_hours = total_time / 3600;
             let total_minutes = (total_time % 3600) / 60;
@@ -1835,7 +1837,10 @@ impl crate::mcp::server::MCPToolHandler for UpdateWorkLogTool {
 
         info!("Updating work log {} for issue: {}", work_log_id, issue_key);
 
-        let updated_work_log = self.client.update_work_log(issue_key, work_log_id, &work_log).await?;
+        let updated_work_log = self
+            .client
+            .update_work_log(issue_key, work_log_id, &work_log)
+            .await?;
 
         let response_text = format!(
             "Work log updated successfully!\n\nIssue: {}\nWork Log ID: {}\nTime Spent: {} ({} seconds)\nAuthor: {}\nUpdated: {}\nComment: {}",
