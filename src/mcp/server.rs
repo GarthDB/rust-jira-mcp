@@ -1,14 +1,20 @@
 use crate::config::JiraConfig;
 use crate::error::Result;
 use crate::mcp::tools::{CreateIssueTool, SearchIssuesTool, TestAuthTool, UpdateIssueTool};
-use crate::types::mcp::{MCPTool, MCPToolCall, MCPToolResult};
+use crate::types::mcp::{
+    CallToolParams, CallToolResult, InitializeParams, InitializeResult, JsonRpcError,
+    JsonRpcRequest, JsonRpcResponse, ListToolsParams, ListToolsResult, MCPTool, MCPToolCall,
+    MCPToolResult, ServerCapabilities, ServerInfo, ToolsCapability,
+};
 use serde_json::json;
 use std::collections::HashMap;
-use tracing::info;
+use tokio::io::{self, AsyncBufReadExt, AsyncWriteExt, BufReader};
+use tracing::{error, info, warn};
 
 pub struct MCPServer {
     config: JiraConfig,
     tools: HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>,
+    initialized: bool,
 }
 
 #[async_trait::async_trait]
@@ -41,7 +47,11 @@ impl MCPServer {
         );
         // Add more tools as we implement them
 
-        Self { config, tools }
+        Self {
+            config,
+            tools,
+            initialized: false,
+        }
     }
 
     /// Run the MCP server with stdio transport.
@@ -53,16 +63,219 @@ impl MCPServer {
         info!("Starting MCP server with stdio transport");
         info!("Configuration: API URL = {}", self.config.api_base_url);
 
-        // This is a placeholder - we'll need to implement the actual MCP protocol handling
-        // For now, we'll just log that the server is running
+        let stdin = io::stdin();
+        let stdout = io::stdout();
+        let mut reader = BufReader::new(stdin);
+        let mut writer = stdout;
+
+        let mut line = String::new();
+
         info!("MCP server is running and ready to accept requests");
 
-        // In a real implementation, this would handle the MCP protocol over stdio
-        // For now, we'll just keep the process alive
-        tokio::signal::ctrl_c().await?;
-        info!("Received shutdown signal, stopping server");
+        loop {
+            line.clear();
+            match reader.read_line(&mut line).await {
+                Ok(0) => {
+                    info!("EOF received, shutting down");
+                    break;
+                }
+                Ok(_) => {
+                    let trimmed = line.trim();
+                    if trimmed.is_empty() {
+                        continue;
+                    }
 
+                    match self.handle_request(trimmed).await {
+                        Ok(Some(response)) => {
+                            let response_json = serde_json::to_string(&response)?;
+                            writer.write_all(response_json.as_bytes()).await?;
+                            writer.write_all(b"\n").await?;
+                            writer.flush().await?;
+                        }
+                        Ok(None) => {
+                            // Notification, no response needed
+                        }
+                        Err(e) => {
+                            error!("Error handling request: {}", e);
+                            // Send error response
+                            let error_response = JsonRpcResponse {
+                                jsonrpc: "2.0".to_string(),
+                                id: None,
+                                result: None,
+                                error: Some(JsonRpcError {
+                                    code: -32603,
+                                    message: "Internal error".to_string(),
+                                    data: Some(json!({ "details": e.to_string() })),
+                                }),
+                            };
+                            let error_json = serde_json::to_string(&error_response)?;
+                            writer.write_all(error_json.as_bytes()).await?;
+                            writer.write_all(b"\n").await?;
+                            writer.flush().await?;
+                        }
+                    }
+                }
+                Err(e) => {
+                    error!("Error reading from stdin: {}", e);
+                    return Err(crate::error::JiraError::Unknown {
+                        message: format!("IO error: {e}"),
+                    });
+                }
+            }
+        }
+
+        info!("MCP server shutdown complete");
         Ok(())
+    }
+
+    /// Handle a JSON-RPC request
+    async fn handle_request(&mut self, request_str: &str) -> Result<Option<JsonRpcResponse>> {
+        let request: JsonRpcRequest = serde_json::from_str(request_str)?;
+
+        let response = match request.method.as_str() {
+            "initialize" => Self::handle_initialize(request)?,
+            "tools/list" => Self::handle_list_tools(request)?,
+            "tools/call" => self.handle_call_tool(request).await?,
+            "notifications/initialized" => {
+                // Handle initialization notification
+                self.initialized = true;
+                info!("MCP client initialized successfully");
+                return Ok(None);
+            }
+            _ => {
+                warn!("Unknown method: {}", request.method);
+                return Ok(Some(JsonRpcResponse {
+                    jsonrpc: "2.0".to_string(),
+                    id: request.id,
+                    result: None,
+                    error: Some(JsonRpcError {
+                        code: -32601,
+                        message: "Method not found".to_string(),
+                        data: None,
+                    }),
+                }));
+            }
+        };
+
+        Ok(Some(response))
+    }
+
+    /// Handle initialize request
+    fn handle_initialize(request: JsonRpcRequest) -> Result<JsonRpcResponse> {
+        let _params: InitializeParams = if let Some(params) = request.params {
+            serde_json::from_value(params)?
+        } else {
+            return Ok(JsonRpcResponse {
+                jsonrpc: "2.0".to_string(),
+                id: request.id,
+                result: None,
+                error: Some(JsonRpcError {
+                    code: -32602,
+                    message: "Invalid params".to_string(),
+                    data: None,
+                }),
+            });
+        };
+
+        let result = InitializeResult {
+            protocol_version: "2024-11-05".to_string(),
+            capabilities: ServerCapabilities {
+                tools: Some(ToolsCapability {
+                    list_changed: Some(false),
+                }),
+            },
+            server_info: ServerInfo {
+                name: "rust-jira-mcp".to_string(),
+                version: env!("CARGO_PKG_VERSION").to_string(),
+            },
+        };
+
+        Ok(JsonRpcResponse {
+            jsonrpc: "2.0".to_string(),
+            id: request.id,
+            result: Some(serde_json::to_value(result)?),
+            error: None,
+        })
+    }
+
+    /// Handle list tools request
+    fn handle_list_tools(request: JsonRpcRequest) -> Result<JsonRpcResponse> {
+        let _params: ListToolsParams = if let Some(params) = request.params {
+            serde_json::from_value(params)?
+        } else {
+            return Ok(JsonRpcResponse {
+                jsonrpc: "2.0".to_string(),
+                id: request.id,
+                result: None,
+                error: Some(JsonRpcError {
+                    code: -32602,
+                    message: "Invalid params".to_string(),
+                    data: None,
+                }),
+            });
+        };
+
+        let tools = Self::list_tools();
+        let result = ListToolsResult { tools };
+
+        Ok(JsonRpcResponse {
+            jsonrpc: "2.0".to_string(),
+            id: request.id,
+            result: Some(serde_json::to_value(result)?),
+            error: None,
+        })
+    }
+
+    /// Handle call tool request
+    async fn handle_call_tool(&self, request: JsonRpcRequest) -> Result<JsonRpcResponse> {
+        let params: CallToolParams = if let Some(params) = request.params {
+            serde_json::from_value(params)?
+        } else {
+            return Ok(JsonRpcResponse {
+                jsonrpc: "2.0".to_string(),
+                id: request.id,
+                result: None,
+                error: Some(JsonRpcError {
+                    code: -32602,
+                    message: "Invalid params".to_string(),
+                    data: None,
+                }),
+            });
+        };
+
+        let tool_call = MCPToolCall {
+            name: params.name,
+            arguments: params.arguments.unwrap_or(json!({})),
+        };
+
+        match self.call_tool(tool_call).await {
+            Ok(tool_result) => {
+                let result = CallToolResult {
+                    content: tool_result.content,
+                    is_error: tool_result.is_error.unwrap_or(false),
+                };
+
+                Ok(JsonRpcResponse {
+                    jsonrpc: "2.0".to_string(),
+                    id: request.id,
+                    result: Some(serde_json::to_value(result)?),
+                    error: None,
+                })
+            }
+            Err(e) => {
+                error!("Tool execution error: {}", e);
+                Ok(JsonRpcResponse {
+                    jsonrpc: "2.0".to_string(),
+                    id: request.id,
+                    result: None,
+                    error: Some(JsonRpcError {
+                        code: -32603,
+                        message: "Tool execution failed".to_string(),
+                        data: Some(json!({ "details": e.to_string() })),
+                    }),
+                })
+            }
+        }
     }
 
     #[must_use]

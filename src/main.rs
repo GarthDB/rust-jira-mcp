@@ -26,7 +26,10 @@ async fn main() -> Result<()> {
 
     // Load configuration
     let config = JiraConfig::load()?;
-    info!("Configuration loaded successfully");
+    info!(
+        "Configuration loaded successfully: API URL = {}",
+        config.api_base_url
+    );
 
     // Create and run MCP server
     let mut server = MCPServer::new(config);

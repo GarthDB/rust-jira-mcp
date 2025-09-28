@@ -1,7 +1,6 @@
 use crate::config::JiraConfig;
 use crate::error::Result;
-use crate::types::mcp::MCPToolResult;
-use crate::utils::format_success_response;
+use crate::types::mcp::{MCPContent, MCPToolResult};
 use serde_json::json;
 use tracing::info;
 
@@ -24,17 +23,19 @@ impl crate::mcp::server::MCPToolHandler for TestAuthTool {
 
         // For now, just return a success response
         // In a real implementation, this would make an actual API call to test auth
-        let response = json!({
+        let _response = json!({
             "authenticated": true,
             "method": "Personal Access Token",
             "email": self.config.email,
             "api_base_url": self.config.api_base_url
         });
 
-        Ok(format_success_response(
-            "Authentication test successful",
-            &response,
-        ))
+        Ok(MCPToolResult {
+            content: vec![MCPContent::text(
+                "Authentication test successful".to_string(),
+            )],
+            is_error: Some(false),
+        })
     }
 }
 
@@ -60,7 +61,7 @@ impl crate::mcp::server::MCPToolHandler for SearchIssuesTool {
 
         // For now, just return a placeholder response
         // In a real implementation, this would make an actual API call to search issues
-        let response = json!({
+        let _response = json!({
             "issues": [],
             "total": 0,
             "start_at": 0,
@@ -68,7 +69,12 @@ impl crate::mcp::server::MCPToolHandler for SearchIssuesTool {
             "api_url": self.config.api_base_url
         });
 
-        Ok(format_success_response("Search completed", &response))
+        Ok(MCPToolResult {
+            content: vec![MCPContent::text(
+                "Search completed successfully".to_string(),
+            )],
+            is_error: Some(false),
+        })
     }
 }
 
@@ -91,16 +97,16 @@ impl crate::mcp::server::MCPToolHandler for CreateIssueTool {
 
         // For now, just return a placeholder response
         // In a real implementation, this would make an actual API call to create an issue
-        let response = json!({
+        let _response = json!({
             "key": "PROJ-123",
             "id": "12345",
             "self": format!("{}/issue/12345", self.config.api_base_url)
         });
 
-        Ok(format_success_response(
-            "Issue created successfully",
-            &response,
-        ))
+        Ok(MCPToolResult {
+            content: vec![MCPContent::text("Issue created successfully".to_string())],
+            is_error: Some(false),
+        })
     }
 }
 
@@ -126,15 +132,15 @@ impl crate::mcp::server::MCPToolHandler for UpdateIssueTool {
 
         // For now, just return a placeholder response
         // In a real implementation, this would make an actual API call to update an issue
-        let response = json!({
+        let _response = json!({
             "success": true,
             "message": "Issue updated successfully",
             "api_url": self.config.api_base_url
         });
 
-        Ok(format_success_response(
-            "Issue updated successfully",
-            &response,
-        ))
+        Ok(MCPToolResult {
+            content: vec![MCPContent::text("Issue updated successfully".to_string())],
+            is_error: Some(false),
+        })
     }
 }

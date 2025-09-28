@@ -11,4 +11,9 @@ pub mod types;
 pub mod utils;
 
 pub use crate::config::jira::JiraConfig;
+pub use crate::types::mcp::{
+    CallToolParams, CallToolResult, ClientInfo, InitializeParams, InitializeResult, JsonRpcError,
+    JsonRpcRequest, JsonRpcResponse, ListToolsParams, ListToolsResult, MCPContent, MCPTool,
+    MCPToolCall, MCPToolResult, ServerCapabilities, ServerInfo, ToolsCapability,
+};
 pub use error::{JiraError, Result};

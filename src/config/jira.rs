@@ -38,7 +38,12 @@ impl JiraConfig {
     /// Returns an error if required environment variables are missing or if configuration
     /// files cannot be read or parsed.
     pub fn load() -> Result<Self> {
-        dotenvy::dotenv().ok(); // Load .env file if it exists
+        // Load .env file if it exists, or use custom filename from environment
+        if let Ok(env_file) = std::env::var("DOTENV_FILENAME") {
+            dotenvy::from_filename(env_file).ok();
+        } else {
+            dotenvy::dotenv().ok();
+        }
 
         let mut builder = ConfigBuilder::builder()
             .add_source(File::with_name("config/default").required(false))
