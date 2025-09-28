@@ -3,7 +3,11 @@
 use crate::config::JiraConfig;
 use crate::error::Result;
 use crate::jira::client::JiraClient;
-use crate::types::jira::{BulkOperationConfig, BulkOperationItem, BulkOperationType};
+use crate::types::jira::{
+    BulkOperationConfig, BulkOperationItem, BulkOperationType, JiraComponentCreateRequest,
+    JiraComponentUpdateRequest, JiraIssueCloneRequest, JiraLabelCreateRequest,
+    JiraLabelUpdateRequest,
+};
 use crate::types::mcp::{MCPContent, MCPToolResult};
 use base64::{engine::general_purpose, Engine as _};
 use serde_json::json;
@@ -1920,6 +1924,601 @@ impl crate::mcp::server::MCPToolHandler for DeleteWorkLogTool {
 
         let response_text =
             format!("Work log {work_log_id} deleted successfully from issue {issue_key}!");
+
+        Ok(MCPToolResult {
+            content: vec![MCPContent::text(response_text)],
+            is_error: Some(false),
+        })
+    }
+}
+
+// Issue Watcher Tools
+
+// Get Issue Watchers Tool
+pub struct GetIssueWatchersTool {
+    client: JiraClient,
+}
+
+impl GetIssueWatchersTool {
+    #[must_use]
+    #[allow(clippy::missing_panics_doc)]
+    pub fn new(config: JiraConfig) -> Self {
+        Self {
+            client: JiraClient::new(config).expect("Failed to create JiraClient"),
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl crate::mcp::server::MCPToolHandler for GetIssueWatchersTool {
+    async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
+        let issue_key = args
+            .get("issue_key")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: issue_key".to_string(),
+            })?;
+
+        info!("Getting watchers for issue: {}", issue_key);
+
+        let watchers_response = self.client.get_issue_watchers(issue_key).await?;
+
+        let mut response_text = format!(
+            "Watchers for issue {issue_key}:\n\nWatching: {}\nWatch Count: {}\n\n",
+            watchers_response.is_watching, watchers_response.watch_count
+        );
+
+        if watchers_response.watchers.is_empty() {
+            response_text.push_str("No watchers found.");
+        } else {
+            for (i, watcher) in watchers_response.watchers.iter().enumerate() {
+                response_text.push_str(&format!(
+                    "{}. {} ({})\n   Email: {}\n   Active: {}\n   Time Zone: {}\n\n",
+                    i + 1,
+                    watcher.display_name,
+                    watcher.account_id,
+                    watcher.email_address.as_deref().unwrap_or("N/A"),
+                    watcher.active,
+                    watcher.time_zone.as_deref().unwrap_or("N/A")
+                ));
+            }
+        }
+
+        Ok(MCPToolResult {
+            content: vec![MCPContent::text(response_text)],
+            is_error: Some(false),
+        })
+    }
+}
+
+// Add Issue Watcher Tool
+pub struct AddIssueWatcherTool {
+    client: JiraClient,
+}
+
+impl AddIssueWatcherTool {
+    #[must_use]
+    #[allow(clippy::missing_panics_doc)]
+    pub fn new(config: JiraConfig) -> Self {
+        Self {
+            client: JiraClient::new(config).expect("Failed to create JiraClient"),
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl crate::mcp::server::MCPToolHandler for AddIssueWatcherTool {
+    async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
+        let issue_key = args
+            .get("issue_key")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: issue_key".to_string(),
+            })?;
+
+        let account_id = args
+            .get("account_id")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: account_id".to_string(),
+            })?;
+
+        info!("Adding watcher {} to issue: {}", account_id, issue_key);
+
+        self.client.add_issue_watcher(issue_key, account_id).await?;
+
+        let response_text = format!(
+            "Watcher {account_id} added successfully to issue {issue_key}!"
+        );
+
+        Ok(MCPToolResult {
+            content: vec![MCPContent::text(response_text)],
+            is_error: Some(false),
+        })
+    }
+}
+
+// Remove Issue Watcher Tool
+pub struct RemoveIssueWatcherTool {
+    client: JiraClient,
+}
+
+impl RemoveIssueWatcherTool {
+    #[must_use]
+    #[allow(clippy::missing_panics_doc)]
+    pub fn new(config: JiraConfig) -> Self {
+        Self {
+            client: JiraClient::new(config).expect("Failed to create JiraClient"),
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl crate::mcp::server::MCPToolHandler for RemoveIssueWatcherTool {
+    async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
+        let issue_key = args
+            .get("issue_key")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: issue_key".to_string(),
+            })?;
+
+        let account_id = args
+            .get("account_id")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: account_id".to_string(),
+            })?;
+
+        info!("Removing watcher {} from issue: {}", account_id, issue_key);
+
+        self.client.remove_issue_watcher(issue_key, account_id).await?;
+
+        let response_text = format!(
+            "Watcher {account_id} removed successfully from issue {issue_key}!"
+        );
+
+        Ok(MCPToolResult {
+            content: vec![MCPContent::text(response_text)],
+            is_error: Some(false),
+        })
+    }
+}
+
+// Issue Label Tools
+
+// Get Labels Tool
+pub struct GetLabelsTool {
+    client: JiraClient,
+}
+
+impl GetLabelsTool {
+    #[must_use]
+    #[allow(clippy::missing_panics_doc)]
+    pub fn new(config: JiraConfig) -> Self {
+        Self {
+            client: JiraClient::new(config).expect("Failed to create JiraClient"),
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl crate::mcp::server::MCPToolHandler for GetLabelsTool {
+    async fn handle(&self, _args: serde_json::Value) -> Result<MCPToolResult> {
+        info!("Getting all available labels");
+
+        let labels = self.client.get_labels().await?;
+
+        let mut response_text = "Available Labels:\n\n".to_string();
+
+        if labels.is_empty() {
+            response_text.push_str("No labels found.");
+        } else {
+            for (i, label) in labels.iter().enumerate() {
+                response_text.push_str(&format!(
+                    "{}. {}\n",
+                    i + 1,
+                    label.name
+                ));
+            }
+        }
+
+        Ok(MCPToolResult {
+            content: vec![MCPContent::text(response_text)],
+            is_error: Some(false),
+        })
+    }
+}
+
+// Create Label Tool
+pub struct CreateLabelTool {
+    client: JiraClient,
+}
+
+impl CreateLabelTool {
+    #[must_use]
+    #[allow(clippy::missing_panics_doc)]
+    pub fn new(config: JiraConfig) -> Self {
+        Self {
+            client: JiraClient::new(config).expect("Failed to create JiraClient"),
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl crate::mcp::server::MCPToolHandler for CreateLabelTool {
+    async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
+        let name = args
+            .get("name")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: name".to_string(),
+            })?;
+
+        info!("Creating label: {}", name);
+
+        let label_request = JiraLabelCreateRequest {
+            name: name.to_string(),
+        };
+
+        let created_label = self.client.create_label(&label_request).await?;
+
+        let response_text = format!(
+            "Label created successfully!\n\nName: {}",
+            created_label.name
+        );
+
+        Ok(MCPToolResult {
+            content: vec![MCPContent::text(response_text)],
+            is_error: Some(false),
+        })
+    }
+}
+
+// Update Label Tool
+pub struct UpdateLabelTool {
+    client: JiraClient,
+}
+
+impl UpdateLabelTool {
+    #[must_use]
+    #[allow(clippy::missing_panics_doc)]
+    pub fn new(config: JiraConfig) -> Self {
+        Self {
+            client: JiraClient::new(config).expect("Failed to create JiraClient"),
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl crate::mcp::server::MCPToolHandler for UpdateLabelTool {
+    async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
+        let old_name = args
+            .get("old_name")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: old_name".to_string(),
+            })?;
+
+        let new_name = args
+            .get("new_name")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: new_name".to_string(),
+            })?;
+
+        info!("Updating label from {} to {}", old_name, new_name);
+
+        let label_request = JiraLabelUpdateRequest {
+            name: new_name.to_string(),
+        };
+
+        let updated_label = self.client.update_label(old_name, &label_request).await?;
+
+        let response_text = format!(
+            "Label updated successfully!\n\nOld Name: {}\nNew Name: {}",
+            old_name, updated_label.name
+        );
+
+        Ok(MCPToolResult {
+            content: vec![MCPContent::text(response_text)],
+            is_error: Some(false),
+        })
+    }
+}
+
+// Delete Label Tool
+pub struct DeleteLabelTool {
+    client: JiraClient,
+}
+
+impl DeleteLabelTool {
+    #[must_use]
+    #[allow(clippy::missing_panics_doc)]
+    pub fn new(config: JiraConfig) -> Self {
+        Self {
+            client: JiraClient::new(config).expect("Failed to create JiraClient"),
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl crate::mcp::server::MCPToolHandler for DeleteLabelTool {
+    async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
+        let name = args
+            .get("name")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: name".to_string(),
+            })?;
+
+        info!("Deleting label: {}", name);
+
+        self.client.delete_label(name).await?;
+
+        let response_text = format!("Label {name} deleted successfully!");
+
+        Ok(MCPToolResult {
+            content: vec![MCPContent::text(response_text)],
+            is_error: Some(false),
+        })
+    }
+}
+
+// Issue Component Tools
+
+// Create Component Tool
+pub struct CreateComponentTool {
+    client: JiraClient,
+}
+
+impl CreateComponentTool {
+    #[must_use]
+    #[allow(clippy::missing_panics_doc)]
+    pub fn new(config: JiraConfig) -> Self {
+        Self {
+            client: JiraClient::new(config).expect("Failed to create JiraClient"),
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl crate::mcp::server::MCPToolHandler for CreateComponentTool {
+    async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
+        let name = args
+            .get("name")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: name".to_string(),
+            })?;
+
+        let project = args
+            .get("project")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: project".to_string(),
+            })?;
+
+        let description = args.get("description").and_then(|v| v.as_str());
+        let assignee_type = args.get("assignee_type").and_then(|v| v.as_str());
+        let lead_account_id = args.get("lead_account_id").and_then(|v| v.as_str());
+
+        info!("Creating component: {} for project: {}", name, project);
+
+        let component_request = JiraComponentCreateRequest {
+            name: name.to_string(),
+            description: description.map(ToString::to_string),
+            project: project.to_string(),
+            assignee_type: assignee_type.map(ToString::to_string),
+            lead_account_id: lead_account_id.map(ToString::to_string),
+        };
+
+        let created_component = self.client.create_component(&component_request).await?;
+
+        let response_text = format!(
+            "Component created successfully!\n\nName: {}\nID: {}\nDescription: {}\nURL: {}",
+            created_component.name,
+            created_component.id,
+            created_component.description.as_deref().unwrap_or("No description"),
+            created_component.self_url
+        );
+
+        Ok(MCPToolResult {
+            content: vec![MCPContent::text(response_text)],
+            is_error: Some(false),
+        })
+    }
+}
+
+// Update Component Tool
+pub struct UpdateComponentTool {
+    client: JiraClient,
+}
+
+impl UpdateComponentTool {
+    #[must_use]
+    #[allow(clippy::missing_panics_doc)]
+    pub fn new(config: JiraConfig) -> Self {
+        Self {
+            client: JiraClient::new(config).expect("Failed to create JiraClient"),
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl crate::mcp::server::MCPToolHandler for UpdateComponentTool {
+    async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
+        let component_id = args
+            .get("component_id")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: component_id".to_string(),
+            })?;
+
+        let name = args.get("name").and_then(|v| v.as_str());
+        let description = args.get("description").and_then(|v| v.as_str());
+        let assignee_type = args.get("assignee_type").and_then(|v| v.as_str());
+        let lead_account_id = args.get("lead_account_id").and_then(|v| v.as_str());
+
+        info!("Updating component: {}", component_id);
+
+        let component_request = JiraComponentUpdateRequest {
+            name: name.map(ToString::to_string),
+            description: description.map(ToString::to_string),
+            assignee_type: assignee_type.map(ToString::to_string),
+            lead_account_id: lead_account_id.map(ToString::to_string),
+        };
+
+        let updated_component = self.client.update_component(component_id, &component_request).await?;
+
+        let response_text = format!(
+            "Component updated successfully!\n\nName: {}\nID: {}\nDescription: {}\nURL: {}",
+            updated_component.name,
+            updated_component.id,
+            updated_component.description.as_deref().unwrap_or("No description"),
+            updated_component.self_url
+        );
+
+        Ok(MCPToolResult {
+            content: vec![MCPContent::text(response_text)],
+            is_error: Some(false),
+        })
+    }
+}
+
+// Delete Component Tool
+pub struct DeleteComponentTool {
+    client: JiraClient,
+}
+
+impl DeleteComponentTool {
+    #[must_use]
+    #[allow(clippy::missing_panics_doc)]
+    pub fn new(config: JiraConfig) -> Self {
+        Self {
+            client: JiraClient::new(config).expect("Failed to create JiraClient"),
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl crate::mcp::server::MCPToolHandler for DeleteComponentTool {
+    async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
+        let component_id = args
+            .get("component_id")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: component_id".to_string(),
+            })?;
+
+        info!("Deleting component: {}", component_id);
+
+        self.client.delete_component(component_id).await?;
+
+        let response_text = format!("Component {component_id} deleted successfully!");
+
+        Ok(MCPToolResult {
+            content: vec![MCPContent::text(response_text)],
+            is_error: Some(false),
+        })
+    }
+}
+
+// Issue Cloning Tools
+
+// Clone Issue Tool
+pub struct CloneIssueTool {
+    client: JiraClient,
+}
+
+impl CloneIssueTool {
+    #[must_use]
+    #[allow(clippy::missing_panics_doc)]
+    pub fn new(config: JiraConfig) -> Self {
+        Self {
+            client: JiraClient::new(config).expect("Failed to create JiraClient"),
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl crate::mcp::server::MCPToolHandler for CloneIssueTool {
+    async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
+        let original_issue_key = args
+            .get("original_issue_key")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: original_issue_key".to_string(),
+            })?;
+
+        let project_key = args
+            .get("project_key")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: project_key".to_string(),
+            })?;
+
+        let issue_type = args
+            .get("issue_type")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: issue_type".to_string(),
+            })?;
+
+        let summary = args
+            .get("summary")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::ApiError {
+                message: "Missing required parameter: summary".to_string(),
+            })?;
+
+        let description = args.get("description").and_then(|v| v.as_str());
+        let copy_attachments = args.get("copy_attachments").and_then(serde_json::Value::as_bool);
+        let copy_comments = args.get("copy_comments").and_then(serde_json::Value::as_bool);
+        let copy_work_logs = args.get("copy_work_logs").and_then(serde_json::Value::as_bool);
+        let copy_watchers = args.get("copy_watchers").and_then(serde_json::Value::as_bool);
+        let copy_links = args.get("copy_links").and_then(serde_json::Value::as_bool);
+
+        info!("Cloning issue {} to project {} as {}", original_issue_key, project_key, issue_type);
+
+        let clone_request = JiraIssueCloneRequest {
+            project_key: project_key.to_string(),
+            issue_type: issue_type.to_string(),
+            summary: summary.to_string(),
+            description: description.map(ToString::to_string),
+            field_mapping: None, // Use default field mapping
+            copy_attachments,
+            copy_comments,
+            copy_work_logs,
+            copy_watchers,
+            copy_links,
+        };
+
+        let clone_response = self.client.clone_issue(original_issue_key, &clone_request).await?;
+
+        let mut response_text = format!(
+            "Issue cloned successfully!\n\nOriginal Issue: {}\nCloned Issue: {}\nCloned Issue ID: {}\nCloned Issue URL: {}\n\n",
+            clone_response.original_issue_key,
+            clone_response.cloned_issue_key,
+            clone_response.cloned_issue_id,
+            clone_response.cloned_issue_url
+        );
+
+        if let Some(count) = clone_response.copied_attachments {
+            response_text.push_str(&format!("Copied Attachments: {count}\n"));
+        }
+        if let Some(count) = clone_response.copied_comments {
+            response_text.push_str(&format!("Copied Comments: {count}\n"));
+        }
+        if let Some(count) = clone_response.copied_work_logs {
+            response_text.push_str(&format!("Copied Work Logs: {count}\n"));
+        }
+        if let Some(count) = clone_response.copied_watchers {
+            response_text.push_str(&format!("Copied Watchers: {count}\n"));
+        }
+        if let Some(count) = clone_response.copied_links {
+            response_text.push_str(&format!("Copied Links: {count}\n"));
+        }
 
         Ok(MCPToolResult {
             content: vec![MCPContent::text(response_text)],
