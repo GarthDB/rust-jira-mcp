@@ -617,7 +617,7 @@ impl JiraClient {
     ) -> Result<BulkOperationSummary> {
         let start_time = Instant::now();
         let mut summary = BulkOperationSummary::new();
-        
+
         info!("Starting bulk operation with {} items", operations.len());
 
         // Validate that we don't exceed the maximum number of operations
@@ -633,7 +633,7 @@ impl JiraClient {
 
         for chunk in operations.chunks(batch_size) {
             let batch_results = self.process_batch(chunk, &config).await;
-            
+
             for result in batch_results {
                 summary.add_result(result);
             }
@@ -648,7 +648,7 @@ impl JiraClient {
         }
 
         summary.duration_ms = start_time.elapsed().as_millis() as u64;
-        
+
         info!(
             "Bulk operation completed: {} successful, {} failed, {:.1}% success rate",
             summary.successful_operations,
@@ -730,19 +730,20 @@ impl JiraClient {
                 self.update_issue(&operation.issue_key, fields).await
             }
             BulkOperationType::Transition => {
-                let transition_id = operation.data
+                let transition_id = operation
+                    .data
                     .get("transition_id")
                     .and_then(|v| v.as_str())
                     .ok_or_else(|| JiraError::ApiError {
                         message: "Missing transition_id in operation data".to_string(),
                     })?;
-                let comment = operation.data
-                    .get("comment")
-                    .and_then(|v| v.as_str());
-                self.transition_issue(&operation.issue_key, transition_id, comment).await
+                let comment = operation.data.get("comment").and_then(|v| v.as_str());
+                self.transition_issue(&operation.issue_key, transition_id, comment)
+                    .await
             }
             BulkOperationType::AddComment => {
-                let comment_body = operation.data
+                let comment_body = operation
+                    .data
                     .get("comment_body")
                     .and_then(|v| v.as_str())
                     .ok_or_else(|| JiraError::ApiError {
@@ -755,22 +756,24 @@ impl JiraClient {
                 // For mixed operations, we need to determine the operation type from the data
                 if operation.data.get("fields").is_some() {
                     // This is an update operation
-                    self.update_issue(&operation.issue_key, &operation.data).await
+                    self.update_issue(&operation.issue_key, &operation.data)
+                        .await
                 } else if operation.data.get("transition_id").is_some() {
                     // This is a transition operation
-                    let transition_id = operation.data
+                    let transition_id = operation
+                        .data
                         .get("transition_id")
                         .and_then(|v| v.as_str())
                         .ok_or_else(|| JiraError::ApiError {
                             message: "Missing transition_id in operation data".to_string(),
                         })?;
-                    let comment = operation.data
-                        .get("comment")
-                        .and_then(|v| v.as_str());
-                    self.transition_issue(&operation.issue_key, transition_id, comment).await
+                    let comment = operation.data.get("comment").and_then(|v| v.as_str());
+                    self.transition_issue(&operation.issue_key, transition_id, comment)
+                        .await
                 } else if operation.data.get("comment_body").is_some() {
                     // This is a comment operation
-                    let comment_body = operation.data
+                    let comment_body = operation
+                        .data
                         .get("comment_body")
                         .and_then(|v| v.as_str())
                         .ok_or_else(|| JiraError::ApiError {
@@ -792,9 +795,9 @@ impl JiraClient {
         match error {
             JiraError::HttpClientError(e) => e.is_timeout(),
             JiraError::ApiError { message } => {
-                message.contains("timeout") || 
-                message.contains("rate limit") ||
-                message.contains("too many requests")
+                message.contains("timeout")
+                    || message.contains("rate limit")
+                    || message.contains("too many requests")
             }
             _ => false,
         }
@@ -840,7 +843,7 @@ impl JiraClient {
         let mut operation_data = serde_json::json!({
             "transition_id": transition_id
         });
-        
+
         if let Some(comment_text) = comment {
             operation_data["comment"] = serde_json::Value::String(comment_text);
         }

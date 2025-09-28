@@ -2,10 +2,10 @@ use crate::config::JiraConfig;
 use crate::error::Result;
 use crate::mcp::tools::{
     AddCommentTool, BulkAddCommentsTool, BulkTransitionIssuesTool, BulkUpdateIssuesTool,
-    CreateIssueTool, GetCommentsTool, GetCustomFieldsTool, GetIssueTool,
-    GetIssueTypeMetadataTool, GetIssueTypesTool, GetPrioritiesAndStatusesTool,
-    GetProjectComponentsTool, GetProjectConfigTool, GetProjectMetadataTool, GetTransitionsTool,
-    MixedBulkOperationsTool, SearchIssuesTool, TestAuthTool, TransitionIssueTool, UpdateIssueTool,
+    CreateIssueTool, GetCommentsTool, GetCustomFieldsTool, GetIssueTool, GetIssueTypeMetadataTool,
+    GetIssueTypesTool, GetPrioritiesAndStatusesTool, GetProjectComponentsTool,
+    GetProjectConfigTool, GetProjectMetadataTool, GetTransitionsTool, MixedBulkOperationsTool,
+    SearchIssuesTool, TestAuthTool, TransitionIssueTool, UpdateIssueTool,
 };
 use crate::types::mcp::{
     CallToolParams, CallToolResult, InitializeParams, InitializeResult, JsonRpcError,

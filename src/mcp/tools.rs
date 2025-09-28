@@ -970,7 +970,11 @@ impl crate::mcp::server::MCPToolHandler for BulkTransitionIssuesTool {
             });
         }
 
-        info!("Bulk transitioning {} issues to transition {}", issue_keys.len(), transition_id);
+        info!(
+            "Bulk transitioning {} issues to transition {}",
+            issue_keys.len(),
+            transition_id
+        );
 
         let summary = self
             .client
@@ -1126,7 +1130,8 @@ impl crate::mcp::server::MCPToolHandler for MixedBulkOperationsTool {
             .get("operations")
             .and_then(|v| v.as_array())
             .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: operations (array of operation objects)".to_string(),
+                message: "Missing required parameter: operations (array of operation objects)"
+                    .to_string(),
             })?;
 
         // Parse configuration if provided
