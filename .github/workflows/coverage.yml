@@ -31,7 +31,7 @@ jobs:
       run: cargo install cargo-llvm-cov --locked
     
     - name: Cache cargo registry
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ~/.cargo/registry
@@ -42,7 +42,7 @@ jobs:
           ${{ runner.os }}-cargo-
     
     - name: Cache coverage data
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           target/llvm-cov
@@ -81,7 +81,7 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }} # Optional, for private repos
     
     - name: Upload coverage artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: coverage-report
