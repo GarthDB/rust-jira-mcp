@@ -6,7 +6,34 @@
 [![Rust](https://img.shields.io/badge/rust-1.70+-orange.svg)](https://www.rust-lang.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A Model Context Protocol (MCP) server implementation for Jira integration, built in Rust. This server provides comprehensive tools for interacting with Jira APIs through MCP-compatible clients.
+A high-performance Rust-based Model Context Protocol (MCP) server for comprehensive Jira API integration. This server provides extensive tooling for issue management, project configuration, bulk operations, and Zephyr test management through MCP-compatible clients.
+
+## 🚀 Quick Start
+
+```bash
+# Clone and build
+git clone https://github.com/GarthDB/rust-jira-mcp.git
+cd rust-jira-mcp
+cargo build --release
+
+# Configure your credentials
+cp env.example .env
+# Edit .env with your Jira credentials
+
+# Run the server
+cargo run --release
+```
+
+## 📖 Documentation
+
+- **[Documentation Index](docs/README.md)** - Complete documentation overview and navigation
+- **[Getting Started Guide](docs/getting-started.md)** - Complete setup and usage guide
+- **[API Documentation](https://docs.rs/rust-jira-mcp)** - Full API reference (generated with rustdoc)
+- **[Configuration Guide](CONFIGURATION.md)** - Comprehensive configuration management
+- **[Configuration Examples](docs/configuration-examples.md)** - Detailed configuration examples
+- **[Tool Examples](docs/tool-examples.md)** - Detailed examples for all MCP tools
+- **[Troubleshooting Guide](docs/troubleshooting.md)** - Common issues and solutions
+- **[Performance Guide](docs/performance.md)** - Optimization and benchmarking
 
 ## Features
 
