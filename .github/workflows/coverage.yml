@@ -70,15 +70,6 @@ jobs:
         # Generate HTML report for artifacts
         cargo llvm-cov --workspace --all-features --html --output-dir target/llvm-cov/html
     
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v4
-      with:
-        file: ./lcov.info
-        flags: unittests
-        name: codecov-umbrella
-        fail_ci_if_error: false
-        verbose: true
-        token: ${{ secrets.CODECOV_TOKEN }} # Optional, for private repos
     
     - name: Upload coverage artifacts
       uses: actions/upload-artifact@v4
@@ -120,8 +111,7 @@ jobs:
         fi
         
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo "📈 **View detailed report:** [Codecov.io](https://codecov.io/gh/${{ github.repository }})" >> $GITHUB_STEP_SUMMARY
-        echo "📋 **Download artifacts:** Check the workflow artifacts" >> $GITHUB_STEP_SUMMARY
+        echo "📋 **Download artifacts:** Check the workflow artifacts for detailed HTML report" >> $GITHUB_STEP_SUMMARY
 
   coverage-check:
     name: Coverage Check
