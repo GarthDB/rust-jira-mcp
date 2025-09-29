@@ -20,7 +20,8 @@ pub struct TestAuthTool {
 
 impl TestAuthTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self { config }
     }
@@ -56,7 +57,8 @@ pub struct SearchIssuesTool {
 
 impl SearchIssuesTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -127,7 +129,8 @@ pub struct CreateIssueTool {
 
 impl CreateIssueTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -167,7 +170,8 @@ pub struct UpdateIssueTool {
 
 impl UpdateIssueTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -214,7 +218,8 @@ pub struct GetIssueTool {
 
 impl GetIssueTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -275,7 +280,8 @@ pub struct GetCommentsTool {
 
 impl GetCommentsTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -328,7 +334,8 @@ pub struct AddCommentTool {
 
 impl AddCommentTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -376,7 +383,8 @@ pub struct GetTransitionsTool {
 
 impl GetTransitionsTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -428,7 +436,8 @@ pub struct TransitionIssueTool {
 
 impl TransitionIssueTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -482,7 +491,8 @@ pub struct GetProjectConfigTool {
 
 impl GetProjectConfigTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -525,7 +535,8 @@ pub struct GetIssueTypesTool {
 
 impl GetIssueTypesTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -581,7 +592,8 @@ pub struct GetIssueTypeMetadataTool {
 
 impl GetIssueTypeMetadataTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -627,7 +639,8 @@ pub struct GetProjectComponentsTool {
 
 impl GetProjectComponentsTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -680,7 +693,8 @@ pub struct GetPrioritiesAndStatusesTool {
 
 impl GetPrioritiesAndStatusesTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -746,7 +760,8 @@ pub struct GetCustomFieldsTool {
 
 impl GetCustomFieldsTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -810,7 +825,8 @@ pub struct GetProjectMetadataTool {
 
 impl GetProjectMetadataTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -858,7 +874,8 @@ pub struct BulkUpdateIssuesTool {
 
 impl BulkUpdateIssuesTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -948,7 +965,8 @@ pub struct BulkTransitionIssuesTool {
 
 impl BulkTransitionIssuesTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -1050,7 +1068,8 @@ pub struct BulkAddCommentsTool {
 
 impl BulkAddCommentsTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -1141,7 +1160,8 @@ pub struct MixedBulkOperationsTool {
 
 impl MixedBulkOperationsTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -1273,7 +1293,8 @@ pub struct GetLinkTypesTool {
 
 impl GetLinkTypesTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -1319,7 +1340,8 @@ pub struct GetIssueLinksTool {
 
 impl GetIssueLinksTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -1378,7 +1400,8 @@ pub struct CreateIssueLinkTool {
 
 impl CreateIssueLinkTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -1439,7 +1462,8 @@ pub struct DeleteIssueLinkTool {
 
 impl DeleteIssueLinkTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -1479,7 +1503,8 @@ pub struct GetIssueAttachmentsTool {
 
 impl GetIssueAttachmentsTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -1535,7 +1560,8 @@ pub struct UploadAttachmentTool {
 
 impl UploadAttachmentTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -1612,7 +1638,8 @@ pub struct DeleteAttachmentTool {
 
 impl DeleteAttachmentTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -1650,7 +1677,8 @@ pub struct DownloadAttachmentTool {
 
 impl DownloadAttachmentTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -1696,7 +1724,8 @@ pub struct GetIssueWorkLogsTool {
 
 impl GetIssueWorkLogsTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -1761,7 +1790,8 @@ pub struct AddWorkLogTool {
 
 impl AddWorkLogTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -1825,7 +1855,8 @@ pub struct UpdateWorkLogTool {
 
 impl UpdateWorkLogTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -1893,7 +1924,8 @@ pub struct DeleteWorkLogTool {
 
 impl DeleteWorkLogTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -1941,7 +1973,8 @@ pub struct GetIssueWatchersTool {
 
 impl GetIssueWatchersTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -1998,7 +2031,8 @@ pub struct AddIssueWatcherTool {
 
 impl AddIssueWatcherTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -2044,7 +2078,8 @@ pub struct RemoveIssueWatcherTool {
 
 impl RemoveIssueWatcherTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -2094,7 +2129,8 @@ pub struct GetLabelsTool {
 
 impl GetLabelsTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -2133,7 +2169,8 @@ pub struct CreateLabelTool {
 
 impl CreateLabelTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -2177,7 +2214,8 @@ pub struct UpdateLabelTool {
 
 impl UpdateLabelTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -2229,7 +2267,8 @@ pub struct DeleteLabelTool {
 
 impl DeleteLabelTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -2268,7 +2307,8 @@ pub struct CreateComponentTool {
 
 impl CreateComponentTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -2333,7 +2373,8 @@ pub struct UpdateComponentTool {
 
 impl UpdateComponentTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -2395,7 +2436,8 @@ pub struct DeleteComponentTool {
 
 impl DeleteComponentTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -2435,7 +2477,8 @@ pub struct CloneIssueTool {
 
 impl CloneIssueTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),

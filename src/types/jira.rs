@@ -568,9 +568,9 @@ pub struct BulkOperationResult {
 /// Result of a complete bulk operation
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BulkOperationSummary {
-    pub total_operations: usize,
-    pub successful_operations: usize,
-    pub failed_operations: usize,
+    pub total_operations: u32,
+    pub successful_operations: u32,
+    pub failed_operations: u32,
     pub results: Vec<BulkOperationResult>,
     pub duration_ms: u64,
 }
@@ -605,9 +605,11 @@ impl BulkOperationSummary {
         if self.total_operations == 0 {
             0.0
         } else {
-            #[allow(clippy::cast_precision_loss)]
-            let result = (self.successful_operations as f64 / self.total_operations as f64) * 100.0;
-            result
+            // Calculate percentage using floating point arithmetic
+            // u32 to f64 conversion is safe and lossless
+            let successful_f64 = f64::from(self.successful_operations);
+            let total_f64 = f64::from(self.total_operations);
+            (successful_f64 / total_f64) * 100.0
         }
     }
 }

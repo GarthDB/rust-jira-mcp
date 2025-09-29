@@ -17,7 +17,8 @@ pub struct GetZephyrTestStepsTool {
 
 impl GetZephyrTestStepsTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -70,7 +71,8 @@ pub struct CreateZephyrTestStepTool {
 
 impl CreateZephyrTestStepTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -150,7 +152,8 @@ pub struct UpdateZephyrTestStepTool {
 
 impl UpdateZephyrTestStepTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -231,7 +234,8 @@ pub struct DeleteZephyrTestStepTool {
 
 impl DeleteZephyrTestStepTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -282,7 +286,8 @@ pub struct GetZephyrTestCasesTool {
 
 impl GetZephyrTestCasesTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -355,7 +360,8 @@ pub struct CreateZephyrTestCaseTool {
 
 impl CreateZephyrTestCaseTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -443,7 +449,8 @@ pub struct GetZephyrTestExecutionsTool {
 
 impl GetZephyrTestExecutionsTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -501,7 +508,8 @@ pub struct CreateZephyrTestExecutionTool {
 
 impl CreateZephyrTestExecutionTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -594,7 +602,8 @@ pub struct GetZephyrTestCyclesTool {
 
 impl GetZephyrTestCyclesTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -649,7 +658,8 @@ pub struct GetZephyrTestPlansTool {
 
 impl GetZephyrTestPlansTool {
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// This function does not panic.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),

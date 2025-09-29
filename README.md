@@ -35,20 +35,44 @@ cargo build --release
 
 ## Configuration
 
-The server requires the following configuration:
+The server includes a comprehensive configuration management system with support for environment variables, configuration files, secret management, and hot-reloading.
 
-```rust
-JiraConfig {
-    api_base_url: "https://your-jira-instance.atlassian.net/rest/api/2".to_string(),
-    email: "your-email@example.com".to_string(),
-    personal_access_token: "your-token".to_string(),
-    default_project: Some("PROJECT_KEY".to_string()),
-    max_results: Some(50),
-    timeout_seconds: Some(30),
-    log_file: None,
-    strict_ssl: Some(true),
-}
+### Quick Start
+
+Create a `.env` file in your project root:
+
+```bash
+# Required
+JIRA_EMAIL=your.email@company.com
+JIRA_PERSONAL_ACCESS_TOKEN=your_personal_access_token_here
+
+# Optional
+JIRA_API_BASE_URL=https://jira.corp.adobe.com/rest/api/2
+JIRA_DEFAULT_PROJECT=PROJ
+JIRA_MAX_RESULTS=50
+JIRA_TIMEOUT_SECONDS=30
 ```
+
+### Configuration Features
+
+- ✅ **Environment Variables**: Support for all configuration via environment variables
+- ✅ **Configuration Files**: TOML, YAML, and JSON configuration file support
+- ✅ **Secret Management**: Secure handling of sensitive data with multiple storage options
+- ✅ **Configuration Validation**: Comprehensive validation with detailed error messages
+- ✅ **Hot-Reloading**: Automatic configuration reloading when files change
+- ✅ **Multiple Sources**: Support for multiple configuration sources with priority ordering
+- ✅ **Default Values**: Sensible defaults for all configuration options
+
+### Configuration Sources (Priority Order)
+
+1. Environment Variables (Highest priority)
+2. .env file
+3. Custom config files (specified via `JIRA_CONFIG_FILE`)
+4. config/local.toml
+5. config/default.toml
+6. Default values (Lowest priority)
+
+For detailed configuration documentation, see [CONFIGURATION.md](CONFIGURATION.md).
 
 ## Available Tools
 
@@ -143,6 +167,8 @@ The server implements the MCP protocol and can be used with any MCP-compatible c
 
 See the `examples/` directory for usage examples:
 - `project_metadata_example.rs` - Demonstrates the new project configuration and metadata tools
+- `simple_config_example.rs` - Shows basic configuration management usage
+- `configuration_example.rs` - Comprehensive configuration system demonstration
 
 ## Testing
 

@@ -82,249 +82,123 @@ pub trait MCPToolHandler {
 impl MCPServer {
     /// Create a new MCP server with the given configuration.
     #[must_use]
-    #[allow(clippy::too_many_lines)]
     pub fn new(config: JiraConfig) -> Self {
         let mut tools: HashMap<String, Box<dyn MCPToolHandler + Send + Sync>> = HashMap::new();
 
-        // Register all tools
-        tools.insert(
-            "test_jira_auth".to_string(),
-            Box::new(TestAuthTool::new(config.clone())),
-        );
-        tools.insert(
-            "search_jira_issues".to_string(),
-            Box::new(SearchIssuesTool::new(config.clone())),
-        );
-        tools.insert(
-            "create_jira_issue".to_string(),
-            Box::new(CreateIssueTool::new(config.clone())),
-        );
-        tools.insert(
-            "update_jira_issue".to_string(),
-            Box::new(UpdateIssueTool::new(config.clone())),
-        );
-        tools.insert(
-            "get_jira_issue".to_string(),
-            Box::new(GetIssueTool::new(config.clone())),
-        );
-        tools.insert(
-            "get_jira_comments".to_string(),
-            Box::new(GetCommentsTool::new(config.clone())),
-        );
-        tools.insert(
-            "add_jira_comment".to_string(),
-            Box::new(AddCommentTool::new(config.clone())),
-        );
-        tools.insert(
-            "get_jira_transitions".to_string(),
-            Box::new(GetTransitionsTool::new(config.clone())),
-        );
-        tools.insert(
-            "transition_jira_issue".to_string(),
-            Box::new(TransitionIssueTool::new(config.clone())),
-        );
-
-        // Project Configuration and Metadata tools
-        tools.insert(
-            "get_project_config".to_string(),
-            Box::new(GetProjectConfigTool::new(config.clone())),
-        );
-        tools.insert(
-            "get_project_issue_types".to_string(),
-            Box::new(GetIssueTypesTool::new(config.clone())),
-        );
-        tools.insert(
-            "get_issue_type_metadata".to_string(),
-            Box::new(GetIssueTypeMetadataTool::new(config.clone())),
-        );
-        tools.insert(
-            "get_project_components".to_string(),
-            Box::new(GetProjectComponentsTool::new(config.clone())),
-        );
-        tools.insert(
-            "get_priorities_and_statuses".to_string(),
-            Box::new(GetPrioritiesAndStatusesTool::new(config.clone())),
-        );
-        tools.insert(
-            "get_custom_fields".to_string(),
-            Box::new(GetCustomFieldsTool::new(config.clone())),
-        );
-        tools.insert(
-            "get_project_metadata".to_string(),
-            Box::new(GetProjectMetadataTool::new(config.clone())),
-        );
-
-        // Bulk Operations tools
-        tools.insert(
-            "bulk_update_issues".to_string(),
-            Box::new(BulkUpdateIssuesTool::new(config.clone())),
-        );
-        tools.insert(
-            "bulk_transition_issues".to_string(),
-            Box::new(BulkTransitionIssuesTool::new(config.clone())),
-        );
-        tools.insert(
-            "bulk_add_comments".to_string(),
-            Box::new(BulkAddCommentsTool::new(config.clone())),
-        );
-        tools.insert(
-            "mixed_bulk_operations".to_string(),
-            Box::new(MixedBulkOperationsTool::new(config.clone())),
-        );
-
-        // Issue Linking tools
-        tools.insert(
-            "get_jira_link_types".to_string(),
-            Box::new(GetLinkTypesTool::new(config.clone())),
-        );
-        tools.insert(
-            "get_jira_issue_links".to_string(),
-            Box::new(GetIssueLinksTool::new(config.clone())),
-        );
-        tools.insert(
-            "create_jira_issue_link".to_string(),
-            Box::new(CreateIssueLinkTool::new(config.clone())),
-        );
-        tools.insert(
-            "delete_jira_issue_link".to_string(),
-            Box::new(DeleteIssueLinkTool::new(config.clone())),
-        );
-
-        // File Attachment tools
-        tools.insert(
-            "get_jira_issue_attachments".to_string(),
-            Box::new(GetIssueAttachmentsTool::new(config.clone())),
-        );
-        tools.insert(
-            "upload_jira_attachment".to_string(),
-            Box::new(UploadAttachmentTool::new(config.clone())),
-        );
-        tools.insert(
-            "delete_jira_attachment".to_string(),
-            Box::new(DeleteAttachmentTool::new(config.clone())),
-        );
-        tools.insert(
-            "download_jira_attachment".to_string(),
-            Box::new(DownloadAttachmentTool::new(config.clone())),
-        );
-
-        // Work Log tools
-        tools.insert(
-            "get_jira_issue_work_logs".to_string(),
-            Box::new(GetIssueWorkLogsTool::new(config.clone())),
-        );
-        tools.insert(
-            "add_jira_work_log".to_string(),
-            Box::new(AddWorkLogTool::new(config.clone())),
-        );
-        tools.insert(
-            "update_jira_work_log".to_string(),
-            Box::new(UpdateWorkLogTool::new(config.clone())),
-        );
-        tools.insert(
-            "delete_jira_work_log".to_string(),
-            Box::new(DeleteWorkLogTool::new(config.clone())),
-        );
-
-        // Issue Watcher tools
-        tools.insert(
-            "get_jira_issue_watchers".to_string(),
-            Box::new(GetIssueWatchersTool::new(config.clone())),
-        );
-        tools.insert(
-            "add_jira_issue_watcher".to_string(),
-            Box::new(AddIssueWatcherTool::new(config.clone())),
-        );
-        tools.insert(
-            "remove_jira_issue_watcher".to_string(),
-            Box::new(RemoveIssueWatcherTool::new(config.clone())),
-        );
-
-        // Issue Label tools
-        tools.insert(
-            "get_jira_labels".to_string(),
-            Box::new(GetLabelsTool::new(config.clone())),
-        );
-        tools.insert(
-            "create_jira_label".to_string(),
-            Box::new(CreateLabelTool::new(config.clone())),
-        );
-        tools.insert(
-            "update_jira_label".to_string(),
-            Box::new(UpdateLabelTool::new(config.clone())),
-        );
-        tools.insert(
-            "delete_jira_label".to_string(),
-            Box::new(DeleteLabelTool::new(config.clone())),
-        );
-
-        // Issue Component tools
-        tools.insert(
-            "create_jira_component".to_string(),
-            Box::new(CreateComponentTool::new(config.clone())),
-        );
-        tools.insert(
-            "update_jira_component".to_string(),
-            Box::new(UpdateComponentTool::new(config.clone())),
-        );
-        tools.insert(
-            "delete_jira_component".to_string(),
-            Box::new(DeleteComponentTool::new(config.clone())),
-        );
-
-        // Issue Cloning tools
-        tools.insert(
-            "clone_jira_issue".to_string(),
-            Box::new(CloneIssueTool::new(config.clone())),
-        );
-
-        // Zephyr Test Management tools
-        tools.insert(
-            "get_zephyr_test_steps".to_string(),
-            Box::new(GetZephyrTestStepsTool::new(config.clone())),
-        );
-        tools.insert(
-            "create_zephyr_test_step".to_string(),
-            Box::new(CreateZephyrTestStepTool::new(config.clone())),
-        );
-        tools.insert(
-            "update_zephyr_test_step".to_string(),
-            Box::new(UpdateZephyrTestStepTool::new(config.clone())),
-        );
-        tools.insert(
-            "delete_zephyr_test_step".to_string(),
-            Box::new(DeleteZephyrTestStepTool::new(config.clone())),
-        );
-        tools.insert(
-            "get_zephyr_test_cases".to_string(),
-            Box::new(GetZephyrTestCasesTool::new(config.clone())),
-        );
-        tools.insert(
-            "create_zephyr_test_case".to_string(),
-            Box::new(CreateZephyrTestCaseTool::new(config.clone())),
-        );
-        tools.insert(
-            "get_zephyr_test_executions".to_string(),
-            Box::new(GetZephyrTestExecutionsTool::new(config.clone())),
-        );
-        tools.insert(
-            "create_zephyr_test_execution".to_string(),
-            Box::new(CreateZephyrTestExecutionTool::new(config.clone())),
-        );
-        tools.insert(
-            "get_zephyr_test_cycles".to_string(),
-            Box::new(GetZephyrTestCyclesTool::new(config.clone())),
-        );
-        tools.insert(
-            "get_zephyr_test_plans".to_string(),
-            Box::new(GetZephyrTestPlansTool::new(config.clone())),
-        );
+        Self::register_basic_tools(&mut tools, &config);
+        Self::register_project_tools(&mut tools, &config);
+        Self::register_bulk_tools(&mut tools, &config);
+        Self::register_linking_tools(&mut tools, &config);
+        Self::register_attachment_tools(&mut tools, &config);
+        Self::register_worklog_tools(&mut tools, &config);
+        Self::register_watcher_tools(&mut tools, &config);
+        Self::register_label_tools(&mut tools, &config);
+        Self::register_component_tools(&mut tools, &config);
+        Self::register_cloning_tools(&mut tools, &config);
+        Self::register_zephyr_tools(&mut tools, &config);
 
         Self {
             config,
             tools,
             initialized: false,
         }
+    }
+
+    /// Register basic Jira tools
+    fn register_basic_tools(tools: &mut HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>, config: &JiraConfig) {
+        tools.insert("test_jira_auth".to_string(), Box::new(TestAuthTool::new(config.clone())));
+        tools.insert("search_jira_issues".to_string(), Box::new(SearchIssuesTool::new(config.clone())));
+        tools.insert("create_jira_issue".to_string(), Box::new(CreateIssueTool::new(config.clone())));
+        tools.insert("update_jira_issue".to_string(), Box::new(UpdateIssueTool::new(config.clone())));
+        tools.insert("get_jira_issue".to_string(), Box::new(GetIssueTool::new(config.clone())));
+        tools.insert("get_jira_comments".to_string(), Box::new(GetCommentsTool::new(config.clone())));
+        tools.insert("add_jira_comment".to_string(), Box::new(AddCommentTool::new(config.clone())));
+        tools.insert("get_jira_transitions".to_string(), Box::new(GetTransitionsTool::new(config.clone())));
+        tools.insert("transition_jira_issue".to_string(), Box::new(TransitionIssueTool::new(config.clone())));
+    }
+
+    /// Register project configuration tools
+    fn register_project_tools(tools: &mut HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>, config: &JiraConfig) {
+        tools.insert("get_project_config".to_string(), Box::new(GetProjectConfigTool::new(config.clone())));
+        tools.insert("get_project_issue_types".to_string(), Box::new(GetIssueTypesTool::new(config.clone())));
+        tools.insert("get_issue_type_metadata".to_string(), Box::new(GetIssueTypeMetadataTool::new(config.clone())));
+        tools.insert("get_project_components".to_string(), Box::new(GetProjectComponentsTool::new(config.clone())));
+        tools.insert("get_priorities_and_statuses".to_string(), Box::new(GetPrioritiesAndStatusesTool::new(config.clone())));
+        tools.insert("get_custom_fields".to_string(), Box::new(GetCustomFieldsTool::new(config.clone())));
+        tools.insert("get_project_metadata".to_string(), Box::new(GetProjectMetadataTool::new(config.clone())));
+    }
+
+    /// Register bulk operation tools
+    fn register_bulk_tools(tools: &mut HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>, config: &JiraConfig) {
+        tools.insert("bulk_update_issues".to_string(), Box::new(BulkUpdateIssuesTool::new(config.clone())));
+        tools.insert("bulk_transition_issues".to_string(), Box::new(BulkTransitionIssuesTool::new(config.clone())));
+        tools.insert("bulk_add_comments".to_string(), Box::new(BulkAddCommentsTool::new(config.clone())));
+        tools.insert("mixed_bulk_operations".to_string(), Box::new(MixedBulkOperationsTool::new(config.clone())));
+    }
+
+    /// Register issue linking tools
+    fn register_linking_tools(tools: &mut HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>, config: &JiraConfig) {
+        tools.insert("get_jira_link_types".to_string(), Box::new(GetLinkTypesTool::new(config.clone())));
+        tools.insert("get_jira_issue_links".to_string(), Box::new(GetIssueLinksTool::new(config.clone())));
+        tools.insert("create_jira_issue_link".to_string(), Box::new(CreateIssueLinkTool::new(config.clone())));
+        tools.insert("delete_jira_issue_link".to_string(), Box::new(DeleteIssueLinkTool::new(config.clone())));
+    }
+
+    /// Register file attachment tools
+    fn register_attachment_tools(tools: &mut HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>, config: &JiraConfig) {
+        tools.insert("get_jira_issue_attachments".to_string(), Box::new(GetIssueAttachmentsTool::new(config.clone())));
+        tools.insert("upload_jira_attachment".to_string(), Box::new(UploadAttachmentTool::new(config.clone())));
+        tools.insert("delete_jira_attachment".to_string(), Box::new(DeleteAttachmentTool::new(config.clone())));
+        tools.insert("download_jira_attachment".to_string(), Box::new(DownloadAttachmentTool::new(config.clone())));
+    }
+
+    /// Register work log tools
+    fn register_worklog_tools(tools: &mut HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>, config: &JiraConfig) {
+        tools.insert("get_jira_issue_work_logs".to_string(), Box::new(GetIssueWorkLogsTool::new(config.clone())));
+        tools.insert("add_jira_work_log".to_string(), Box::new(AddWorkLogTool::new(config.clone())));
+        tools.insert("update_jira_work_log".to_string(), Box::new(UpdateWorkLogTool::new(config.clone())));
+        tools.insert("delete_jira_work_log".to_string(), Box::new(DeleteWorkLogTool::new(config.clone())));
+    }
+
+    /// Register issue watcher tools
+    fn register_watcher_tools(tools: &mut HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>, config: &JiraConfig) {
+        tools.insert("get_jira_issue_watchers".to_string(), Box::new(GetIssueWatchersTool::new(config.clone())));
+        tools.insert("add_jira_issue_watcher".to_string(), Box::new(AddIssueWatcherTool::new(config.clone())));
+        tools.insert("remove_jira_issue_watcher".to_string(), Box::new(RemoveIssueWatcherTool::new(config.clone())));
+    }
+
+    /// Register issue label tools
+    fn register_label_tools(tools: &mut HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>, config: &JiraConfig) {
+        tools.insert("get_jira_labels".to_string(), Box::new(GetLabelsTool::new(config.clone())));
+        tools.insert("create_jira_label".to_string(), Box::new(CreateLabelTool::new(config.clone())));
+        tools.insert("update_jira_label".to_string(), Box::new(UpdateLabelTool::new(config.clone())));
+        tools.insert("delete_jira_label".to_string(), Box::new(DeleteLabelTool::new(config.clone())));
+    }
+
+    /// Register issue component tools
+    fn register_component_tools(tools: &mut HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>, config: &JiraConfig) {
+        tools.insert("create_jira_component".to_string(), Box::new(CreateComponentTool::new(config.clone())));
+        tools.insert("update_jira_component".to_string(), Box::new(UpdateComponentTool::new(config.clone())));
+        tools.insert("delete_jira_component".to_string(), Box::new(DeleteComponentTool::new(config.clone())));
+    }
+
+    /// Register issue cloning tools
+    fn register_cloning_tools(tools: &mut HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>, config: &JiraConfig) {
+        tools.insert("clone_jira_issue".to_string(), Box::new(CloneIssueTool::new(config.clone())));
+    }
+
+    /// Register Zephyr test management tools
+    fn register_zephyr_tools(tools: &mut HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>, config: &JiraConfig) {
+        tools.insert("get_zephyr_test_steps".to_string(), Box::new(GetZephyrTestStepsTool::new(config.clone())));
+        tools.insert("create_zephyr_test_step".to_string(), Box::new(CreateZephyrTestStepTool::new(config.clone())));
+        tools.insert("update_zephyr_test_step".to_string(), Box::new(UpdateZephyrTestStepTool::new(config.clone())));
+        tools.insert("delete_zephyr_test_step".to_string(), Box::new(DeleteZephyrTestStepTool::new(config.clone())));
+        tools.insert("get_zephyr_test_cases".to_string(), Box::new(GetZephyrTestCasesTool::new(config.clone())));
+        tools.insert("create_zephyr_test_case".to_string(), Box::new(CreateZephyrTestCaseTool::new(config.clone())));
+        tools.insert("get_zephyr_test_executions".to_string(), Box::new(GetZephyrTestExecutionsTool::new(config.clone())));
+        tools.insert("create_zephyr_test_execution".to_string(), Box::new(CreateZephyrTestExecutionTool::new(config.clone())));
+        tools.insert("get_zephyr_test_cycles".to_string(), Box::new(GetZephyrTestCyclesTool::new(config.clone())));
+        tools.insert("get_zephyr_test_plans".to_string(), Box::new(GetZephyrTestPlansTool::new(config.clone())));
     }
 
     /// Run the MCP server with stdio transport.
@@ -551,9 +425,17 @@ impl MCPServer {
         }
     }
 
-    #[must_use]
-    #[allow(clippy::too_many_lines)]
-    pub fn list_tools() -> Vec<MCPTool> {
+    /// Get basic tool definitions
+    fn get_basic_tool_definitions() -> Vec<MCPTool> {
+        let mut tools = Vec::new();
+        tools.extend(Self::get_auth_and_search_tools());
+        tools.extend(Self::get_issue_crud_tools());
+        tools.extend(Self::get_comment_and_transition_tools());
+        tools
+    }
+
+    /// Get authentication and search tools
+    fn get_auth_and_search_tools() -> Vec<MCPTool> {
         vec![
             MCPTool {
                 name: "test_jira_auth".to_string(),
@@ -596,6 +478,12 @@ impl MCPServer {
                     "required": ["jql"]
                 }),
             },
+        ]
+    }
+
+    /// Get issue CRUD tools
+    fn get_issue_crud_tools() -> Vec<MCPTool> {
+        vec![
             MCPTool {
                 name: "create_jira_issue".to_string(),
                 description: "Create a new Jira issue".to_string(),
@@ -642,6 +530,12 @@ impl MCPServer {
                     "required": ["issue_key"]
                 }),
             },
+        ]
+    }
+
+    /// Get comment and transition tools
+    fn get_comment_and_transition_tools() -> Vec<MCPTool> {
+        vec![
             MCPTool {
                 name: "get_jira_comments".to_string(),
                 description: "Get all comments for a Jira issue".to_string(),
@@ -710,7 +604,12 @@ impl MCPServer {
                     "required": ["issue_key", "transition_id"]
                 }),
             },
-            // Project Configuration and Metadata tools
+        ]
+    }
+
+    /// Get project tool definitions
+    fn get_project_tool_definitions() -> Vec<MCPTool> {
+        vec![
             MCPTool {
                 name: "get_project_config".to_string(),
                 description: "Get project configuration details".to_string(),
@@ -797,7 +696,20 @@ impl MCPServer {
                     "required": ["project_key"]
                 }),
             },
-            // Bulk Operations tools
+        ]
+    }
+
+    /// Get bulk tool definitions
+    fn get_bulk_tool_definitions() -> Vec<MCPTool> {
+        let mut tools = Vec::new();
+        tools.extend(Self::get_simple_bulk_tools());
+        tools.extend(Self::get_mixed_bulk_tools());
+        tools
+    }
+
+    /// Get simple bulk operation tools
+    fn get_simple_bulk_tools() -> Vec<MCPTool> {
+        vec![
             MCPTool {
                 name: "bulk_update_issues".to_string(),
                 description: "Bulk update multiple Jira issues with the same fields".to_string(),
@@ -889,6 +801,12 @@ impl MCPServer {
                     "required": ["issue_keys", "comment_body"]
                 }),
             },
+        ]
+    }
+
+    /// Get mixed bulk operation tools
+    fn get_mixed_bulk_tools() -> Vec<MCPTool> {
+        vec![
             MCPTool {
                 name: "mixed_bulk_operations".to_string(),
                 description: "Execute mixed bulk operations on multiple Jira issues (update, transition, add comments, or mixed operations)".to_string(),
@@ -929,7 +847,22 @@ impl MCPServer {
                     "required": ["operations"]
                 }),
             },
-            // Zephyr Test Management tools
+        ]
+    }
+
+    /// Get Zephyr tool definitions
+    fn get_zephyr_tool_definitions() -> Vec<MCPTool> {
+        let mut tools = Vec::new();
+        tools.extend(Self::get_zephyr_test_step_tools());
+        tools.extend(Self::get_zephyr_test_case_tools());
+        tools.extend(Self::get_zephyr_execution_tools());
+        tools.extend(Self::get_zephyr_cycle_and_plan_tools());
+        tools
+    }
+
+    /// Get Zephyr test step tools
+    fn get_zephyr_test_step_tools() -> Vec<MCPTool> {
+        vec![
             MCPTool {
                 name: "get_zephyr_test_steps".to_string(),
                 description: "Get test steps for a Zephyr test case".to_string(),
@@ -1026,6 +959,12 @@ impl MCPServer {
                     "required": ["test_case_id", "step_id"]
                 }),
             },
+        ]
+    }
+
+    /// Get Zephyr test case tools
+    fn get_zephyr_test_case_tools() -> Vec<MCPTool> {
+        vec![
             MCPTool {
                 name: "get_zephyr_test_cases".to_string(),
                 description: "Search for Zephyr test cases in a project".to_string(),
@@ -1082,6 +1021,12 @@ impl MCPServer {
                     "required": ["name", "project_key", "issue_type"]
                 }),
             },
+        ]
+    }
+
+    /// Get Zephyr execution tools
+    fn get_zephyr_execution_tools() -> Vec<MCPTool> {
+        vec![
             MCPTool {
                 name: "get_zephyr_test_executions".to_string(),
                 description: "Get test executions for a Zephyr test case".to_string(),
@@ -1134,6 +1079,12 @@ impl MCPServer {
                     "required": ["test_case_id", "project_id", "status"]
                 }),
             },
+        ]
+    }
+
+    /// Get Zephyr cycle and plan tools
+    fn get_zephyr_cycle_and_plan_tools() -> Vec<MCPTool> {
+        vec![
             MCPTool {
                 name: "get_zephyr_test_cycles".to_string(),
                 description: "Get test cycles for a Zephyr project".to_string(),
@@ -1162,7 +1113,12 @@ impl MCPServer {
                     "required": ["project_key"]
                 }),
             },
-            // Issue Linking tools
+        ]
+    }
+
+    /// Get linking tool definitions
+    fn get_linking_tool_definitions() -> Vec<MCPTool> {
+        vec![
             MCPTool {
                 name: "get_jira_link_types".to_string(),
                 description: "Get all available issue link types in Jira".to_string(),
@@ -1225,7 +1181,12 @@ impl MCPServer {
                     "required": ["link_id"]
                 }),
             },
-            // File Attachment tools
+        ]
+    }
+
+    /// Get attachment tool definitions
+    fn get_attachment_tool_definitions() -> Vec<MCPTool> {
+        vec![
             MCPTool {
                 name: "get_jira_issue_attachments".to_string(),
                 description: "Get all attachments for a specific Jira issue".to_string(),
@@ -1290,7 +1251,12 @@ impl MCPServer {
                     "required": ["attachment_id"]
                 }),
             },
-            // Work Log tools
+        ]
+    }
+
+    /// Get work log tool definitions
+    fn get_worklog_tool_definitions() -> Vec<MCPTool> {
+        vec![
             MCPTool {
                 name: "get_jira_issue_work_logs".to_string(),
                 description: "Get all work log entries for a specific Jira issue".to_string(),
@@ -1379,7 +1345,12 @@ impl MCPServer {
                     "required": ["issue_key", "work_log_id"]
                 }),
             },
-            // Issue Watcher tools
+        ]
+    }
+
+    /// Get watcher tool definitions
+    fn get_watcher_tool_definitions() -> Vec<MCPTool> {
+        vec![
             MCPTool {
                 name: "get_jira_issue_watchers".to_string(),
                 description: "Get all watchers for a specific Jira issue".to_string(),
@@ -1430,7 +1401,12 @@ impl MCPServer {
                     "required": ["issue_key", "account_id"]
                 }),
             },
-            // Issue Label tools
+        ]
+    }
+
+    /// Get label tool definitions
+    fn get_label_tool_definitions() -> Vec<MCPTool> {
+        vec![
             MCPTool {
                 name: "get_jira_labels".to_string(),
                 description: "Get all available labels in Jira".to_string(),
@@ -1485,7 +1461,12 @@ impl MCPServer {
                     "required": ["name"]
                 }),
             },
-            // Issue Component tools
+        ]
+    }
+
+    /// Get component tool definitions
+    fn get_component_tool_definitions() -> Vec<MCPTool> {
+        vec![
             MCPTool {
                 name: "create_jira_component".to_string(),
                 description: "Create a new component in a Jira project".to_string(),
@@ -1560,7 +1541,12 @@ impl MCPServer {
                     "required": ["component_id"]
                 }),
             },
-            // Issue Cloning tools
+        ]
+    }
+
+    /// Get cloning tool definitions
+    fn get_cloning_tool_definitions() -> Vec<MCPTool> {
+        vec![
             MCPTool {
                 name: "clone_jira_issue".to_string(),
                 description: "Clone an existing Jira issue with optional copying of attachments, comments, work logs, watchers, and links".to_string(),
@@ -1612,6 +1598,23 @@ impl MCPServer {
                 }),
             },
         ]
+    }
+
+    #[must_use]
+    pub fn list_tools() -> Vec<MCPTool> {
+        let mut tools = Vec::new();
+        tools.extend(Self::get_basic_tool_definitions());
+        tools.extend(Self::get_project_tool_definitions());
+        tools.extend(Self::get_bulk_tool_definitions());
+        tools.extend(Self::get_zephyr_tool_definitions());
+        tools.extend(Self::get_linking_tool_definitions());
+        tools.extend(Self::get_attachment_tool_definitions());
+        tools.extend(Self::get_worklog_tool_definitions());
+        tools.extend(Self::get_watcher_tool_definitions());
+        tools.extend(Self::get_label_tool_definitions());
+        tools.extend(Self::get_component_tool_definitions());
+        tools.extend(Self::get_cloning_tool_definitions());
+        tools
     }
 
     /// Call a tool by name with the given arguments.
