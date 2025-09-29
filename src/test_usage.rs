@@ -38,12 +38,8 @@ pub fn test_usage() {
         status: reqwest::StatusCode::BAD_REQUEST,
         message: "test".to_string(),
     };
-    let _api_error = JiraError::ApiError {
-        message: "test".to_string(),
-    };
-    let _unknown_error = JiraError::Unknown {
-        message: "test".to_string(),
-    };
+    let _api_error = JiraError::api_error("test");
+    let _unknown_error = JiraError::unknown_error("test");
 
     // Test from_jira_response
     let _jira_error = JiraError::from_jira_response(

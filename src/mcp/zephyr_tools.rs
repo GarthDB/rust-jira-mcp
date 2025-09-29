@@ -32,8 +32,8 @@ impl crate::mcp::server::MCPToolHandler for GetZephyrTestStepsTool {
         let test_case_id = args
             .get("test_case_id")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: test_case_id".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: test_case_id")
             })?;
 
         info!("Getting Zephyr test steps for test case: {}", test_case_id);
@@ -86,21 +86,19 @@ impl crate::mcp::server::MCPToolHandler for CreateZephyrTestStepTool {
         let test_case_id = args
             .get("test_case_id")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: test_case_id".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: test_case_id")
             })?;
 
         let step = args.get("step").and_then(|v| v.as_str()).ok_or_else(|| {
-            crate::error::JiraError::ApiError {
-                message: "Missing required parameter: step".to_string(),
-            }
+            crate::error::JiraError::api_error("Missing required parameter: step")
         })?;
 
         let order = i32::try_from(
             args.get("order")
                 .and_then(serde_json::Value::as_i64)
-                .ok_or_else(|| crate::error::JiraError::ApiError {
-                    message: "Missing required parameter: order".to_string(),
+                .ok_or_else(|| {
+                    crate::error::JiraError::api_error("Missing required parameter: order")
                 })?,
         )
         .unwrap_or(0);
@@ -167,15 +165,15 @@ impl crate::mcp::server::MCPToolHandler for UpdateZephyrTestStepTool {
         let test_case_id = args
             .get("test_case_id")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: test_case_id".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: test_case_id")
             })?;
 
         let step_id = args
             .get("step_id")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: step_id".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: step_id")
             })?;
 
         let step = args
@@ -249,15 +247,15 @@ impl crate::mcp::server::MCPToolHandler for DeleteZephyrTestStepTool {
         let test_case_id = args
             .get("test_case_id")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: test_case_id".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: test_case_id")
             })?;
 
         let step_id = args
             .get("step_id")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: step_id".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: step_id")
             })?;
 
         info!(
@@ -301,8 +299,8 @@ impl crate::mcp::server::MCPToolHandler for GetZephyrTestCasesTool {
         let project_key = args
             .get("project_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: project_key".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: project_key")
             })?;
 
         let start_at = args
@@ -373,23 +371,21 @@ impl CreateZephyrTestCaseTool {
 impl crate::mcp::server::MCPToolHandler for CreateZephyrTestCaseTool {
     async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
         let name = args.get("name").and_then(|v| v.as_str()).ok_or_else(|| {
-            crate::error::JiraError::ApiError {
-                message: "Missing required parameter: name".to_string(),
-            }
+            crate::error::JiraError::api_error("Missing required parameter: name")
         })?;
 
         let project_key = args
             .get("project_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: project_key".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: project_key")
             })?;
 
         let issue_type = args
             .get("issue_type")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: issue_type".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_type")
             })?;
 
         let priority = args
@@ -464,8 +460,8 @@ impl crate::mcp::server::MCPToolHandler for GetZephyrTestExecutionsTool {
         let test_case_id = args
             .get("test_case_id")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: test_case_id".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: test_case_id")
             })?;
 
         info!(
@@ -523,21 +519,19 @@ impl crate::mcp::server::MCPToolHandler for CreateZephyrTestExecutionTool {
         let test_case_id = args
             .get("test_case_id")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: test_case_id".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: test_case_id")
             })?;
 
         let project_id = args
             .get("project_id")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: project_id".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: project_id")
             })?;
 
         let status = args.get("status").and_then(|v| v.as_str()).ok_or_else(|| {
-            crate::error::JiraError::ApiError {
-                message: "Missing required parameter: status".to_string(),
-            }
+            crate::error::JiraError::api_error("Missing required parameter: status")
         })?;
 
         let cycle_id = args
@@ -617,8 +611,8 @@ impl crate::mcp::server::MCPToolHandler for GetZephyrTestCyclesTool {
         let project_key = args
             .get("project_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: project_key".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: project_key")
             })?;
 
         info!("Getting Zephyr test cycles for project: {}", project_key);
@@ -673,8 +667,8 @@ impl crate::mcp::server::MCPToolHandler for GetZephyrTestPlansTool {
         let project_key = args
             .get("project_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: project_key".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: project_key")
             })?;
 
         info!("Getting Zephyr test plans for project: {}", project_key);

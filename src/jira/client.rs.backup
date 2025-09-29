@@ -7,8 +7,10 @@ use crate::types::jira::{
     JiraIssueLink, JiraIssueLinkCreateRequest, JiraLabel, JiraLabelCreateRequest,
     JiraLabelUpdateRequest, JiraLinkType, JiraSearchResult, JiraTransition, JiraWatchersResponse,
     JiraWorkLog, JiraWorkLogCreateRequest, JiraWorkLogUpdateRequest, ZephyrTestCase,
-    ZephyrTestCaseCreateRequest, ZephyrTestCaseSearchResult, ZephyrTestCycle, ZephyrTestExecution,
-    ZephyrTestExecutionCreateRequest, ZephyrTestPlan, ZephyrTestStep, ZephyrTestStepCreateRequest,
+    ZephyrTestCaseCreateRequest, ZephyrTestCaseSearchResult, ZephyrTestCaseUpdateRequest,
+    ZephyrTestCycle, ZephyrTestCycleCreateRequest, ZephyrTestExecution,
+    ZephyrTestExecutionCreateRequest, ZephyrTestExecutionUpdateRequest, ZephyrTestPlan,
+    ZephyrTestPlanCreateRequest, ZephyrTestStep, ZephyrTestStepCreateRequest,
     ZephyrTestStepUpdateRequest,
 };
 use reqwest::{Client, Method, RequestBuilder};
@@ -845,6 +847,11 @@ impl JiraClient {
     /// # Errors
     ///
     /// Returns an error if the work log cannot be found or the request fails.
+    pub async fn get_work_log(&self, issue_key: &str, work_log_id: &str) -> Result<JiraWorkLog> {
+        let endpoint = format!("issue/{issue_key}/worklog/{work_log_id}");
+        self.get(&endpoint).await
+    }
+
     /// Get project metadata including all configuration details
     ///
     /// # Errors
@@ -1329,10 +1336,7 @@ impl JiraClient {
 
         // Apply field mapping
         if let Some(field_mapping) = &clone_request.field_mapping {
-            warn!(
-                "Field mapping requested but not implemented: {:?}",
-                field_mapping
-            );
+            warn!("Field mapping requested but not implemented: {:?}", field_mapping);
         }
 
         // Create the new issue
@@ -1615,6 +1619,11 @@ impl JiraClient {
     /// # Errors
     ///
     /// Returns an error if the test case cannot be found or the request fails
+    pub async fn get_zephyr_test_case(&self, test_case_id: &str) -> Result<ZephyrTestCase> {
+        let endpoint = format!("testcase/{test_case_id}");
+        self.zephyr_get(&endpoint).await
+    }
+
     /// Search for test cases
     ///
     /// # Errors
@@ -1663,12 +1672,28 @@ impl JiraClient {
     /// # Errors
     ///
     /// Returns an error if the test case update fails or the response cannot be parsed
+    pub async fn update_zephyr_test_case(
+        &self,
+        test_case_id: &str,
+        test_case: &ZephyrTestCaseUpdateRequest,
+    ) -> Result<ZephyrTestCase> {
+        let endpoint = format!("testcase/{test_case_id}");
+        self.zephyr_put(&endpoint, test_case).await
+    }
+
     /// Delete a test case
     ///
     /// # Errors
     ///
     /// Returns an error if the test case deletion fails
+    pub async fn delete_zephyr_test_case(&self, test_case_id: &str) -> Result<()> {
+        let endpoint = format!("testcase/{test_case_id}");
+        let _: serde_json::Value = self.zephyr_delete(&endpoint).await?;
+        Ok(())
+    }
+
     // Test Execution Operations
+
     /// Get test executions for a test case
     ///
     /// # Errors
@@ -1714,12 +1739,28 @@ impl JiraClient {
     /// # Errors
     ///
     /// Returns an error if the test execution update fails or the response cannot be parsed
+    pub async fn update_zephyr_test_execution(
+        &self,
+        execution_id: &str,
+        execution: &ZephyrTestExecutionUpdateRequest,
+    ) -> Result<ZephyrTestExecution> {
+        let endpoint = format!("execution/{execution_id}");
+        self.zephyr_put(&endpoint, execution).await
+    }
+
     /// Delete a test execution
     ///
     /// # Errors
     ///
     /// Returns an error if the test execution deletion fails
+    pub async fn delete_zephyr_test_execution(&self, execution_id: &str) -> Result<()> {
+        let endpoint = format!("execution/{execution_id}");
+        let _: serde_json::Value = self.zephyr_delete(&endpoint).await?;
+        Ok(())
+    }
+
     // Test Cycle Operations
+
     /// Get test cycles for a project
     ///
     /// # Errors
@@ -1750,17 +1791,40 @@ impl JiraClient {
     /// # Errors
     ///
     /// Returns an error if the test cycle creation fails or the response cannot be parsed
+    pub async fn create_zephyr_test_cycle(
+        &self,
+        cycle: &ZephyrTestCycleCreateRequest,
+    ) -> Result<ZephyrTestCycle> {
+        self.zephyr_post("cycle", cycle).await
+    }
+
     /// Update an existing test cycle
     ///
     /// # Errors
     ///
     /// Returns an error if the test cycle update fails or the response cannot be parsed
+    pub async fn update_zephyr_test_cycle(
+        &self,
+        cycle_id: &str,
+        cycle: &ZephyrTestCycleCreateRequest,
+    ) -> Result<ZephyrTestCycle> {
+        let endpoint = format!("cycle/{cycle_id}");
+        self.zephyr_put(&endpoint, cycle).await
+    }
+
     /// Delete a test cycle
     ///
     /// # Errors
     ///
     /// Returns an error if the test cycle deletion fails
+    pub async fn delete_zephyr_test_cycle(&self, cycle_id: &str) -> Result<()> {
+        let endpoint = format!("cycle/{cycle_id}");
+        let _: serde_json::Value = self.zephyr_delete(&endpoint).await?;
+        Ok(())
+    }
+
     // Test Plan Operations
+
     /// Get test plans for a project
     ///
     /// # Errors
@@ -1784,5 +1848,42 @@ impl JiraClient {
         }
 
         Ok(result)
+    }
+
+    /// Create a new test plan
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the test plan creation fails or the response cannot be parsed
+    pub async fn create_zephyr_test_plan(
+        &self,
+        plan: &ZephyrTestPlanCreateRequest,
+    ) -> Result<ZephyrTestPlan> {
+        self.zephyr_post("testplan", plan).await
+    }
+
+    /// Update an existing test plan
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the test plan update fails or the response cannot be parsed
+    pub async fn update_zephyr_test_plan(
+        &self,
+        plan_id: &str,
+        plan: &ZephyrTestPlanCreateRequest,
+    ) -> Result<ZephyrTestPlan> {
+        let endpoint = format!("testplan/{plan_id}");
+        self.zephyr_put(&endpoint, plan).await
+    }
+
+    /// Delete a test plan
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the test plan deletion fails
+    pub async fn delete_zephyr_test_plan(&self, plan_id: &str) -> Result<()> {
+        let endpoint = format!("testplan/{plan_id}");
+        let _: serde_json::Value = self.zephyr_delete(&endpoint).await?;
+        Ok(())
     }
 }

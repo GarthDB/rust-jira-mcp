@@ -69,11 +69,10 @@ impl SearchIssuesTool {
 #[async_trait::async_trait]
 impl crate::mcp::server::MCPToolHandler for SearchIssuesTool {
     async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
-        let jql = args.get("jql").and_then(|v| v.as_str()).ok_or_else(|| {
-            crate::error::JiraError::ApiError {
-                message: "Missing required parameter: jql".to_string(),
-            }
-        })?;
+        let jql = args
+            .get("jql")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: jql"))?;
 
         let start_at = args
             .get("start_at")
@@ -141,11 +140,9 @@ impl CreateIssueTool {
 #[async_trait::async_trait]
 impl crate::mcp::server::MCPToolHandler for CreateIssueTool {
     async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
-        let fields = args
-            .get("fields")
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: fields".to_string(),
-            })?;
+        let fields = args.get("fields").ok_or_else(|| {
+            crate::error::JiraError::api_error("Missing required parameter: fields")
+        })?;
 
         info!("Creating Jira issue with fields: {:?}", fields);
 
@@ -185,15 +182,13 @@ impl crate::mcp::server::MCPToolHandler for UpdateIssueTool {
         let issue_id_or_key = args
             .get("issue_id_or_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: issue_id_or_key".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_id_or_key")
             })?;
 
-        let fields = args
-            .get("fields")
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: fields".to_string(),
-            })?;
+        let fields = args.get("fields").ok_or_else(|| {
+            crate::error::JiraError::api_error("Missing required parameter: fields")
+        })?;
 
         info!(
             "Updating Jira issue {} with fields: {:?}",
@@ -233,8 +228,8 @@ impl crate::mcp::server::MCPToolHandler for GetIssueTool {
         let issue_key = args
             .get("issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: issue_key".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_key")
             })?;
 
         info!("Getting Jira issue: {}", issue_key);
@@ -295,8 +290,8 @@ impl crate::mcp::server::MCPToolHandler for GetCommentsTool {
         let issue_key = args
             .get("issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: issue_key".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_key")
             })?;
 
         info!("Getting comments for Jira issue: {}", issue_key);
@@ -349,15 +344,15 @@ impl crate::mcp::server::MCPToolHandler for AddCommentTool {
         let issue_key = args
             .get("issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: issue_key".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_key")
             })?;
 
         let comment_body = args
             .get("comment_body")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: comment_body".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: comment_body")
             })?;
 
         info!("Adding comment to Jira issue: {}", issue_key);
@@ -398,8 +393,8 @@ impl crate::mcp::server::MCPToolHandler for GetTransitionsTool {
         let issue_key = args
             .get("issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: issue_key".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_key")
             })?;
 
         info!("Getting transitions for Jira issue: {}", issue_key);
@@ -451,15 +446,15 @@ impl crate::mcp::server::MCPToolHandler for TransitionIssueTool {
         let issue_key = args
             .get("issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: issue_key".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_key")
             })?;
 
         let transition_id = args
             .get("transition_id")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: transition_id".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: transition_id")
             })?;
 
         let comment = args.get("comment").and_then(|v| v.as_str());
@@ -506,8 +501,8 @@ impl crate::mcp::server::MCPToolHandler for GetProjectConfigTool {
         let project_key = args
             .get("project_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: project_key".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: project_key")
             })?;
 
         info!("Getting project configuration for: {}", project_key);
@@ -550,8 +545,8 @@ impl crate::mcp::server::MCPToolHandler for GetIssueTypesTool {
         let project_key = args
             .get("project_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: project_key".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: project_key")
             })?;
 
         info!("Getting issue types for project: {}", project_key);
@@ -607,8 +602,8 @@ impl crate::mcp::server::MCPToolHandler for GetIssueTypeMetadataTool {
         let issue_type_id = args
             .get("issue_type_id")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: issue_type_id".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_type_id")
             })?;
 
         info!("Getting issue type metadata for ID: {}", issue_type_id);
@@ -654,8 +649,8 @@ impl crate::mcp::server::MCPToolHandler for GetProjectComponentsTool {
         let project_key = args
             .get("project_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: project_key".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: project_key")
             })?;
 
         info!("Getting components for project: {}", project_key);
@@ -840,8 +835,8 @@ impl crate::mcp::server::MCPToolHandler for GetProjectMetadataTool {
         let project_key = args
             .get("project_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: project_key".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: project_key")
             })?;
 
         info!(
@@ -889,15 +884,15 @@ impl crate::mcp::server::MCPToolHandler for BulkUpdateIssuesTool {
         let issue_keys = args
             .get("issue_keys")
             .and_then(|v| v.as_array())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: issue_keys (array of issue keys)".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error(
+                    "Missing required parameter: issue_keys (array of issue keys)",
+                )
             })?;
 
-        let fields = args
-            .get("fields")
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: fields".to_string(),
-            })?;
+        let fields = args.get("fields").ok_or_else(|| {
+            crate::error::JiraError::api_error("Missing required parameter: fields")
+        })?;
 
         // Parse configuration if provided
         let config = if let Some(config_data) = args.get("config") {
@@ -913,9 +908,7 @@ impl crate::mcp::server::MCPToolHandler for BulkUpdateIssuesTool {
             .collect();
 
         if issue_keys.is_empty() {
-            return Err(crate::error::JiraError::ApiError {
-                message: "No issue keys provided".to_string(),
-            });
+            return Err(crate::error::JiraError::api_error("No issue keys provided"));
         }
 
         info!("Bulk updating {} issues", issue_keys.len());
@@ -980,15 +973,17 @@ impl crate::mcp::server::MCPToolHandler for BulkTransitionIssuesTool {
         let issue_keys = args
             .get("issue_keys")
             .and_then(|v| v.as_array())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: issue_keys (array of issue keys)".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error(
+                    "Missing required parameter: issue_keys (array of issue keys)",
+                )
             })?;
 
         let transition_id = args
             .get("transition_id")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: transition_id".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: transition_id")
             })?;
 
         let comment = args.get("comment").and_then(|v| v.as_str());
@@ -1007,9 +1002,7 @@ impl crate::mcp::server::MCPToolHandler for BulkTransitionIssuesTool {
             .collect();
 
         if issue_keys.is_empty() {
-            return Err(crate::error::JiraError::ApiError {
-                message: "No issue keys provided".to_string(),
-            });
+            return Err(crate::error::JiraError::api_error("No issue keys provided"));
         }
 
         info!(
@@ -1083,15 +1076,17 @@ impl crate::mcp::server::MCPToolHandler for BulkAddCommentsTool {
         let issue_keys = args
             .get("issue_keys")
             .and_then(|v| v.as_array())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: issue_keys (array of issue keys)".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error(
+                    "Missing required parameter: issue_keys (array of issue keys)",
+                )
             })?;
 
         let comment_body = args
             .get("comment_body")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: comment_body".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: comment_body")
             })?;
 
         // Parse configuration if provided
@@ -1108,9 +1103,7 @@ impl crate::mcp::server::MCPToolHandler for BulkAddCommentsTool {
             .collect();
 
         if issue_keys.is_empty() {
-            return Err(crate::error::JiraError::ApiError {
-                message: "No issue keys provided".to_string(),
-            });
+            return Err(crate::error::JiraError::api_error("No issue keys provided"));
         }
 
         info!("Bulk adding comments to {} issues", issue_keys.len());
@@ -1175,9 +1168,10 @@ impl crate::mcp::server::MCPToolHandler for MixedBulkOperationsTool {
         let operations = args
             .get("operations")
             .and_then(|v| v.as_array())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: operations (array of operation objects)"
-                    .to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error(
+                    "Missing required parameter: operations (array of operation objects)",
+                )
             })?;
 
         // Parse configuration if provided
@@ -1193,15 +1187,21 @@ impl crate::mcp::server::MCPToolHandler for MixedBulkOperationsTool {
             let issue_key = op
                 .get("issue_key")
                 .and_then(|v| v.as_str())
-                .ok_or_else(|| crate::error::JiraError::ApiError {
-                    message: format!("Missing issue_key in operation {}", i + 1),
+                .ok_or_else(|| {
+                    crate::error::JiraError::api_error(&format!(
+                        "Missing issue_key in operation {}",
+                        i + 1
+                    ))
                 })?;
 
             let operation_type = op
                 .get("operation_type")
                 .and_then(|v| v.as_str())
-                .ok_or_else(|| crate::error::JiraError::ApiError {
-                    message: format!("Missing operation_type in operation {}", i + 1),
+                .ok_or_else(|| {
+                    crate::error::JiraError::api_error(&format!(
+                        "Missing operation_type in operation {}",
+                        i + 1
+                    ))
                 })?;
 
             let operation_type = match operation_type {
@@ -1210,20 +1210,16 @@ impl crate::mcp::server::MCPToolHandler for MixedBulkOperationsTool {
                 "add_comment" => BulkOperationType::AddComment,
                 "mixed" => BulkOperationType::Mixed,
                 _ => {
-                    return Err(crate::error::JiraError::ApiError {
-                        message: format!(
-                            "Invalid operation_type '{}' in operation {}. Must be one of: update, transition, add_comment, mixed",
-                            operation_type, i + 1
-                        ),
-                    });
+                    return Err(crate::error::JiraError::api_error(&format!(
+                        "Invalid operation_type '{}' in operation {}. Must be one of: update, transition, add_comment, mixed",
+                        operation_type, i + 1
+                    )));
                 }
             };
 
-            let data = op
-                .get("data")
-                .ok_or_else(|| crate::error::JiraError::ApiError {
-                    message: format!("Missing data in operation {}", i + 1),
-                })?;
+            let data = op.get("data").ok_or_else(|| {
+                crate::error::JiraError::api_error(&format!("Missing data in operation {}", i + 1))
+            })?;
 
             bulk_operations.push(BulkOperationItem {
                 issue_key: issue_key.to_string(),
@@ -1233,9 +1229,7 @@ impl crate::mcp::server::MCPToolHandler for MixedBulkOperationsTool {
         }
 
         if bulk_operations.is_empty() {
-            return Err(crate::error::JiraError::ApiError {
-                message: "No operations provided".to_string(),
-            });
+            return Err(crate::error::JiraError::api_error("No operations provided"));
         }
 
         info!("Executing {} mixed bulk operations", bulk_operations.len());
@@ -1355,8 +1349,8 @@ impl crate::mcp::server::MCPToolHandler for GetIssueLinksTool {
         let issue_key = args
             .get("issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: issue_key".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_key")
             })?;
 
         info!("Getting issue links for: {}", issue_key);
@@ -1415,22 +1409,22 @@ impl crate::mcp::server::MCPToolHandler for CreateIssueLinkTool {
         let inward_issue_key = args
             .get("inward_issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: inward_issue_key".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: inward_issue_key")
             })?;
 
         let outward_issue_key = args
             .get("outward_issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: outward_issue_key".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: outward_issue_key")
             })?;
 
         let link_type_name = args
             .get("link_type_name")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: link_type_name".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: link_type_name")
             })?;
 
         let comment = args.get("comment").and_then(|v| v.as_str());
@@ -1477,8 +1471,8 @@ impl crate::mcp::server::MCPToolHandler for DeleteIssueLinkTool {
         let link_id = args
             .get("link_id")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: link_id".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: link_id")
             })?;
 
         info!("Deleting issue link: {}", link_id);
@@ -1518,8 +1512,8 @@ impl crate::mcp::server::MCPToolHandler for GetIssueAttachmentsTool {
         let issue_key = args
             .get("issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: issue_key".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_key")
             })?;
 
         info!("Getting attachments for issue: {}", issue_key);
@@ -1575,31 +1569,31 @@ impl crate::mcp::server::MCPToolHandler for UploadAttachmentTool {
         let issue_key = args
             .get("issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: issue_key".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_key")
             })?;
 
         let filename = args
             .get("filename")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: filename".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: filename")
             })?;
 
         let content = args
             .get("content")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: content (base64 encoded)".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error(
+                    "Missing required parameter: content (base64 encoded)",
+                )
             })?;
 
         let mime_type = args.get("mime_type").and_then(|v| v.as_str());
 
         // Decode base64 content
         let content_bytes = general_purpose::STANDARD.decode(content).map_err(|e| {
-            crate::error::JiraError::ApiError {
-                message: format!("Failed to decode base64 content: {e}"),
-            }
+            crate::error::JiraError::api_error(&format!("Failed to decode base64 content: {e}"))
         })?;
 
         info!("Uploading attachment to issue: {}", issue_key);
@@ -1653,8 +1647,8 @@ impl crate::mcp::server::MCPToolHandler for DeleteAttachmentTool {
         let attachment_id = args
             .get("attachment_id")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: attachment_id".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: attachment_id")
             })?;
 
         info!("Deleting attachment: {}", attachment_id);
@@ -1692,8 +1686,8 @@ impl crate::mcp::server::MCPToolHandler for DownloadAttachmentTool {
         let attachment_id = args
             .get("attachment_id")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: attachment_id".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: attachment_id")
             })?;
 
         info!("Downloading attachment: {}", attachment_id);
@@ -1739,8 +1733,8 @@ impl crate::mcp::server::MCPToolHandler for GetIssueWorkLogsTool {
         let issue_key = args
             .get("issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: issue_key".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_key")
             })?;
 
         info!("Getting work logs for issue: {}", issue_key);
@@ -1805,15 +1799,15 @@ impl crate::mcp::server::MCPToolHandler for AddWorkLogTool {
         let issue_key = args
             .get("issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: issue_key".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_key")
             })?;
 
         let time_spent = args
             .get("time_spent")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: time_spent".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: time_spent")
             })?;
 
         let comment = args.get("comment").and_then(|v| v.as_str());
@@ -1870,15 +1864,15 @@ impl crate::mcp::server::MCPToolHandler for UpdateWorkLogTool {
         let issue_key = args
             .get("issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: issue_key".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_key")
             })?;
 
         let work_log_id = args
             .get("work_log_id")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: work_log_id".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: work_log_id")
             })?;
 
         let time_spent = args.get("time_spent").and_then(|v| v.as_str());
@@ -1939,15 +1933,15 @@ impl crate::mcp::server::MCPToolHandler for DeleteWorkLogTool {
         let issue_key = args
             .get("issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: issue_key".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_key")
             })?;
 
         let work_log_id = args
             .get("work_log_id")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: work_log_id".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: work_log_id")
             })?;
 
         info!("Deleting work log {} for issue: {}", work_log_id, issue_key);
@@ -1988,8 +1982,8 @@ impl crate::mcp::server::MCPToolHandler for GetIssueWatchersTool {
         let issue_key = args
             .get("issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: issue_key".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_key")
             })?;
 
         info!("Getting watchers for issue: {}", issue_key);
@@ -2046,15 +2040,15 @@ impl crate::mcp::server::MCPToolHandler for AddIssueWatcherTool {
         let issue_key = args
             .get("issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: issue_key".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_key")
             })?;
 
         let account_id = args
             .get("account_id")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: account_id".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: account_id")
             })?;
 
         info!("Adding watcher {} to issue: {}", account_id, issue_key);
@@ -2093,15 +2087,15 @@ impl crate::mcp::server::MCPToolHandler for RemoveIssueWatcherTool {
         let issue_key = args
             .get("issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: issue_key".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_key")
             })?;
 
         let account_id = args
             .get("account_id")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: account_id".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: account_id")
             })?;
 
         info!("Removing watcher {} from issue: {}", account_id, issue_key);
@@ -2182,9 +2176,7 @@ impl CreateLabelTool {
 impl crate::mcp::server::MCPToolHandler for CreateLabelTool {
     async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
         let name = args.get("name").and_then(|v| v.as_str()).ok_or_else(|| {
-            crate::error::JiraError::ApiError {
-                message: "Missing required parameter: name".to_string(),
-            }
+            crate::error::JiraError::api_error("Missing required parameter: name")
         })?;
 
         info!("Creating label: {}", name);
@@ -2229,15 +2221,15 @@ impl crate::mcp::server::MCPToolHandler for UpdateLabelTool {
         let old_name = args
             .get("old_name")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: old_name".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: old_name")
             })?;
 
         let new_name = args
             .get("new_name")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: new_name".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: new_name")
             })?;
 
         info!("Updating label from {} to {}", old_name, new_name);
@@ -2280,9 +2272,7 @@ impl DeleteLabelTool {
 impl crate::mcp::server::MCPToolHandler for DeleteLabelTool {
     async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
         let name = args.get("name").and_then(|v| v.as_str()).ok_or_else(|| {
-            crate::error::JiraError::ApiError {
-                message: "Missing required parameter: name".to_string(),
-            }
+            crate::error::JiraError::api_error("Missing required parameter: name")
         })?;
 
         info!("Deleting label: {}", name);
@@ -2320,16 +2310,14 @@ impl CreateComponentTool {
 impl crate::mcp::server::MCPToolHandler for CreateComponentTool {
     async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
         let name = args.get("name").and_then(|v| v.as_str()).ok_or_else(|| {
-            crate::error::JiraError::ApiError {
-                message: "Missing required parameter: name".to_string(),
-            }
+            crate::error::JiraError::api_error("Missing required parameter: name")
         })?;
 
         let project = args
             .get("project")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: project".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: project")
             })?;
 
         let description = args.get("description").and_then(|v| v.as_str());
@@ -2388,8 +2376,8 @@ impl crate::mcp::server::MCPToolHandler for UpdateComponentTool {
         let component_id = args
             .get("component_id")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: component_id".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: component_id")
             })?;
 
         let name = args.get("name").and_then(|v| v.as_str());
@@ -2451,8 +2439,8 @@ impl crate::mcp::server::MCPToolHandler for DeleteComponentTool {
         let component_id = args
             .get("component_id")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: component_id".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: component_id")
             })?;
 
         info!("Deleting component: {}", component_id);
@@ -2492,29 +2480,29 @@ impl crate::mcp::server::MCPToolHandler for CloneIssueTool {
         let original_issue_key = args
             .get("original_issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: original_issue_key".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: original_issue_key")
             })?;
 
         let project_key = args
             .get("project_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: project_key".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: project_key")
             })?;
 
         let issue_type = args
             .get("issue_type")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: issue_type".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_type")
             })?;
 
         let summary = args
             .get("summary")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::ApiError {
-                message: "Missing required parameter: summary".to_string(),
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: summary")
             })?;
 
         let description = args.get("description").and_then(|v| v.as_str());
