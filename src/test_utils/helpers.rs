@@ -14,7 +14,9 @@ pub fn create_test_config(
     project: Option<&str>,
 ) -> JiraConfig {
     JiraConfig {
-        api_base_url: api_base_url.unwrap_or("https://test-jira.example.com/rest/api/2").to_string(),
+        api_base_url: api_base_url
+            .unwrap_or("https://test-jira.example.com/rest/api/2")
+            .to_string(),
         email: email.unwrap_or("test@example.com").to_string(),
         personal_access_token: token.unwrap_or("test-token-12345").to_string(),
         default_project: project.map(|s| s.to_string()),
@@ -41,11 +43,7 @@ pub fn create_test_user(
 }
 
 /// Helper function to create a Jira project for testing
-pub fn create_test_project(
-    id: Option<&str>,
-    key: Option<&str>,
-    name: Option<&str>,
-) -> JiraProject {
+pub fn create_test_project(id: Option<&str>, key: Option<&str>, name: Option<&str>) -> JiraProject {
     JiraProject {
         id: id.unwrap_or("10000").to_string(),
         key: key.unwrap_or("TEST").to_string(),
@@ -76,15 +74,14 @@ pub fn create_test_status(
 }
 
 /// Helper function to create a Jira priority for testing
-pub fn create_test_priority(
-    id: Option<&str>,
-    name: Option<&str>,
-) -> JiraPriority {
+pub fn create_test_priority(id: Option<&str>, name: Option<&str>) -> JiraPriority {
     JiraPriority {
         id: id.unwrap_or("3").to_string(),
         name: name.unwrap_or("Medium").to_string(),
         description: Some("Medium priority".to_string()),
-        icon_url: Some("https://test-jira.example.com/images/icons/priorities/medium.svg".to_string()),
+        icon_url: Some(
+            "https://test-jira.example.com/images/icons/priorities/medium.svg".to_string(),
+        ),
     }
 }
 
@@ -98,7 +95,9 @@ pub fn create_test_issue_type(
         id: id.unwrap_or("10001").to_string(),
         name: name.unwrap_or("Story").to_string(),
         description: Some("Test issue type description".to_string()),
-        icon_url: Some("https://test-jira.example.com/images/icons/issuetypes/story.svg".to_string()),
+        icon_url: Some(
+            "https://test-jira.example.com/images/icons/issuetypes/story.svg".to_string(),
+        ),
         subtask: subtask.unwrap_or(false),
     }
 }
@@ -112,17 +111,26 @@ pub fn create_test_issue(
 ) -> JiraIssue {
     let issue_id = id.unwrap_or("12345");
     let issue_key = key.unwrap_or("TEST-123");
-    
+
     let mut fields = HashMap::new();
-    fields.insert("summary".to_string(), serde_json::Value::String(summary.unwrap_or("Test Issue Summary").to_string()));
+    fields.insert(
+        "summary".to_string(),
+        serde_json::Value::String(summary.unwrap_or("Test Issue Summary").to_string()),
+    );
     if let Some(desc) = description {
-        fields.insert("description".to_string(), serde_json::Value::String(desc.to_string()));
+        fields.insert(
+            "description".to_string(),
+            serde_json::Value::String(desc.to_string()),
+        );
     }
-    
+
     JiraIssue {
         id: issue_id.to_string(),
         key: issue_key.to_string(),
-        self_url: format!("https://test-jira.example.com/rest/api/2/issue/{}", issue_id),
+        self_url: format!(
+            "https://test-jira.example.com/rest/api/2/issue/{}",
+            issue_id
+        ),
         fields,
     }
 }
@@ -193,7 +201,9 @@ pub fn create_test_zephyr_test_step(
 ) -> ZephyrTestStep {
     ZephyrTestStep {
         id: Some(id.unwrap_or("10001").to_string()),
-        step: step.unwrap_or("Step 1: Navigate to the login page").to_string(),
+        step: step
+            .unwrap_or("Step 1: Navigate to the login page")
+            .to_string(),
         data: data.map(|s| s.to_string()),
         result: result.map(|s| s.to_string()),
         order: 1,
@@ -206,12 +216,12 @@ pub fn current_timestamp() -> String {
     let now = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .unwrap_or_default();
-    
+
     // Convert to Jira timestamp format (ISO 8601)
     let secs = now.as_secs();
     let nanos = now.subsec_nanos();
     let _millis = secs * 1000 + (nanos / 1_000_000) as u64;
-    
+
     // This is a simplified version - in real code you'd use chrono
     "2024-01-01T10:00:00.000+0000".to_string()
 }
@@ -260,7 +270,10 @@ pub fn create_bulk_operation_response(
 }
 
 /// Helper function to assert that a result is an error with a specific message
-pub fn assert_error_message<T>(result: Result<T, Box<dyn std::error::Error>>, expected_message: &str) {
+pub fn assert_error_message<T>(
+    result: Result<T, Box<dyn std::error::Error>>,
+    expected_message: &str,
+) {
     match result {
         Ok(_) => panic!("Expected error but got Ok"),
         Err(e) => {

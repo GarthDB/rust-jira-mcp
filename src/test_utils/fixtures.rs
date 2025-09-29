@@ -36,9 +36,15 @@ pub fn mock_jira_config(base_url: &str) -> JiraConfig {
 /// Create a sample Jira issue for testing
 pub fn sample_jira_issue() -> JiraIssue {
     let mut fields = HashMap::new();
-    fields.insert("summary".to_string(), serde_json::Value::String("Test Issue Summary".to_string()));
-    fields.insert("description".to_string(), serde_json::Value::String("This is a test issue description".to_string()));
-    
+    fields.insert(
+        "summary".to_string(),
+        serde_json::Value::String("Test Issue Summary".to_string()),
+    );
+    fields.insert(
+        "description".to_string(),
+        serde_json::Value::String("This is a test issue description".to_string()),
+    );
+
     JiraIssue {
         id: "12345".to_string(),
         key: "TEST-123".to_string(),
@@ -195,7 +201,10 @@ pub fn sample_issue() -> JiraIssue {
         fields: {
             let mut fields = HashMap::new();
             fields.insert("summary".to_string(), json!("Test Issue Summary"));
-            fields.insert("description".to_string(), json!("This is a test issue description"));
+            fields.insert(
+                "description".to_string(),
+                json!("This is a test issue description"),
+            );
             fields
         },
     }
@@ -218,7 +227,7 @@ pub fn sample_bulk_operation_response() -> serde_json::Value {
                 "status": "success"
             },
             {
-                "id": "12346", 
+                "id": "12346",
                 "key": "TEST-124",
                 "status": "success"
             }

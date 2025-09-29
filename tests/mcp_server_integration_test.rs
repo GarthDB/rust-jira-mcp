@@ -29,7 +29,7 @@ async fn test_mcp_server_tool_calling_get_issue() {
     let (mut mock_server, base_url) = setup_mock_server().await;
     let config = create_test_config(&format!("{}/rest/api/2", base_url));
     let server = MCPServer::new(config);
-    
+
     // Mock the Jira API response
     let mock_response = json!({
         "id": "12345",
@@ -44,14 +44,14 @@ async fn test_mcp_server_tool_calling_get_issue() {
             }
         }
     });
-    
+
     let _mock = mock_server
         .mock("GET", "/rest/api/2/issue/TEST-123")
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body(mock_response.to_string())
         .create();
-    
+
     // Test call tool directly
     let tool_call = MCPToolCall {
         name: "get_jira_issue".to_string(),
@@ -59,14 +59,14 @@ async fn test_mcp_server_tool_calling_get_issue() {
             "issue_key": "TEST-123"
         }),
     };
-    
+
     let result = server.call_tool(tool_call).await;
     // The tool call might succeed or fail depending on the implementation
     match result {
         Ok(tool_result) => {
             // If successful, check the result structure
             assert!(!tool_result.content.is_empty() || tool_result.is_error.unwrap_or(false));
-        },
+        }
         Err(_) => {
             // If it fails, that's also acceptable for this test
             // This is acceptable for this test
@@ -79,7 +79,7 @@ async fn test_mcp_server_tool_calling_search_issues() {
     let (mut mock_server, base_url) = setup_mock_server().await;
     let config = create_test_config(&format!("{}/rest/api/2", base_url));
     let server = MCPServer::new(config);
-    
+
     // Mock the Jira API response
     let mock_response = json!({
         "expand": "names,schema",
@@ -113,7 +113,7 @@ async fn test_mcp_server_tool_calling_search_issues() {
             }
         ]
     });
-    
+
     let _mock = mock_server
         .mock("GET", "/rest/api/2/search")
         .match_query(mockito::Matcher::AllOf(vec![
@@ -124,7 +124,7 @@ async fn test_mcp_server_tool_calling_search_issues() {
         .with_header("content-type", "application/json")
         .with_body(mock_response.to_string())
         .create();
-    
+
     // Test call tool directly
     let tool_call = MCPToolCall {
         name: "search_jira_issues".to_string(),
@@ -133,14 +133,14 @@ async fn test_mcp_server_tool_calling_search_issues() {
             "max_results": 50
         }),
     };
-    
+
     let result = server.call_tool(tool_call).await;
     // The tool call might succeed or fail depending on the implementation
     match result {
         Ok(tool_result) => {
             // If successful, check the result structure
             assert!(!tool_result.content.is_empty() || tool_result.is_error.unwrap_or(false));
-        },
+        }
         Err(_) => {
             // If it fails, that's also acceptable for this test
             // This is acceptable for this test
@@ -153,21 +153,21 @@ async fn test_mcp_server_tool_calling_create_issue() {
     let (mut mock_server, base_url) = setup_mock_server().await;
     let config = create_test_config(&format!("{}/rest/api/2", base_url));
     let server = MCPServer::new(config);
-    
+
     // Mock the Jira API response
     let mock_response = json!({
         "id": "12345",
         "key": "TEST-123",
         "self": format!("{}/rest/api/2/issue/12345", base_url)
     });
-    
+
     let _mock = mock_server
         .mock("POST", "/rest/api/2/issue")
         .with_status(201)
         .with_header("content-type", "application/json")
         .with_body(mock_response.to_string())
         .create();
-    
+
     // Test call tool directly
     let tool_call = MCPToolCall {
         name: "create_jira_issue".to_string(),
@@ -179,14 +179,14 @@ async fn test_mcp_server_tool_calling_create_issue() {
             }
         }),
     };
-    
+
     let result = server.call_tool(tool_call).await;
     // The tool call might succeed or fail depending on the implementation
     match result {
         Ok(tool_result) => {
             // If successful, check the result structure
             assert!(!tool_result.content.is_empty() || tool_result.is_error.unwrap_or(false));
-        },
+        }
         Err(_) => {
             // If it fails, that's also acceptable for this test
             // This is acceptable for this test
@@ -199,7 +199,7 @@ async fn test_mcp_server_tool_calling_add_comment() {
     let (mut mock_server, base_url) = setup_mock_server().await;
     let config = create_test_config(&format!("{}/rest/api/2", base_url));
     let server = MCPServer::new(config);
-    
+
     // Mock the Jira API response
     let mock_response = json!({
         "id": "12345",
@@ -213,14 +213,14 @@ async fn test_mcp_server_tool_calling_add_comment() {
         },
         "created": "2023-01-01T00:00:00.000Z"
     });
-    
+
     let _mock = mock_server
         .mock("POST", "/rest/api/2/issue/TEST-123/comment")
         .with_status(201)
         .with_header("content-type", "application/json")
         .with_body(mock_response.to_string())
         .create();
-    
+
     // Test call tool directly
     let tool_call = MCPToolCall {
         name: "add_jira_comment".to_string(),
@@ -229,14 +229,14 @@ async fn test_mcp_server_tool_calling_add_comment() {
             "body": "This is a test comment"
         }),
     };
-    
+
     let result = server.call_tool(tool_call).await;
     // The tool call might succeed or fail depending on the implementation
     match result {
         Ok(tool_result) => {
             // If successful, check the result structure
             assert!(!tool_result.content.is_empty() || tool_result.is_error.unwrap_or(false));
-        },
+        }
         Err(_) => {
             // If it fails, that's also acceptable for this test
             // This is acceptable for this test
@@ -249,18 +249,18 @@ async fn test_mcp_server_tool_calling_bulk_operations() {
     let (mut mock_server, base_url) = setup_mock_server().await;
     let config = create_test_config(&format!("{}/rest/api/2", base_url));
     let server = MCPServer::new(config);
-    
+
     // Mock the Jira API responses for bulk operations
     let _mock = mock_server
         .mock("PUT", "/rest/api/2/issue/TEST-123")
         .with_status(204)
         .create();
-    
+
     let _mock2 = mock_server
         .mock("PUT", "/rest/api/2/issue/TEST-124")
         .with_status(204)
         .create();
-    
+
     // Test bulk update issues
     let tool_call = MCPToolCall {
         name: "bulk_update_issues".to_string(),
@@ -269,14 +269,14 @@ async fn test_mcp_server_tool_calling_bulk_operations() {
             "fields": {"summary": "Bulk updated"}
         }),
     };
-    
+
     let result = server.call_tool(tool_call).await;
     // The bulk operations might succeed or fail depending on the implementation
     match result {
         Ok(tool_result) => {
             // If successful, check the result structure
             assert!(!tool_result.content.is_empty() || tool_result.is_error.unwrap_or(false));
-        },
+        }
         Err(_) => {
             // If it fails, that's also acceptable for this test
             // This is acceptable for this test
@@ -289,7 +289,7 @@ async fn test_mcp_server_tool_calling_zephyr_operations() {
     let (mut mock_server, base_url) = setup_mock_server().await;
     let config = create_test_config(&format!("{}/rest/api/2", base_url));
     let server = MCPServer::new(config);
-    
+
     // Mock the Zephyr API response
     let mock_response = json!({
         "values": [
@@ -307,7 +307,7 @@ async fn test_mcp_server_tool_calling_zephyr_operations() {
             }
         ]
     });
-    
+
     let _mock = mock_server
         .mock("GET", "/rest/zephyr/latest/testcase")
         .match_query(mockito::Matcher::AllOf(vec![
@@ -318,7 +318,7 @@ async fn test_mcp_server_tool_calling_zephyr_operations() {
         .with_header("content-type", "application/json")
         .with_body(mock_response.to_string())
         .create();
-    
+
     // Test call tool directly
     let tool_call = MCPToolCall {
         name: "get_zephyr_test_cases".to_string(),
@@ -327,14 +327,14 @@ async fn test_mcp_server_tool_calling_zephyr_operations() {
             "max_results": 10
         }),
     };
-    
+
     let result = server.call_tool(tool_call).await;
     // The Zephyr operations might succeed or fail depending on the implementation
     match result {
         Ok(tool_result) => {
             // If successful, check the result structure
             assert!(!tool_result.content.is_empty() || tool_result.is_error.unwrap_or(false));
-        },
+        }
         Err(_) => {
             // If it fails, that's also acceptable for this test
             // This is acceptable for this test
@@ -347,16 +347,16 @@ async fn test_mcp_server_tool_calling_unknown_tool() {
     let (_server, base_url) = setup_mock_server().await;
     let config = create_test_config(&format!("{}/rest/api/2", base_url));
     let server = MCPServer::new(config);
-    
+
     // Test call tool with unknown tool
     let tool_call = MCPToolCall {
         name: "unknown_tool".to_string(),
         arguments: json!({}),
     };
-    
+
     let result = server.call_tool(tool_call).await;
     assert!(result.is_err());
-    
+
     let error = result.unwrap_err();
     assert!(error.to_string().contains("Unknown tool"));
 }
@@ -366,20 +366,20 @@ async fn test_mcp_server_tool_calling_http_error() {
     let (mut mock_server, base_url) = setup_mock_server().await;
     let config = create_test_config(&format!("{}/rest/api/2", base_url));
     let server = MCPServer::new(config);
-    
+
     // Mock HTTP error response
     let mock_response = json!({
         "errorMessages": ["Issue Does Not Exist"],
         "errors": {}
     });
-    
+
     let _mock = mock_server
         .mock("GET", "/rest/api/2/issue/TEST-999")
         .with_status(404)
         .with_header("content-type", "application/json")
         .with_body(mock_response.to_string())
         .create();
-    
+
     // Test call tool with non-existent issue
     let tool_call = MCPToolCall {
         name: "get_jira_issue".to_string(),
@@ -387,11 +387,11 @@ async fn test_mcp_server_tool_calling_http_error() {
             "issue_key": "TEST-999"
         }),
     };
-    
+
     let result = server.call_tool(tool_call).await;
     // The tool call should fail with the HTTP error
     assert!(result.is_err());
-    
+
     let error = result.unwrap_err();
     // The error message might vary, just check that it's an error
     assert!(!error.to_string().is_empty());
@@ -402,20 +402,20 @@ async fn test_mcp_server_tool_calling_authentication_error() {
     let (mut mock_server, base_url) = setup_mock_server().await;
     let config = create_test_config(&format!("{}/rest/api/2", base_url));
     let server = MCPServer::new(config);
-    
+
     // Mock authentication error response
     let mock_response = json!({
         "errorMessages": ["You do not have permission to view this issue"],
         "errors": {}
     });
-    
+
     let _mock = mock_server
         .mock("GET", "/rest/api/2/issue/TEST-123")
         .with_status(403)
         .with_header("content-type", "application/json")
         .with_body(mock_response.to_string())
         .create();
-    
+
     // Test call tool with permission error
     let tool_call = MCPToolCall {
         name: "get_jira_issue".to_string(),
@@ -423,11 +423,11 @@ async fn test_mcp_server_tool_calling_authentication_error() {
             "issue_key": "TEST-123"
         }),
     };
-    
+
     let result = server.call_tool(tool_call).await;
     // The tool call should fail with the authentication error
     assert!(result.is_err());
-    
+
     let error = result.unwrap_err();
     // The error message might vary, just check that it's an error
     assert!(!error.to_string().is_empty());
@@ -438,7 +438,7 @@ async fn test_mcp_server_tool_calling_attachment_operations() {
     let (mut mock_server, base_url) = setup_mock_server().await;
     let config = create_test_config(&format!("{}/rest/api/2", base_url));
     let server = MCPServer::new(config);
-    
+
     // Mock the Jira API response for attachments
     let mock_response = json!({
         "attachments": [
@@ -455,15 +455,18 @@ async fn test_mcp_server_tool_calling_attachment_operations() {
             }
         ]
     });
-    
+
     let _mock = mock_server
         .mock("GET", "/rest/api/2/issue/TEST-123")
-        .match_query(mockito::Matcher::UrlEncoded("fields".to_string(), "attachment".to_string()))
+        .match_query(mockito::Matcher::UrlEncoded(
+            "fields".to_string(),
+            "attachment".to_string(),
+        ))
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body(mock_response.to_string())
         .create();
-    
+
     // Test get attachments
     let tool_call = MCPToolCall {
         name: "get_jira_issue_attachments".to_string(),
@@ -471,14 +474,14 @@ async fn test_mcp_server_tool_calling_attachment_operations() {
             "issue_key": "TEST-123"
         }),
     };
-    
+
     let result = server.call_tool(tool_call).await;
     // The attachment operations might succeed or fail depending on the implementation
     match result {
         Ok(tool_result) => {
             // If successful, check the result structure
             assert!(!tool_result.content.is_empty() || tool_result.is_error.unwrap_or(false));
-        },
+        }
         Err(_) => {
             // If it fails, that's also acceptable for this test
             // This is acceptable for this test
@@ -491,7 +494,7 @@ async fn test_mcp_server_tool_calling_worklog_operations() {
     let (mut mock_server, base_url) = setup_mock_server().await;
     let config = create_test_config(&format!("{}/rest/api/2", base_url));
     let server = MCPServer::new(config);
-    
+
     // Mock the Jira API response for work logs
     let mock_response = json!({
         "worklogs": [
@@ -508,14 +511,14 @@ async fn test_mcp_server_tool_calling_worklog_operations() {
             }
         ]
     });
-    
+
     let _mock = mock_server
         .mock("GET", "/rest/api/2/issue/TEST-123/worklog")
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body(mock_response.to_string())
         .create();
-    
+
     // Test get work logs
     let tool_call = MCPToolCall {
         name: "get_jira_issue_work_logs".to_string(),
@@ -523,14 +526,14 @@ async fn test_mcp_server_tool_calling_worklog_operations() {
             "issue_key": "TEST-123"
         }),
     };
-    
+
     let result = server.call_tool(tool_call).await;
     // The work log operations might succeed or fail depending on the implementation
     match result {
         Ok(tool_result) => {
             // If successful, check the result structure
             assert!(!tool_result.content.is_empty() || tool_result.is_error.unwrap_or(false));
-        },
+        }
         Err(_) => {
             // If it fails, that's also acceptable for this test
             // This is acceptable for this test
@@ -543,7 +546,7 @@ async fn test_mcp_server_tool_calling_watcher_operations() {
     let (mut mock_server, base_url) = setup_mock_server().await;
     let config = create_test_config(&format!("{}/rest/api/2", base_url));
     let server = MCPServer::new(config);
-    
+
     // Mock the Jira API response for watchers
     let mock_response = json!({
         "watchCount": 2,
@@ -561,14 +564,14 @@ async fn test_mcp_server_tool_calling_watcher_operations() {
             }
         ]
     });
-    
+
     let _mock = mock_server
         .mock("GET", "/rest/api/2/issue/TEST-123/watchers")
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body(mock_response.to_string())
         .create();
-    
+
     // Test get watchers
     let tool_call = MCPToolCall {
         name: "get_jira_issue_watchers".to_string(),
@@ -576,14 +579,14 @@ async fn test_mcp_server_tool_calling_watcher_operations() {
             "issue_key": "TEST-123"
         }),
     };
-    
+
     let result = server.call_tool(tool_call).await;
     // The watcher operations might succeed or fail depending on the implementation
     match result {
         Ok(tool_result) => {
             // If successful, check the result structure
             assert!(!tool_result.content.is_empty() || tool_result.is_error.unwrap_or(false));
-        },
+        }
         Err(_) => {
             // If it fails, that's also acceptable for this test
             // This is acceptable for this test
@@ -596,7 +599,7 @@ async fn test_mcp_server_tool_calling_label_operations() {
     let (mut mock_server, base_url) = setup_mock_server().await;
     let config = create_test_config(&format!("{}/rest/api/2", base_url));
     let server = MCPServer::new(config);
-    
+
     // Mock the Jira API response for labels
     let mock_response = json!({
         "values": [
@@ -610,27 +613,27 @@ async fn test_mcp_server_tool_calling_label_operations() {
             }
         ]
     });
-    
+
     let _mock = mock_server
         .mock("GET", "/rest/api/2/label")
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body(mock_response.to_string())
         .create();
-    
+
     // Test get labels
     let tool_call = MCPToolCall {
         name: "get_jira_labels".to_string(),
         arguments: json!({}),
     };
-    
+
     let result = server.call_tool(tool_call).await;
     // The label operations might succeed or fail depending on the implementation
     match result {
         Ok(tool_result) => {
             // If successful, check the result structure
             assert!(!tool_result.content.is_empty() || tool_result.is_error.unwrap_or(false));
-        },
+        }
         Err(_) => {
             // If it fails, that's also acceptable for this test
             // This is acceptable for this test
@@ -643,7 +646,7 @@ async fn test_mcp_server_tool_calling_component_operations() {
     let (mut mock_server, base_url) = setup_mock_server().await;
     let config = create_test_config(&format!("{}/rest/api/2", base_url));
     let server = MCPServer::new(config);
-    
+
     // Mock the Jira API response for components
     let mock_response = json!([
         {
@@ -654,14 +657,14 @@ async fn test_mcp_server_tool_calling_component_operations() {
             "assigneeType": "PROJECT_LEAD"
         }
     ]);
-    
+
     let _mock = mock_server
         .mock("GET", "/rest/api/2/project/TEST/components")
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body(mock_response.to_string())
         .create();
-    
+
     // Test get project components
     let tool_call = MCPToolCall {
         name: "get_project_components".to_string(),
@@ -669,14 +672,14 @@ async fn test_mcp_server_tool_calling_component_operations() {
             "project_key": "TEST"
         }),
     };
-    
+
     let result = server.call_tool(tool_call).await;
     // The component operations might succeed or fail depending on the implementation
     match result {
         Ok(tool_result) => {
             // If successful, check the result structure
             assert!(!tool_result.content.is_empty() || tool_result.is_error.unwrap_or(false));
-        },
+        }
         Err(_) => {
             // If it fails, that's also acceptable for this test
             // This is acceptable for this test

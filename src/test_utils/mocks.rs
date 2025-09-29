@@ -163,9 +163,10 @@ impl JiraMockBuilder {
 
         self.server
             .mock("GET", "/rest/api/2/search")
-            .match_query(mockito::Matcher::AllOf(vec![
-                mockito::Matcher::UrlEncoded("jql".to_string(), jql.to_string()),
-            ]))
+            .match_query(mockito::Matcher::AllOf(vec![mockito::Matcher::UrlEncoded(
+                "jql".to_string(),
+                jql.to_string(),
+            )]))
             .with_status(200)
             .with_header("content-type", "application/json")
             .with_body(response.to_string())
@@ -191,10 +192,7 @@ impl JiraMockBuilder {
     /// Mock a successful issue update
     pub async fn mock_update_issue(&mut self, issue_key: &str) -> Mock {
         let path = format!("/rest/api/2/issue/{}", issue_key);
-        self.server
-            .mock("PUT", &*path)
-            .with_status(204)
-            .create()
+        self.server.mock("PUT", &*path).with_status(204).create()
     }
 
     /// Mock a successful comment creation
@@ -278,10 +276,7 @@ impl JiraMockBuilder {
     /// Mock a successful issue transition
     pub async fn mock_transition_issue(&mut self, issue_key: &str) -> Mock {
         let path = format!("/rest/api/2/issue/{}/transitions", issue_key);
-        self.server
-            .mock("POST", &*path)
-            .with_status(204)
-            .create()
+        self.server.mock("POST", &*path).with_status(204).create()
     }
 
     /// Mock a server error (500)

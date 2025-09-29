@@ -4,8 +4,11 @@ use std::path::PathBuf;
 #[test]
 fn test_jira_config_default() {
     let config = JiraConfig::default();
-    
-    assert_eq!(config.api_base_url, "https://jira.corp.adobe.com/rest/api/2");
+
+    assert_eq!(
+        config.api_base_url,
+        "https://jira.corp.adobe.com/rest/api/2"
+    );
     assert!(config.email.is_empty());
     assert!(config.personal_access_token.is_empty());
     assert!(config.default_project.is_none());
@@ -27,13 +30,16 @@ fn test_jira_config_serialization() {
         log_file: Some(PathBuf::from("/tmp/test.log")),
         strict_ssl: Some(false),
     };
-    
+
     let serialized = serde_json::to_string(&config).unwrap();
     let deserialized: JiraConfig = serde_json::from_str(&serialized).unwrap();
-    
+
     assert_eq!(deserialized.api_base_url, config.api_base_url);
     assert_eq!(deserialized.email, config.email);
-    assert_eq!(deserialized.personal_access_token, config.personal_access_token);
+    assert_eq!(
+        deserialized.personal_access_token,
+        config.personal_access_token
+    );
     assert_eq!(deserialized.default_project, config.default_project);
     assert_eq!(deserialized.max_results, config.max_results);
     assert_eq!(deserialized.timeout_seconds, config.timeout_seconds);
@@ -53,9 +59,9 @@ fn test_jira_config_clone() {
         log_file: Some(PathBuf::from("/tmp/test.log")),
         strict_ssl: Some(false),
     };
-    
+
     let cloned = config.clone();
-    
+
     assert_eq!(cloned.api_base_url, config.api_base_url);
     assert_eq!(cloned.email, config.email);
     assert_eq!(cloned.personal_access_token, config.personal_access_token);
@@ -70,7 +76,7 @@ fn test_jira_config_clone() {
 fn test_jira_config_debug() {
     let config = JiraConfig::default();
     let debug_str = format!("{:?}", config);
-    
+
     assert!(debug_str.contains("JiraConfig"));
     assert!(debug_str.contains("api_base_url"));
     assert!(debug_str.contains("email"));
@@ -89,7 +95,7 @@ fn test_auth_header() {
         log_file: None,
         strict_ssl: None,
     };
-    
+
     let auth_header = config.auth_header();
     assert_eq!(auth_header, "Bearer test-token-123");
 }
@@ -106,7 +112,7 @@ fn test_auth_header_with_empty_token() {
         log_file: None,
         strict_ssl: None,
     };
-    
+
     let auth_header = config.auth_header();
     assert_eq!(auth_header, "Bearer ");
 }
@@ -123,7 +129,7 @@ fn test_timeout_duration_default() {
         log_file: None,
         strict_ssl: None,
     };
-    
+
     let duration = config.timeout_duration();
     assert_eq!(duration, std::time::Duration::from_secs(30));
 }
@@ -140,7 +146,7 @@ fn test_timeout_duration_custom() {
         log_file: None,
         strict_ssl: None,
     };
-    
+
     let duration = config.timeout_duration();
     assert_eq!(duration, std::time::Duration::from_secs(120));
 }
@@ -157,7 +163,7 @@ fn test_validate_success() {
         log_file: None,
         strict_ssl: None,
     };
-    
+
     let result = config.validate();
     assert!(result.is_ok());
 }
@@ -174,7 +180,7 @@ fn test_validate_invalid_email() {
         log_file: None,
         strict_ssl: None,
     };
-    
+
     let result = config.validate();
     assert!(result.is_err());
     assert!(result.unwrap_err().to_string().contains("email"));
@@ -192,7 +198,7 @@ fn test_validate_empty_email() {
         log_file: None,
         strict_ssl: None,
     };
-    
+
     let result = config.validate();
     assert!(result.is_err());
     assert!(result.unwrap_err().to_string().contains("email"));
@@ -210,10 +216,13 @@ fn test_validate_short_token() {
         log_file: None,
         strict_ssl: None,
     };
-    
+
     let result = config.validate();
     assert!(result.is_err());
-    assert!(result.unwrap_err().to_string().contains("personal_access_token"));
+    assert!(result
+        .unwrap_err()
+        .to_string()
+        .contains("personal_access_token"));
 }
 
 #[test]
@@ -228,7 +237,7 @@ fn test_validate_invalid_url() {
         log_file: None,
         strict_ssl: None,
     };
-    
+
     let result = config.validate();
     assert!(result.is_err());
     assert!(result.unwrap_err().to_string().contains("api_base_url"));
@@ -246,7 +255,7 @@ fn test_validate_http_url() {
         log_file: None,
         strict_ssl: None,
     };
-    
+
     let result = config.validate();
     assert!(result.is_ok());
 }
@@ -263,7 +272,7 @@ fn test_validate_https_url() {
         log_file: None,
         strict_ssl: None,
     };
-    
+
     let result = config.validate();
     assert!(result.is_ok());
 }
@@ -280,7 +289,7 @@ fn test_validate_email_with_at_start() {
         log_file: None,
         strict_ssl: None,
     };
-    
+
     let result = config.validate();
     assert!(result.is_err());
 }
@@ -297,7 +306,7 @@ fn test_validate_email_with_at_end() {
         log_file: None,
         strict_ssl: None,
     };
-    
+
     let result = config.validate();
     assert!(result.is_err());
 }
@@ -314,7 +323,7 @@ fn test_validate_email_without_dot() {
         log_file: None,
         strict_ssl: None,
     };
-    
+
     let result = config.validate();
     assert!(result.is_err());
 }
@@ -331,7 +340,7 @@ fn test_validate_email_without_at() {
         log_file: None,
         strict_ssl: None,
     };
-    
+
     let result = config.validate();
     assert!(result.is_err());
 }

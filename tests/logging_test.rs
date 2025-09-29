@@ -1,5 +1,5 @@
+use rust_jira_mcp::logging::config::{LogFormat, LogLevel};
 use rust_jira_mcp::logging::*;
-use rust_jira_mcp::logging::config::{LogLevel, LogFormat};
 use std::collections::HashMap;
 
 #[test]
@@ -13,7 +13,7 @@ fn test_log_level_serialization() {
     let level = LogLevel::Debug;
     let serialized = serde_json::to_string(&level).unwrap();
     assert_eq!(serialized, "\"Debug\"");
-    
+
     let deserialized: LogLevel = serde_json::from_str(&serialized).unwrap();
     assert_eq!(deserialized, level);
 }
@@ -27,7 +27,7 @@ fn test_log_level_all_variants() {
         LogLevel::Warn,
         LogLevel::Error,
     ];
-    
+
     for variant in variants {
         let serialized = serde_json::to_string(&variant).unwrap();
         let deserialized: LogLevel = serde_json::from_str(&serialized).unwrap();
@@ -46,19 +46,15 @@ fn test_log_format_serialization() {
     let format = LogFormat::Json;
     let serialized = serde_json::to_string(&format).unwrap();
     assert_eq!(serialized, "\"Json\"");
-    
+
     let deserialized: LogFormat = serde_json::from_str(&serialized).unwrap();
     assert_eq!(deserialized, format);
 }
 
 #[test]
 fn test_log_format_all_variants() {
-    let variants = vec![
-        LogFormat::Json,
-        LogFormat::Pretty,
-        LogFormat::Compact,
-    ];
-    
+    let variants = vec![LogFormat::Json, LogFormat::Pretty, LogFormat::Compact];
+
     for variant in variants {
         let serialized = serde_json::to_string(&variant).unwrap();
         let deserialized: LogFormat = serde_json::from_str(&serialized).unwrap();
@@ -101,10 +97,10 @@ fn test_logging_config_serialization() {
         console_enabled: true,
         file_enabled: false,
     };
-    
+
     let serialized = serde_json::to_string(&config).unwrap();
     let deserialized: LoggingConfig = serde_json::from_str(&serialized).unwrap();
-    
+
     assert_eq!(deserialized.level, config.level);
     assert_eq!(deserialized.format, config.format);
     assert_eq!(deserialized.console_enabled, config.console_enabled);
@@ -115,7 +111,7 @@ fn test_logging_config_serialization() {
 fn test_logging_config_clone() {
     let config = LoggingConfig::production();
     let cloned = config.clone();
-    
+
     assert_eq!(cloned.level, config.level);
     assert_eq!(cloned.format, config.format);
     assert_eq!(cloned.console_enabled, config.console_enabled);
@@ -165,12 +161,14 @@ async fn test_metrics_collector_record_operation_success() {
     let collector = MetricsCollector::new();
     let mut metadata = HashMap::new();
     metadata.insert("test_key".to_string(), "test_value".to_string());
-    
+
     let duration = std::time::Duration::from_millis(100);
-    
+
     // Record operation success
-    collector.record_operation_success("test_operation", duration, &metadata).await;
-    
+    collector
+        .record_operation_success("test_operation", duration, &metadata)
+        .await;
+
     // Test that operation recording doesn't panic
     // This is acceptable for this test
 }
@@ -180,12 +178,18 @@ async fn test_metrics_collector_multiple_operations() {
     let collector = MetricsCollector::new();
     let metadata = HashMap::new();
     let duration = std::time::Duration::from_millis(50);
-    
+
     // Record multiple operations
-    collector.record_operation_success("operation1", duration, &metadata).await;
-    collector.record_operation_success("operation2", duration, &metadata).await;
-    collector.record_operation_success("operation1", duration, &metadata).await;
-    
+    collector
+        .record_operation_success("operation1", duration, &metadata)
+        .await;
+    collector
+        .record_operation_success("operation2", duration, &metadata)
+        .await;
+    collector
+        .record_operation_success("operation1", duration, &metadata)
+        .await;
+
     // Test that multiple operations don't panic
     // This is acceptable for this test
 }
@@ -204,9 +208,9 @@ fn test_logger_log_operation_success() {
     let logger = Logger::new(metrics_collector);
     let mut metadata = HashMap::new();
     metadata.insert("test_key".to_string(), "test_value".to_string());
-    
+
     let duration = std::time::Duration::from_millis(200);
-    
+
     // This should not panic
     logger.log_operation_success("test_operation", duration, &metadata);
 }
@@ -216,9 +220,9 @@ fn test_logger_with_empty_metadata() {
     let metrics_collector = MetricsCollector::new();
     let logger = Logger::new(metrics_collector);
     let metadata = HashMap::new();
-    
+
     let duration = std::time::Duration::from_millis(100);
-    
+
     // This should not panic
     logger.log_operation_success("test_operation", duration, &metadata);
 }
@@ -228,9 +232,9 @@ fn test_logger_with_zero_duration() {
     let metrics_collector = MetricsCollector::new();
     let logger = Logger::new(metrics_collector);
     let metadata = HashMap::new();
-    
+
     let duration = std::time::Duration::from_nanos(0);
-    
+
     // This should not panic
     logger.log_operation_success("test_operation", duration, &metadata);
 }
@@ -240,9 +244,9 @@ fn test_logger_with_large_duration() {
     let metrics_collector = MetricsCollector::new();
     let logger = Logger::new(metrics_collector);
     let metadata = HashMap::new();
-    
+
     let duration = std::time::Duration::from_secs(3600); // 1 hour
-    
+
     // This should not panic
     logger.log_operation_success("test_operation", duration, &metadata);
 }

@@ -1,5 +1,5 @@
-use rust_jira_mcp::error::{JiraError, Result};
 use reqwest::StatusCode;
+use rust_jira_mcp::error::{JiraError, Result};
 use serde_json::json;
 
 #[test]
@@ -89,15 +89,18 @@ fn test_jira_error_from_jira_response_with_error_messages() {
             "Permission denied"
         ]
     });
-    
+
     let error = JiraError::from_jira_response(StatusCode::NOT_FOUND, &response_body);
-    
+
     match error {
-        JiraError::ApiError { message, error_codes } => {
+        JiraError::ApiError {
+            message,
+            error_codes,
+        } => {
             assert_eq!(message, "Issue does not exist, Permission denied");
             assert!(error_codes.is_some());
             assert!(error_codes.unwrap().is_empty());
-        },
+        }
         _ => panic!("Expected ApiError"),
     }
 }
@@ -110,18 +113,21 @@ fn test_jira_error_from_jira_response_with_errors() {
             "project": "Project does not exist"
         }
     });
-    
+
     let error = JiraError::from_jira_response(StatusCode::BAD_REQUEST, &response_body);
-    
+
     match error {
-        JiraError::ApiError { message, error_codes } => {
+        JiraError::ApiError {
+            message,
+            error_codes,
+        } => {
             // The message format might vary, so let's check for key parts
             assert!(message.contains("summary") || message.contains("project"));
             assert!(error_codes.is_some());
             let codes = error_codes.unwrap();
             assert!(codes.contains(&"summary".to_string()));
             assert!(codes.contains(&"project".to_string()));
-        },
+        }
         _ => panic!("Expected ApiError"),
     }
 }
@@ -129,16 +135,19 @@ fn test_jira_error_from_jira_response_with_errors() {
 #[test]
 fn test_jira_error_from_jira_response_fallback() {
     let response_body = json!({});
-    
+
     let error = JiraError::from_jira_response(StatusCode::INTERNAL_SERVER_ERROR, &response_body);
-    
+
     match error {
-        JiraError::ApiError { message, error_codes } => {
+        JiraError::ApiError {
+            message,
+            error_codes,
+        } => {
             // The message format might include more details, so check for key parts
             assert!(message.contains("HTTP 500"));
             assert!(error_codes.is_some());
             assert!(error_codes.unwrap().is_empty());
-        },
+        }
         _ => panic!("Expected ApiError"),
     }
 }
@@ -146,12 +155,15 @@ fn test_jira_error_from_jira_response_fallback() {
 #[test]
 fn test_jira_error_api_error() {
     let error = JiraError::api_error("Test API error");
-    
+
     match error {
-        JiraError::ApiError { message, error_codes } => {
+        JiraError::ApiError {
+            message,
+            error_codes,
+        } => {
             assert_eq!(message, "Test API error");
             assert!(error_codes.is_none());
-        },
+        }
         _ => panic!("Expected ApiError"),
     }
 }
@@ -159,12 +171,12 @@ fn test_jira_error_api_error() {
 #[test]
 fn test_jira_error_validation_error() {
     let error = JiraError::validation_error("email", "Invalid format");
-    
+
     match error {
         JiraError::ValidationError { field, message } => {
             assert_eq!(field, "email");
             assert_eq!(message, "Invalid format");
-        },
+        }
         _ => panic!("Expected ValidationError"),
     }
 }
@@ -172,11 +184,11 @@ fn test_jira_error_validation_error() {
 #[test]
 fn test_jira_error_auth_error() {
     let error = JiraError::auth_error("Invalid token");
-    
+
     match error {
         JiraError::AuthError { message } => {
             assert_eq!(message, "Invalid token");
-        },
+        }
         _ => panic!("Expected AuthError"),
     }
 }
@@ -184,11 +196,11 @@ fn test_jira_error_auth_error() {
 #[test]
 fn test_jira_error_config_error() {
     let error = JiraError::config_error("Missing API key");
-    
+
     match error {
         JiraError::ConfigError { message } => {
             assert_eq!(message, "Missing API key");
-        },
+        }
         _ => panic!("Expected ConfigError"),
     }
 }
@@ -196,11 +208,11 @@ fn test_jira_error_config_error() {
 #[test]
 fn test_jira_error_unknown_error() {
     let error = JiraError::unknown_error("Unexpected failure");
-    
+
     match error {
         JiraError::Unknown { message } => {
             assert_eq!(message, "Unexpected failure");
-        },
+        }
         _ => panic!("Expected Unknown"),
     }
 }
@@ -209,9 +221,9 @@ fn test_jira_error_unknown_error() {
 fn test_jira_error_from_serde_json_error() {
     let json_error = serde_json::from_str::<serde_json::Value>("invalid json").unwrap_err();
     let error: JiraError = json_error.into();
-    
+
     match error {
-        JiraError::SerializationError(_) => {},
+        JiraError::SerializationError(_) => {}
         _ => panic!("Expected SerializationError"),
     }
 }
@@ -227,9 +239,9 @@ fn test_jira_error_from_reqwest_error() {
 fn test_jira_error_from_io_error() {
     let io_error = std::io::Error::new(std::io::ErrorKind::NotFound, "File not found");
     let error: JiraError = io_error.into();
-    
+
     match error {
-        JiraError::IoError(_) => {},
+        JiraError::IoError(_) => {}
         _ => panic!("Expected IoError"),
     }
 }
@@ -238,9 +250,9 @@ fn test_jira_error_from_io_error() {
 fn test_jira_error_from_config_error() {
     let config_error = config::ConfigError::Message("Config error".to_string());
     let error: JiraError = config_error.into();
-    
+
     match error {
-        JiraError::ConfigErrorWrapper(_) => {},
+        JiraError::ConfigErrorWrapper(_) => {}
         _ => panic!("Expected ConfigErrorWrapper"),
     }
 }
@@ -249,9 +261,9 @@ fn test_jira_error_from_config_error() {
 fn test_jira_error_from_anyhow_error() {
     let anyhow_error = anyhow::anyhow!("Something went wrong");
     let error: JiraError = anyhow_error.into();
-    
+
     match error {
-        JiraError::AnyhowError(_) => {},
+        JiraError::AnyhowError(_) => {}
         _ => panic!("Expected AnyhowError"),
     }
 }
@@ -260,9 +272,9 @@ fn test_jira_error_from_anyhow_error() {
 fn test_jira_error_from_url_error() {
     let url_error = url::ParseError::EmptyHost;
     let error: JiraError = url_error.into();
-    
+
     match error {
-        JiraError::UrlError(_) => {},
+        JiraError::UrlError(_) => {}
         _ => panic!("Expected UrlError"),
     }
 }
@@ -273,22 +285,22 @@ fn test_result_type_alias() {
     fn success_function() -> Result<String> {
         Ok("success".to_string())
     }
-    
+
     fn error_function() -> Result<String> {
         Err(JiraError::api_error("test error"))
     }
-    
+
     assert!(success_function().is_ok());
     assert!(error_function().is_err());
-    
+
     let success_result = success_function().unwrap();
     assert_eq!(success_result, "success");
-    
+
     let error_result = error_function().unwrap_err();
     match error_result {
         JiraError::ApiError { message, .. } => {
             assert_eq!(message, "test error");
-        },
+        }
         _ => panic!("Expected ApiError"),
     }
 }
@@ -299,7 +311,7 @@ fn test_jira_error_debug() {
         message: "Test error".to_string(),
         error_codes: Some(vec!["TEST_CODE".to_string()]),
     };
-    
+
     let debug_str = format!("{:?}", error);
     assert!(debug_str.contains("ApiError"));
     assert!(debug_str.contains("Test error"));
@@ -312,7 +324,7 @@ fn test_jira_error_validation_debug() {
         field: "test_field".to_string(),
         message: "test message".to_string(),
     };
-    
+
     let debug_str = format!("{:?}", error);
     assert!(debug_str.contains("ValidationError"));
     assert!(debug_str.contains("test_field"));
@@ -326,7 +338,7 @@ fn test_jira_error_serialization() {
         message: "Test error".to_string(),
         error_codes: Some(vec!["TEST_CODE".to_string()]),
     };
-    
+
     // Test that the error can be converted to string
     let error_str = error.to_string();
     assert!(error_str.contains("Jira API error"));
@@ -340,7 +352,7 @@ fn test_jira_error_error_trait() {
         message: "Test error".to_string(),
         error_codes: None,
     };
-    
+
     // This should compile and work
     let error_ref: &dyn std::error::Error = &error;
     assert!(error_ref.to_string().contains("Jira API error"));
@@ -351,15 +363,18 @@ fn test_jira_error_from_jira_response_empty_error_messages() {
     let response_body = json!({
         "errorMessages": []
     });
-    
+
     let error = JiraError::from_jira_response(StatusCode::BAD_REQUEST, &response_body);
-    
+
     match error {
-        JiraError::ApiError { message, error_codes } => {
+        JiraError::ApiError {
+            message,
+            error_codes,
+        } => {
             assert_eq!(message, "");
             assert!(error_codes.is_some());
             assert!(error_codes.unwrap().is_empty());
-        },
+        }
         _ => panic!("Expected ApiError"),
     }
 }
@@ -373,16 +388,19 @@ fn test_jira_error_from_jira_response_mixed_error_types() {
             "field2": "Field 2 error"
         }
     });
-    
+
     let error = JiraError::from_jira_response(StatusCode::BAD_REQUEST, &response_body);
-    
+
     match error {
-        JiraError::ApiError { message, error_codes } => {
+        JiraError::ApiError {
+            message,
+            error_codes,
+        } => {
             // Should prioritize errorMessages over errors
             assert_eq!(message, "General error");
             assert!(error_codes.is_some());
             assert!(error_codes.unwrap().is_empty());
-        },
+        }
         _ => panic!("Expected ApiError"),
     }
 }
@@ -397,16 +415,19 @@ fn test_jira_error_from_jira_response_non_string_error_messages() {
             null
         ]
     });
-    
+
     let error = JiraError::from_jira_response(StatusCode::BAD_REQUEST, &response_body);
-    
+
     match error {
-        JiraError::ApiError { message, error_codes } => {
+        JiraError::ApiError {
+            message,
+            error_codes,
+        } => {
             // Should only include string errors
             assert_eq!(message, "String error");
             assert!(error_codes.is_some());
             assert!(error_codes.unwrap().is_empty());
-        },
+        }
         _ => panic!("Expected ApiError"),
     }
 }

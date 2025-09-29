@@ -1,8 +1,8 @@
+use base64::Engine;
 use rust_jira_mcp::config::secrets::*;
 use std::path::PathBuf;
 use tempfile::NamedTempFile;
 use tokio::fs;
-use base64::Engine;
 
 #[test]
 fn test_secret_manager_new() {
@@ -69,7 +69,7 @@ fn test_secret_value_serialization() {
     let secret = SecretValue::Plain("test-secret".to_string());
     let serialized = serde_json::to_string(&secret).unwrap();
     let deserialized: SecretValue = serde_json::from_str(&serialized).unwrap();
-    
+
     match deserialized {
         SecretValue::Plain(value) => assert_eq!(value, "test-secret"),
         _ => panic!("Expected Plain variant"),
@@ -80,7 +80,7 @@ fn test_secret_value_serialization() {
 fn test_secret_value_clone() {
     let secret = SecretValue::Plain("test-secret".to_string());
     let cloned = secret.clone();
-    
+
     match (secret, cloned) {
         (SecretValue::Plain(orig), SecretValue::Plain(clone)) => {
             assert_eq!(orig, clone);
@@ -143,7 +143,7 @@ async fn test_secret_value_file_path_resolve() {
     let temp_file = NamedTempFile::new().unwrap();
     let path = temp_file.path();
     fs::write(path, "test-secret-content").await.unwrap();
-    
+
     let secret = SecretValue::FilePath(path.to_path_buf());
     let result = secret.resolve().await;
     assert!(result.is_ok());
@@ -168,17 +168,20 @@ async fn test_secret_value_encrypted_resolve() {
 #[test]
 fn test_secret_config_serialization() {
     let mut secrets = std::collections::HashMap::new();
-    secrets.insert("token".to_string(), SecretValue::Plain("test-token".to_string()));
-    
+    secrets.insert(
+        "token".to_string(),
+        SecretValue::Plain("test-token".to_string()),
+    );
+
     let config = SecretConfig {
         secrets,
         encryption_key: Some("test-key".to_string()),
         key_file: Some(PathBuf::from("/tmp/key")),
     };
-    
+
     let serialized = serde_json::to_string(&config).unwrap();
     let deserialized: SecretConfig = serde_json::from_str(&serialized).unwrap();
-    
+
     assert_eq!(deserialized.encryption_key, config.encryption_key);
     assert_eq!(deserialized.key_file, config.key_file);
     assert_eq!(deserialized.secrets.len(), config.secrets.len());
@@ -187,14 +190,17 @@ fn test_secret_config_serialization() {
 #[test]
 fn test_secret_config_clone() {
     let mut secrets = std::collections::HashMap::new();
-    secrets.insert("token".to_string(), SecretValue::Plain("test-token".to_string()));
-    
+    secrets.insert(
+        "token".to_string(),
+        SecretValue::Plain("test-token".to_string()),
+    );
+
     let config = SecretConfig {
         secrets,
         encryption_key: Some("test-key".to_string()),
         key_file: Some(PathBuf::from("/tmp/key")),
     };
-    
+
     let cloned = config.clone();
     assert_eq!(cloned.encryption_key, config.encryption_key);
     assert_eq!(cloned.key_file, config.key_file);
@@ -204,14 +210,17 @@ fn test_secret_config_clone() {
 #[test]
 fn test_secret_config_debug() {
     let mut secrets = std::collections::HashMap::new();
-    secrets.insert("token".to_string(), SecretValue::Plain("test-token".to_string()));
-    
+    secrets.insert(
+        "token".to_string(),
+        SecretValue::Plain("test-token".to_string()),
+    );
+
     let config = SecretConfig {
         secrets,
         encryption_key: Some("test-key".to_string()),
         key_file: Some(PathBuf::from("/tmp/key")),
     };
-    
+
     let debug_str = format!("{:?}", config);
     assert!(debug_str.contains("SecretConfig"));
 }
@@ -224,24 +233,24 @@ async fn test_secret_manager_load_from_env() {
     std::env::set_var("JIRA_FILE_SECRET", "file:/tmp/secret.txt");
     std::env::set_var("JIRA_ENV_SECRET", "env:OTHER_VAR");
     std::env::set_var("OTHER_VAR", "env-secret-value");
-    
+
     let mut manager = SecretManager::new();
     let result = manager.load_from_env("JIRA_").await;
     assert!(result.is_ok());
-    
+
     // Check that secrets were loaded
     let token = manager.get_secret("token").await.unwrap();
     assert_eq!(token, Some("test-token".to_string()));
-    
+
     let email = manager.get_secret("email").await.unwrap();
     assert_eq!(email, Some("test@example.com".to_string()));
-    
+
     let base64_secret = manager.get_secret("base64_secret").await.unwrap();
     assert_eq!(base64_secret, Some("test-secret".to_string()));
-    
+
     let env_secret = manager.get_secret("env_secret").await.unwrap();
     assert_eq!(env_secret, Some("env-secret-value".to_string()));
-    
+
     // Clean up
     std::env::remove_var("JIRA_TOKEN");
     std::env::remove_var("JIRA_EMAIL");
@@ -254,15 +263,15 @@ async fn test_secret_manager_load_from_env() {
 #[tokio::test]
 async fn test_secret_manager_load_from_env_no_prefix() {
     std::env::set_var("SOME_OTHER_VAR", "value");
-    
+
     let mut manager = SecretManager::new();
     let result = manager.load_from_env("JIRA_").await;
     assert!(result.is_ok());
-    
+
     // Should not load variables without the prefix
     let secret = manager.get_secret("some_other_var").await.unwrap();
     assert!(secret.is_none());
-    
+
     std::env::remove_var("SOME_OTHER_VAR");
 }
 
