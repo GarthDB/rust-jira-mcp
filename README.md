@@ -1,5 +1,11 @@
 # Rust Jira MCP Server
 
+[![CI](https://github.com/GarthDB/rust-jira-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/GarthDB/rust-jira-mcp/actions/workflows/ci.yml)
+[![Coverage](https://codecov.io/gh/GarthDB/rust-jira-mcp/branch/main/graph/badge.svg)](https://codecov.io/gh/GarthDB/rust-jira-mcp)
+[![Coverage Status](https://img.shields.io/badge/coverage-75%25-brightgreen)](https://codecov.io/gh/GarthDB/rust-jira-mcp)
+[![Rust](https://img.shields.io/badge/rust-1.70+-orange.svg)](https://www.rust-lang.org)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 A Model Context Protocol (MCP) server implementation for Jira integration, built in Rust. This server provides comprehensive tools for interacting with Jira APIs through MCP-compatible clients.
 
 ## Features
@@ -201,13 +207,50 @@ src/
 3. Add the tool definition to the `list_tools()` method
 4. Add corresponding client methods in `src/jira/client.rs` if needed
 
+## Coverage
+
+This project maintains high test coverage with comprehensive testing tools:
+
+### Coverage Status
+- **Overall Coverage**: ~75% (excluding test utilities)
+- **Target Coverage**: 80%
+- **Application Code**: 70-75% coverage
+
+### Coverage Tools
+```bash
+# Quick coverage check
+make coverage-check
+
+# Detailed analysis
+make coverage-analyze
+
+# Get test suggestions for a module
+make coverage-suggest MODULE=main
+
+# Open HTML coverage report
+make coverage-dashboard
+```
+
+### Coverage Monitoring
+- **Codecov.io**: Continuous coverage monitoring
+- **GitHub Actions**: Automated coverage reporting on PRs
+- **Coverage Badges**: Real-time coverage status in README
+
+For detailed coverage information, see [COVERAGE.md](COVERAGE.md).
+
 ## Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Add tests
-5. Submit a pull request
+4. Add tests (aim for 80%+ coverage)
+5. Run `make coverage-check` to verify coverage
+6. Submit a pull request
+
+### Coverage Requirements
+- New features must maintain or improve overall coverage
+- Critical modules (main.rs, jira_client, mcp_tools) should have 80%+ coverage
+- Use `make coverage-suggest MODULE=<name>` for guidance
 
 ## License
 

@@ -24,7 +24,7 @@ jobs:
         components: rustfmt, clippy
     
     - name: Cache cargo registry
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ~/.cargo/registry
@@ -54,6 +54,15 @@ jobs:
     
     - name: Run tests in release mode
       run: cargo test --release --verbose
+    
+    - name: Quick coverage check
+      run: |
+        # Install coverage tools
+        rustup component add llvm-tools-preview
+        cargo install cargo-llvm-cov --locked
+        
+        # Run quick coverage check
+        make coverage-check
 
   security:
     name: Security Audit
