@@ -105,100 +105,292 @@ impl MCPServer {
     }
 
     /// Register basic Jira tools
-    fn register_basic_tools(tools: &mut HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>, config: &JiraConfig) {
-        tools.insert("test_jira_auth".to_string(), Box::new(TestAuthTool::new(config.clone())));
-        tools.insert("search_jira_issues".to_string(), Box::new(SearchIssuesTool::new(config.clone())));
-        tools.insert("create_jira_issue".to_string(), Box::new(CreateIssueTool::new(config.clone())));
-        tools.insert("update_jira_issue".to_string(), Box::new(UpdateIssueTool::new(config.clone())));
-        tools.insert("get_jira_issue".to_string(), Box::new(GetIssueTool::new(config.clone())));
-        tools.insert("get_jira_comments".to_string(), Box::new(GetCommentsTool::new(config.clone())));
-        tools.insert("add_jira_comment".to_string(), Box::new(AddCommentTool::new(config.clone())));
-        tools.insert("get_jira_transitions".to_string(), Box::new(GetTransitionsTool::new(config.clone())));
-        tools.insert("transition_jira_issue".to_string(), Box::new(TransitionIssueTool::new(config.clone())));
+    fn register_basic_tools(
+        tools: &mut HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>,
+        config: &JiraConfig,
+    ) {
+        tools.insert(
+            "test_jira_auth".to_string(),
+            Box::new(TestAuthTool::new(config.clone())),
+        );
+        tools.insert(
+            "search_jira_issues".to_string(),
+            Box::new(SearchIssuesTool::new(config.clone())),
+        );
+        tools.insert(
+            "create_jira_issue".to_string(),
+            Box::new(CreateIssueTool::new(config.clone())),
+        );
+        tools.insert(
+            "update_jira_issue".to_string(),
+            Box::new(UpdateIssueTool::new(config.clone())),
+        );
+        tools.insert(
+            "get_jira_issue".to_string(),
+            Box::new(GetIssueTool::new(config.clone())),
+        );
+        tools.insert(
+            "get_jira_comments".to_string(),
+            Box::new(GetCommentsTool::new(config.clone())),
+        );
+        tools.insert(
+            "add_jira_comment".to_string(),
+            Box::new(AddCommentTool::new(config.clone())),
+        );
+        tools.insert(
+            "get_jira_transitions".to_string(),
+            Box::new(GetTransitionsTool::new(config.clone())),
+        );
+        tools.insert(
+            "transition_jira_issue".to_string(),
+            Box::new(TransitionIssueTool::new(config.clone())),
+        );
     }
 
     /// Register project configuration tools
-    fn register_project_tools(tools: &mut HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>, config: &JiraConfig) {
-        tools.insert("get_project_config".to_string(), Box::new(GetProjectConfigTool::new(config.clone())));
-        tools.insert("get_project_issue_types".to_string(), Box::new(GetIssueTypesTool::new(config.clone())));
-        tools.insert("get_issue_type_metadata".to_string(), Box::new(GetIssueTypeMetadataTool::new(config.clone())));
-        tools.insert("get_project_components".to_string(), Box::new(GetProjectComponentsTool::new(config.clone())));
-        tools.insert("get_priorities_and_statuses".to_string(), Box::new(GetPrioritiesAndStatusesTool::new(config.clone())));
-        tools.insert("get_custom_fields".to_string(), Box::new(GetCustomFieldsTool::new(config.clone())));
-        tools.insert("get_project_metadata".to_string(), Box::new(GetProjectMetadataTool::new(config.clone())));
+    fn register_project_tools(
+        tools: &mut HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>,
+        config: &JiraConfig,
+    ) {
+        tools.insert(
+            "get_project_config".to_string(),
+            Box::new(GetProjectConfigTool::new(config.clone())),
+        );
+        tools.insert(
+            "get_project_issue_types".to_string(),
+            Box::new(GetIssueTypesTool::new(config.clone())),
+        );
+        tools.insert(
+            "get_issue_type_metadata".to_string(),
+            Box::new(GetIssueTypeMetadataTool::new(config.clone())),
+        );
+        tools.insert(
+            "get_project_components".to_string(),
+            Box::new(GetProjectComponentsTool::new(config.clone())),
+        );
+        tools.insert(
+            "get_priorities_and_statuses".to_string(),
+            Box::new(GetPrioritiesAndStatusesTool::new(config.clone())),
+        );
+        tools.insert(
+            "get_custom_fields".to_string(),
+            Box::new(GetCustomFieldsTool::new(config.clone())),
+        );
+        tools.insert(
+            "get_project_metadata".to_string(),
+            Box::new(GetProjectMetadataTool::new(config.clone())),
+        );
     }
 
     /// Register bulk operation tools
-    fn register_bulk_tools(tools: &mut HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>, config: &JiraConfig) {
-        tools.insert("bulk_update_issues".to_string(), Box::new(BulkUpdateIssuesTool::new(config.clone())));
-        tools.insert("bulk_transition_issues".to_string(), Box::new(BulkTransitionIssuesTool::new(config.clone())));
-        tools.insert("bulk_add_comments".to_string(), Box::new(BulkAddCommentsTool::new(config.clone())));
-        tools.insert("mixed_bulk_operations".to_string(), Box::new(MixedBulkOperationsTool::new(config.clone())));
+    fn register_bulk_tools(
+        tools: &mut HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>,
+        config: &JiraConfig,
+    ) {
+        tools.insert(
+            "bulk_update_issues".to_string(),
+            Box::new(BulkUpdateIssuesTool::new(config.clone())),
+        );
+        tools.insert(
+            "bulk_transition_issues".to_string(),
+            Box::new(BulkTransitionIssuesTool::new(config.clone())),
+        );
+        tools.insert(
+            "bulk_add_comments".to_string(),
+            Box::new(BulkAddCommentsTool::new(config.clone())),
+        );
+        tools.insert(
+            "mixed_bulk_operations".to_string(),
+            Box::new(MixedBulkOperationsTool::new(config.clone())),
+        );
     }
 
     /// Register issue linking tools
-    fn register_linking_tools(tools: &mut HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>, config: &JiraConfig) {
-        tools.insert("get_jira_link_types".to_string(), Box::new(GetLinkTypesTool::new(config.clone())));
-        tools.insert("get_jira_issue_links".to_string(), Box::new(GetIssueLinksTool::new(config.clone())));
-        tools.insert("create_jira_issue_link".to_string(), Box::new(CreateIssueLinkTool::new(config.clone())));
-        tools.insert("delete_jira_issue_link".to_string(), Box::new(DeleteIssueLinkTool::new(config.clone())));
+    fn register_linking_tools(
+        tools: &mut HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>,
+        config: &JiraConfig,
+    ) {
+        tools.insert(
+            "get_jira_link_types".to_string(),
+            Box::new(GetLinkTypesTool::new(config.clone())),
+        );
+        tools.insert(
+            "get_jira_issue_links".to_string(),
+            Box::new(GetIssueLinksTool::new(config.clone())),
+        );
+        tools.insert(
+            "create_jira_issue_link".to_string(),
+            Box::new(CreateIssueLinkTool::new(config.clone())),
+        );
+        tools.insert(
+            "delete_jira_issue_link".to_string(),
+            Box::new(DeleteIssueLinkTool::new(config.clone())),
+        );
     }
 
     /// Register file attachment tools
-    fn register_attachment_tools(tools: &mut HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>, config: &JiraConfig) {
-        tools.insert("get_jira_issue_attachments".to_string(), Box::new(GetIssueAttachmentsTool::new(config.clone())));
-        tools.insert("upload_jira_attachment".to_string(), Box::new(UploadAttachmentTool::new(config.clone())));
-        tools.insert("delete_jira_attachment".to_string(), Box::new(DeleteAttachmentTool::new(config.clone())));
-        tools.insert("download_jira_attachment".to_string(), Box::new(DownloadAttachmentTool::new(config.clone())));
+    fn register_attachment_tools(
+        tools: &mut HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>,
+        config: &JiraConfig,
+    ) {
+        tools.insert(
+            "get_jira_issue_attachments".to_string(),
+            Box::new(GetIssueAttachmentsTool::new(config.clone())),
+        );
+        tools.insert(
+            "upload_jira_attachment".to_string(),
+            Box::new(UploadAttachmentTool::new(config.clone())),
+        );
+        tools.insert(
+            "delete_jira_attachment".to_string(),
+            Box::new(DeleteAttachmentTool::new(config.clone())),
+        );
+        tools.insert(
+            "download_jira_attachment".to_string(),
+            Box::new(DownloadAttachmentTool::new(config.clone())),
+        );
     }
 
     /// Register work log tools
-    fn register_worklog_tools(tools: &mut HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>, config: &JiraConfig) {
-        tools.insert("get_jira_issue_work_logs".to_string(), Box::new(GetIssueWorkLogsTool::new(config.clone())));
-        tools.insert("add_jira_work_log".to_string(), Box::new(AddWorkLogTool::new(config.clone())));
-        tools.insert("update_jira_work_log".to_string(), Box::new(UpdateWorkLogTool::new(config.clone())));
-        tools.insert("delete_jira_work_log".to_string(), Box::new(DeleteWorkLogTool::new(config.clone())));
+    fn register_worklog_tools(
+        tools: &mut HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>,
+        config: &JiraConfig,
+    ) {
+        tools.insert(
+            "get_jira_issue_work_logs".to_string(),
+            Box::new(GetIssueWorkLogsTool::new(config.clone())),
+        );
+        tools.insert(
+            "add_jira_work_log".to_string(),
+            Box::new(AddWorkLogTool::new(config.clone())),
+        );
+        tools.insert(
+            "update_jira_work_log".to_string(),
+            Box::new(UpdateWorkLogTool::new(config.clone())),
+        );
+        tools.insert(
+            "delete_jira_work_log".to_string(),
+            Box::new(DeleteWorkLogTool::new(config.clone())),
+        );
     }
 
     /// Register issue watcher tools
-    fn register_watcher_tools(tools: &mut HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>, config: &JiraConfig) {
-        tools.insert("get_jira_issue_watchers".to_string(), Box::new(GetIssueWatchersTool::new(config.clone())));
-        tools.insert("add_jira_issue_watcher".to_string(), Box::new(AddIssueWatcherTool::new(config.clone())));
-        tools.insert("remove_jira_issue_watcher".to_string(), Box::new(RemoveIssueWatcherTool::new(config.clone())));
+    fn register_watcher_tools(
+        tools: &mut HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>,
+        config: &JiraConfig,
+    ) {
+        tools.insert(
+            "get_jira_issue_watchers".to_string(),
+            Box::new(GetIssueWatchersTool::new(config.clone())),
+        );
+        tools.insert(
+            "add_jira_issue_watcher".to_string(),
+            Box::new(AddIssueWatcherTool::new(config.clone())),
+        );
+        tools.insert(
+            "remove_jira_issue_watcher".to_string(),
+            Box::new(RemoveIssueWatcherTool::new(config.clone())),
+        );
     }
 
     /// Register issue label tools
-    fn register_label_tools(tools: &mut HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>, config: &JiraConfig) {
-        tools.insert("get_jira_labels".to_string(), Box::new(GetLabelsTool::new(config.clone())));
-        tools.insert("create_jira_label".to_string(), Box::new(CreateLabelTool::new(config.clone())));
-        tools.insert("update_jira_label".to_string(), Box::new(UpdateLabelTool::new(config.clone())));
-        tools.insert("delete_jira_label".to_string(), Box::new(DeleteLabelTool::new(config.clone())));
+    fn register_label_tools(
+        tools: &mut HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>,
+        config: &JiraConfig,
+    ) {
+        tools.insert(
+            "get_jira_labels".to_string(),
+            Box::new(GetLabelsTool::new(config.clone())),
+        );
+        tools.insert(
+            "create_jira_label".to_string(),
+            Box::new(CreateLabelTool::new(config.clone())),
+        );
+        tools.insert(
+            "update_jira_label".to_string(),
+            Box::new(UpdateLabelTool::new(config.clone())),
+        );
+        tools.insert(
+            "delete_jira_label".to_string(),
+            Box::new(DeleteLabelTool::new(config.clone())),
+        );
     }
 
     /// Register issue component tools
-    fn register_component_tools(tools: &mut HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>, config: &JiraConfig) {
-        tools.insert("create_jira_component".to_string(), Box::new(CreateComponentTool::new(config.clone())));
-        tools.insert("update_jira_component".to_string(), Box::new(UpdateComponentTool::new(config.clone())));
-        tools.insert("delete_jira_component".to_string(), Box::new(DeleteComponentTool::new(config.clone())));
+    fn register_component_tools(
+        tools: &mut HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>,
+        config: &JiraConfig,
+    ) {
+        tools.insert(
+            "create_jira_component".to_string(),
+            Box::new(CreateComponentTool::new(config.clone())),
+        );
+        tools.insert(
+            "update_jira_component".to_string(),
+            Box::new(UpdateComponentTool::new(config.clone())),
+        );
+        tools.insert(
+            "delete_jira_component".to_string(),
+            Box::new(DeleteComponentTool::new(config.clone())),
+        );
     }
 
     /// Register issue cloning tools
-    fn register_cloning_tools(tools: &mut HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>, config: &JiraConfig) {
-        tools.insert("clone_jira_issue".to_string(), Box::new(CloneIssueTool::new(config.clone())));
+    fn register_cloning_tools(
+        tools: &mut HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>,
+        config: &JiraConfig,
+    ) {
+        tools.insert(
+            "clone_jira_issue".to_string(),
+            Box::new(CloneIssueTool::new(config.clone())),
+        );
     }
 
     /// Register Zephyr test management tools
-    fn register_zephyr_tools(tools: &mut HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>, config: &JiraConfig) {
-        tools.insert("get_zephyr_test_steps".to_string(), Box::new(GetZephyrTestStepsTool::new(config.clone())));
-        tools.insert("create_zephyr_test_step".to_string(), Box::new(CreateZephyrTestStepTool::new(config.clone())));
-        tools.insert("update_zephyr_test_step".to_string(), Box::new(UpdateZephyrTestStepTool::new(config.clone())));
-        tools.insert("delete_zephyr_test_step".to_string(), Box::new(DeleteZephyrTestStepTool::new(config.clone())));
-        tools.insert("get_zephyr_test_cases".to_string(), Box::new(GetZephyrTestCasesTool::new(config.clone())));
-        tools.insert("create_zephyr_test_case".to_string(), Box::new(CreateZephyrTestCaseTool::new(config.clone())));
-        tools.insert("get_zephyr_test_executions".to_string(), Box::new(GetZephyrTestExecutionsTool::new(config.clone())));
-        tools.insert("create_zephyr_test_execution".to_string(), Box::new(CreateZephyrTestExecutionTool::new(config.clone())));
-        tools.insert("get_zephyr_test_cycles".to_string(), Box::new(GetZephyrTestCyclesTool::new(config.clone())));
-        tools.insert("get_zephyr_test_plans".to_string(), Box::new(GetZephyrTestPlansTool::new(config.clone())));
+    fn register_zephyr_tools(
+        tools: &mut HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>,
+        config: &JiraConfig,
+    ) {
+        tools.insert(
+            "get_zephyr_test_steps".to_string(),
+            Box::new(GetZephyrTestStepsTool::new(config.clone())),
+        );
+        tools.insert(
+            "create_zephyr_test_step".to_string(),
+            Box::new(CreateZephyrTestStepTool::new(config.clone())),
+        );
+        tools.insert(
+            "update_zephyr_test_step".to_string(),
+            Box::new(UpdateZephyrTestStepTool::new(config.clone())),
+        );
+        tools.insert(
+            "delete_zephyr_test_step".to_string(),
+            Box::new(DeleteZephyrTestStepTool::new(config.clone())),
+        );
+        tools.insert(
+            "get_zephyr_test_cases".to_string(),
+            Box::new(GetZephyrTestCasesTool::new(config.clone())),
+        );
+        tools.insert(
+            "create_zephyr_test_case".to_string(),
+            Box::new(CreateZephyrTestCaseTool::new(config.clone())),
+        );
+        tools.insert(
+            "get_zephyr_test_executions".to_string(),
+            Box::new(GetZephyrTestExecutionsTool::new(config.clone())),
+        );
+        tools.insert(
+            "create_zephyr_test_execution".to_string(),
+            Box::new(CreateZephyrTestExecutionTool::new(config.clone())),
+        );
+        tools.insert(
+            "get_zephyr_test_cycles".to_string(),
+            Box::new(GetZephyrTestCyclesTool::new(config.clone())),
+        );
+        tools.insert(
+            "get_zephyr_test_plans".to_string(),
+            Box::new(GetZephyrTestPlansTool::new(config.clone())),
+        );
     }
 
     /// Run the MCP server with stdio transport.

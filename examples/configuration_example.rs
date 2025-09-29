@@ -12,7 +12,9 @@ async fn main() -> Result<()> {
     // Example 1: Basic configuration loading
     println!("1. Basic Configuration Loading:");
     let mut config_manager = ConfigManager::new();
-    config_manager.load_with_options(ConfigOptions::default()).await?;
+    config_manager
+        .load_with_options(ConfigOptions::default())
+        .await?;
     let config = config_manager.get_config().await;
     println!("   Loaded config: {config:?}\n");
 

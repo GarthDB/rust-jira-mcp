@@ -136,7 +136,6 @@ impl ValidationRule {
         self
     }
 
-
     #[must_use]
     pub fn custom_validator<F>(mut self, validator: F) -> Self
     where

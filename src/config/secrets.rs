@@ -62,7 +62,6 @@ impl SecretValue {
             }
         }
     }
-
 }
 
 /// Secret configuration loaded from files
@@ -160,14 +159,6 @@ impl SecretManager {
             Ok(None)
         }
     }
-
-
-
-
-
-
-
-
 }
 
 impl Default for SecretManager {
@@ -175,4 +166,3 @@ impl Default for SecretManager {
         Self::new()
     }
 }
-

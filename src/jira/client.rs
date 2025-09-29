@@ -209,7 +209,9 @@ impl JiraClient {
                     if retry_count < max_retries && Self::should_retry(status) {
                         retry_count += 1;
                         // retry_count is always positive (starts at 0, only incremented)
-                        let delay = Duration::from_millis(1000 * u64::try_from(retry_count.max(0)).unwrap_or(0));
+                        let delay = Duration::from_millis(
+                            1000 * u64::try_from(retry_count.max(0)).unwrap_or(0),
+                        );
                         warn!(
                             "Retrying request in {:?} (attempt {}/{})",
                             delay, retry_count, max_retries
@@ -226,7 +228,9 @@ impl JiraClient {
                     if retry_count < max_retries && e.is_timeout() {
                         retry_count += 1;
                         // retry_count is always positive (starts at 0, only incremented)
-                        let delay = Duration::from_millis(1000 * u64::try_from(retry_count.max(0)).unwrap_or(0));
+                        let delay = Duration::from_millis(
+                            1000 * u64::try_from(retry_count.max(0)).unwrap_or(0),
+                        );
                         warn!(
                             "Retrying request after timeout in {:?} (attempt {}/{})",
                             delay, retry_count, max_retries
@@ -984,7 +988,9 @@ impl JiraClient {
                 Err(e) => {
                     if retry_count < max_retries && Self::should_retry_operation(self, &e) {
                         retry_count += 1;
-                        let delay = Duration::from_millis(1000 * u64::try_from(retry_count.max(0)).unwrap_or(0));
+                        let delay = Duration::from_millis(
+                            1000 * u64::try_from(retry_count.max(0)).unwrap_or(0),
+                        );
                         warn!(
                             "Retrying operation for {} in {:?} (attempt {}/{})",
                             operation.issue_key, delay, retry_count, max_retries
@@ -1343,7 +1349,10 @@ impl JiraClient {
         // Apply field mapping
         if let Some(field_mapping) = &clone_request.field_mapping {
             // Field mapping functionality is not yet implemented
-            warn!("Field mapping requested but not implemented: {:?}", field_mapping);
+            warn!(
+                "Field mapping requested but not implemented: {:?}",
+                field_mapping
+            );
         }
 
         // Create the new issue
@@ -1468,7 +1477,6 @@ impl JiraClient {
         Ok(response)
     }
 
-
     // Zephyr Test Management Operations
 
     /// Get the Zephyr API base URL
@@ -1588,7 +1596,9 @@ impl JiraClient {
                     // Retry on certain status codes
                     if retry_count < max_retries && Self::should_retry(status) {
                         retry_count += 1;
-                        let delay = Duration::from_millis(1000 * u64::try_from(retry_count.max(0)).unwrap_or(0));
+                        let delay = Duration::from_millis(
+                            1000 * u64::try_from(retry_count.max(0)).unwrap_or(0),
+                        );
                         warn!(
                             "Retrying Zephyr request in {:?} (attempt {}/{})",
                             delay, retry_count, max_retries
@@ -1604,7 +1614,9 @@ impl JiraClient {
 
                     if retry_count < max_retries && e.is_timeout() {
                         retry_count += 1;
-                        let delay = Duration::from_millis(1000 * u64::try_from(retry_count.max(0)).unwrap_or(0));
+                        let delay = Duration::from_millis(
+                            1000 * u64::try_from(retry_count.max(0)).unwrap_or(0),
+                        );
                         warn!(
                             "Retrying Zephyr request after timeout in {:?} (attempt {}/{})",
                             delay, retry_count, max_retries

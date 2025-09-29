@@ -91,12 +91,10 @@ impl ConfigManager {
         Ok(())
     }
 
-
     /// Get the current configuration (read-only)
     pub async fn get_config(&self) -> JiraConfig {
         self.config.read().await.clone()
     }
-
 
     /// Enable hot-reloading for the specified paths
     fn enable_hot_reload(&mut self, watch_paths: &[PathBuf]) -> Result<()> {
