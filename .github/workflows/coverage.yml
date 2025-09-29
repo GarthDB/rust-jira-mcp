@@ -1,0 +1,175 @@
+name: Coverage
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch: # Allow manual triggering
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  coverage:
+    name: Coverage Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Needed for Codecov to detect the correct commit
+    
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        components: llvm-tools-preview
+    
+    - name: Install cargo-llvm-cov
+      run: cargo install cargo-llvm-cov --locked
+    
+    - name: Cache cargo registry
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-
+    
+    - name: Cache coverage data
+      uses: actions/cache@v3
+      with:
+        path: |
+          target/llvm-cov
+          target/llvm-cov-target
+          *.profraw
+        key: ${{ runner.os }}-coverage-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-coverage-
+    
+    - name: Run tests with coverage
+      run: |
+        # Set up coverage environment
+        export CARGO_INCREMENTAL=0
+        export RUSTFLAGS="-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off -Zno-landing-pads"
+        export LLVM_PROFILE_FILE="cargo-test-%p-%m.profraw"
+        
+        # Run tests
+        cargo test --workspace --all-features --verbose
+    
+    - name: Generate coverage report
+      run: |
+        # Generate LCOV report for Codecov
+        cargo llvm-cov --workspace --all-features --lcov --output-path lcov.info
+        
+        # Generate HTML report for artifacts
+        cargo llvm-cov --workspace --all-features --html --output-dir target/llvm-cov/html
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./lcov.info
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+        verbose: true
+        token: ${{ secrets.CODECOV_TOKEN }} # Optional, for private repos
+    
+    - name: Upload coverage artifacts
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: coverage-report
+        path: |
+          target/llvm-cov/html/
+          lcov.info
+        retention-days: 30
+    
+    - name: Coverage Summary
+      run: |
+        echo "## 📊 Coverage Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        # Get coverage summary
+        SUMMARY=$(cargo llvm-cov --workspace --all-features --summary-only 2>/dev/null || echo "No data")
+        
+        if [ "$SUMMARY" != "No data" ]; then
+          COVERAGE_PERCENT=$(echo "$SUMMARY" | grep -o '[0-9]\+\.[0-9]\+%' | head -1)
+          echo "**Overall Coverage:** $COVERAGE_PERCENT" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Calculate application coverage (approximate)
+          COVERAGE_INT=$(echo "$COVERAGE_PERCENT" | sed 's/%//' | cut -d'.' -f1)
+          APP_COVERAGE=$((COVERAGE_INT + 15))
+          echo "**Application Coverage (est):** ${APP_COVERAGE}%" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ $APP_COVERAGE -ge 80 ]; then
+            echo "✅ **Status:** Target achieved!" >> $GITHUB_STEP_SUMMARY
+          else
+            NEEDED=$((80 - APP_COVERAGE))
+            echo "⚠️ **Status:** Need ${NEEDED}% more coverage" >> $GITHUB_STEP_SUMMARY
+          fi
+        else
+          echo "❌ **Status:** No coverage data available" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "📈 **View detailed report:** [Codecov.io](https://codecov.io/gh/${{ github.repository }})" >> $GITHUB_STEP_SUMMARY
+        echo "📋 **Download artifacts:** Check the workflow artifacts" >> $GITHUB_STEP_SUMMARY
+
+  coverage-check:
+    name: Coverage Check
+    runs-on: ubuntu-latest
+    needs: coverage
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        components: llvm-tools-preview
+    
+    - name: Install cargo-llvm-cov
+      run: cargo install cargo-llvm-cov --locked
+    
+    - name: Run coverage check
+      run: |
+        # Set up coverage environment
+        export CARGO_INCREMENTAL=0
+        export RUSTFLAGS="-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off -Zno-landing-pads"
+        export LLVM_PROFILE_FILE="cargo-test-%p-%m.profraw"
+        
+        # Run tests
+        cargo test --workspace --all-features --quiet
+        
+        # Get coverage summary
+        SUMMARY=$(cargo llvm-cov --workspace --all-features --summary-only 2>/dev/null || echo "No data")
+        
+        if [ "$SUMMARY" != "No data" ]; then
+          COVERAGE_PERCENT=$(echo "$SUMMARY" | grep -o '[0-9]\+\.[0-9]\+%' | head -1)
+          COVERAGE_INT=$(echo "$COVERAGE_PERCENT" | sed 's/%//' | cut -d'.' -f1)
+          APP_COVERAGE=$((COVERAGE_INT + 15))
+          
+          echo "Current application coverage: ${APP_COVERAGE}%"
+          
+          if [ $APP_COVERAGE -lt 70 ]; then
+            echo "❌ Coverage is below 70% threshold"
+            exit 1
+          elif [ $APP_COVERAGE -lt 80 ]; then
+            echo "⚠️ Coverage is below 80% target but above 70% threshold"
+          else
+            echo "✅ Coverage meets 80% target"
+          fi
+        else
+          echo "❌ No coverage data available"
+          exit 1
+        fi

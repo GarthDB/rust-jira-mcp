@@ -55,3 +55,60 @@ run-release: ## Run the binary in release mode
 	cargo run --release
 
 check-all: fmt-check clippy-pedantic test audit ## Run all checks including security audit
+
+# Coverage targets
+coverage: ## Run coverage analysis and generate HTML report
+	@echo "Running coverage analysis..."
+	@./scripts/coverage.sh run
+
+coverage-open: ## Open coverage report in browser
+	@./scripts/coverage.sh open
+
+coverage-summary: ## Show coverage summary
+	@./scripts/coverage.sh summary
+
+coverage-lcov: ## Generate LCOV format report
+	@./scripts/coverage.sh lcov
+
+coverage-clean: ## Clean coverage artifacts
+	@./scripts/coverage.sh clean
+
+# New coverage analysis tools
+coverage-check: ## Quick coverage status check
+	@./scripts/coverage-simple.sh status
+
+coverage-analyze: ## Detailed coverage analysis dashboard
+	@./scripts/coverage-simple.sh modules && echo "" && ./scripts/coverage-simple.sh opportunities
+
+coverage-modules: ## Show module coverage breakdown
+	@./scripts/coverage-simple.sh modules
+
+coverage-opportunities: ## Show improvement opportunities
+	@./scripts/coverage-simple.sh opportunities
+
+coverage-actions: ## Show quick action commands
+	@./scripts/coverage-simple.sh actions
+
+coverage-suggest: ## Generate test suggestions for a module (usage: make coverage-suggest MODULE=main)
+	@./scripts/coverage-simple.sh suggest $(MODULE)
+
+coverage-dashboard: ## Open coverage dashboard
+	@./scripts/coverage.sh open
+
+# Test targets
+test-unit: ## Run unit tests only
+	cargo test --lib
+
+test-integration: ## Run integration tests only
+	cargo test --test '*'
+
+test-all: test-unit test-integration ## Run all tests
+
+# Development targets
+dev-setup: ## Set up development environment
+	@echo "Setting up development environment..."
+	@rustup component add llvm-tools-preview
+	@cargo install cargo-llvm-cov --locked
+	@echo "Development environment ready!"
+
+test-coverage: coverage-summary ## Quick coverage check

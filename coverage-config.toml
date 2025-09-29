@@ -1,0 +1,39 @@
+# Coverage Configuration
+# This file defines coverage targets and exclusions
+
+[coverage]
+# Overall coverage target
+target_percent = 80
+
+# Application code coverage target (excluding test utilities)
+app_target_percent = 80
+
+# Modules to exclude from coverage calculation
+exclude_modules = [
+    "src/test_utils",
+    "src/test_usage.rs",
+    "tests",
+]
+
+# Priority modules for improvement (ordered by impact)
+priority_modules = [
+    { name = "main", current_coverage = 0, lines = 73, impact = "high" },
+    { name = "zephyr_tools", current_coverage = 31, lines = 156, impact = "medium" },
+    { name = "mcp_tools", current_coverage = 46, lines = 604, impact = "high" },
+    { name = "jira_client", current_coverage = 52, lines = 1108, impact = "high" },
+]
+
+# Coverage thresholds by module type
+[coverage.thresholds]
+core_modules = 90      # Error handling, types, config
+api_modules = 80       # Jira client, MCP server
+tool_modules = 75      # MCP tools, Zephyr tools
+main_modules = 70      # Main application logic
+
+# Quick commands for common tasks
+[coverage.commands]
+check = "make coverage-check"
+analyze = "make coverage-analyze"
+dashboard = "make coverage-dashboard"
+gaps = "make coverage-gaps MODULE="
+suggest = "make coverage-suggest MODULE="

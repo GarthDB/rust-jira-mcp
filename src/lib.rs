@@ -11,6 +11,9 @@ pub mod mcp;
 pub mod types;
 pub mod utils;
 
+#[cfg(test)]
+pub mod test_utils;
+
 pub use crate::config::jira::JiraConfig;
 pub use crate::types::mcp::{
     CallToolParams, CallToolResult, ClientInfo, InitializeParams, InitializeResult, JsonRpcError,

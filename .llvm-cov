@@ -1,0 +1,26 @@
+# LLVM Coverage Configuration
+# Exclude test utilities and test files from coverage calculation
+
+[llvm-cov]
+# Exclude test utilities from coverage
+exclude = [
+    "src/test_utils/**",
+    "src/test_usage.rs",
+    "tests/**",
+    "**/test_*.rs",
+    "**/*_test.rs",
+    "**/*_tests.rs",
+]
+
+# Include only application code
+include = [
+    "src/config/**",
+    "src/error/**", 
+    "src/jira/**",
+    "src/logging/**",
+    "src/mcp/**",
+    "src/types/**",
+    "src/utils/**",
+    "src/main.rs",
+    "src/lib.rs",
+]
