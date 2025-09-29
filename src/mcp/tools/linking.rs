@@ -26,20 +26,22 @@ impl crate::mcp::server::MCPToolHandler for GetIssueLinksTool {
         let issue_key = args
             .get("issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: issue_key"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_key")
+            })?;
 
         info!("Getting issue links for: {}", issue_key);
 
         let links = self.client.get_issue_links(issue_key).await?;
 
-        let mut content = vec![MCPContent::text(format!("Found {} links for issue {}\n\n", links.len(), issue_key))];
+        let mut content = vec![MCPContent::text(format!(
+            "Found {} links for issue {}\n\n",
+            links.len(),
+            issue_key
+        ))];
 
         for link in links {
-            let link_text = format!(
-                "• {} - {}\n",
-                link.id,
-                link.link_type.name
-            );
+            let link_text = format!("• {} - {}\n", link.id, link.link_type.name);
             content.push(MCPContent::text(link_text));
         }
 
@@ -72,21 +74,30 @@ impl crate::mcp::server::MCPToolHandler for CreateIssueLinkTool {
         let link_type = args
             .get("link_type")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: link_type"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: link_type")
+            })?;
 
         let inward_issue = args
             .get("inward_issue")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: inward_issue"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: inward_issue")
+            })?;
 
         let outward_issue = args
             .get("outward_issue")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: outward_issue"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: outward_issue")
+            })?;
 
         let comment = args.get("comment").and_then(|v| v.as_str());
 
-        info!("Creating link between {} and {} with type {}", inward_issue, outward_issue, link_type);
+        info!(
+            "Creating link between {} and {} with type {}",
+            inward_issue, outward_issue, link_type
+        );
 
         let link_request = crate::types::jira::JiraIssueLinkCreateRequest {
             link_type: crate::types::jira::JiraIssueLinkType {
@@ -139,15 +150,15 @@ impl crate::mcp::server::MCPToolHandler for DeleteIssueLinkTool {
         let link_id = args
             .get("link_id")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: link_id"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: link_id")
+            })?;
 
         info!("Deleting issue link: {}", link_id);
 
         self.client.delete_issue_link(link_id).await?;
 
-        let response_text = format!(
-            "Issue link deleted successfully: {link_id}"
-        );
+        let response_text = format!("Issue link deleted successfully: {link_id}");
 
         Ok(MCPToolResult {
             content: vec![MCPContent::text(response_text)],
@@ -155,4 +166,3 @@ impl crate::mcp::server::MCPToolHandler for DeleteIssueLinkTool {
         })
     }
 }
-

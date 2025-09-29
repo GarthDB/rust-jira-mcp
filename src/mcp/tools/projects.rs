@@ -26,7 +26,9 @@ impl crate::mcp::server::MCPToolHandler for GetProjectConfigTool {
         let project_key = args
             .get("project_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: project_key"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: project_key")
+            })?;
 
         info!("Getting project configuration for: {}", project_key);
 
@@ -35,7 +37,8 @@ impl crate::mcp::server::MCPToolHandler for GetProjectConfigTool {
         let response_text = format!(
             "Project configuration for {}:\n{}",
             project_key,
-            serde_json::to_string_pretty(&config).unwrap_or_else(|_| "Failed to format configuration".to_string())
+            serde_json::to_string_pretty(&config)
+                .unwrap_or_else(|_| "Failed to format configuration".to_string())
         );
 
         Ok(MCPToolResult {
@@ -67,7 +70,9 @@ impl crate::mcp::server::MCPToolHandler for GetProjectMetadataTool {
         let project_key = args
             .get("project_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: project_key"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: project_key")
+            })?;
 
         info!("Getting project metadata for: {}", project_key);
 
@@ -76,7 +81,8 @@ impl crate::mcp::server::MCPToolHandler for GetProjectMetadataTool {
         let response_text = format!(
             "Project metadata for {}:\n{}",
             project_key,
-            serde_json::to_string_pretty(&metadata).unwrap_or_else(|_| "Failed to format metadata".to_string())
+            serde_json::to_string_pretty(&metadata)
+                .unwrap_or_else(|_| "Failed to format metadata".to_string())
         );
 
         Ok(MCPToolResult {
@@ -113,14 +119,22 @@ impl crate::mcp::server::MCPToolHandler for GetPrioritiesAndStatusesTool {
         let mut content = vec![MCPContent::text("Priorities:\n".to_string())];
 
         for priority in priorities {
-            let priority_text = format!("• {} - {}\n", priority.name, priority.description.as_deref().unwrap_or("No description"));
+            let priority_text = format!(
+                "• {} - {}\n",
+                priority.name,
+                priority.description.as_deref().unwrap_or("No description")
+            );
             content.push(MCPContent::text(priority_text));
         }
 
         content.push(MCPContent::text("\nStatuses:\n".to_string()));
 
         for status in statuses {
-            let status_text = format!("• {} - {}\n", status.name, status.description.as_deref().unwrap_or("No description"));
+            let status_text = format!(
+                "• {} - {}\n",
+                status.name,
+                status.description.as_deref().unwrap_or("No description")
+            );
             content.push(MCPContent::text(status_text));
         }
 
@@ -154,12 +168,25 @@ impl crate::mcp::server::MCPToolHandler for GetCustomFieldsTool {
 
         let custom_fields = self.client.get_custom_fields().await?;
 
-        let mut content = vec![MCPContent::text(format!("Found {} custom fields:\n\n", custom_fields.len()))];
+        let mut content = vec![MCPContent::text(format!(
+            "Found {} custom fields:\n\n",
+            custom_fields.len()
+        ))];
 
         for field in custom_fields {
-            let field_name = field.get("name").and_then(|n| n.as_str()).unwrap_or("Unknown");
-            let field_id = field.get("id").and_then(|i| i.as_str()).unwrap_or("Unknown");
-            let field_type = field.get("schema").and_then(|s| s.get("type")).and_then(|t| t.as_str()).unwrap_or("Unknown");
+            let field_name = field
+                .get("name")
+                .and_then(|n| n.as_str())
+                .unwrap_or("Unknown");
+            let field_id = field
+                .get("id")
+                .and_then(|i| i.as_str())
+                .unwrap_or("Unknown");
+            let field_type = field
+                .get("schema")
+                .and_then(|s| s.get("type"))
+                .and_then(|t| t.as_str())
+                .unwrap_or("Unknown");
 
             let field_text = format!("• {} ({}): {}\n", field_name, field_id, field_type);
             content.push(MCPContent::text(field_text));
@@ -194,7 +221,9 @@ impl crate::mcp::server::MCPToolHandler for GetIssueTypeMetadataTool {
         let issue_type_id = args
             .get("issue_type_id")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: issue_type_id"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_type_id")
+            })?;
 
         info!("Getting issue type metadata for: {}", issue_type_id);
 
@@ -203,7 +232,8 @@ impl crate::mcp::server::MCPToolHandler for GetIssueTypeMetadataTool {
         let response_text = format!(
             "Issue type metadata for {}:\n{}",
             issue_type_id,
-            serde_json::to_string_pretty(&issue_type).unwrap_or_else(|_| "Failed to format issue type".to_string())
+            serde_json::to_string_pretty(&issue_type)
+                .unwrap_or_else(|_| "Failed to format issue type".to_string())
         );
 
         Ok(MCPToolResult {
@@ -235,16 +265,26 @@ impl crate::mcp::server::MCPToolHandler for GetProjectComponentsTool {
         let project_key = args
             .get("project_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: project_key"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: project_key")
+            })?;
 
         info!("Getting project components for: {}", project_key);
 
         let components = self.client.get_project_components(project_key).await?;
 
-        let mut content = vec![MCPContent::text(format!("Found {} components for project {}:\n\n", components.len(), project_key))];
+        let mut content = vec![MCPContent::text(format!(
+            "Found {} components for project {}:\n\n",
+            components.len(),
+            project_key
+        ))];
 
         for component in components {
-            let component_text = format!("• {} - {}\n", component.name, component.description.unwrap_or_default());
+            let component_text = format!(
+                "• {} - {}\n",
+                component.name,
+                component.description.unwrap_or_default()
+            );
             content.push(MCPContent::text(component_text));
         }
 
@@ -277,16 +317,26 @@ impl crate::mcp::server::MCPToolHandler for GetIssueTypesTool {
         let project_key = args
             .get("project_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: project_key"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: project_key")
+            })?;
 
         info!("Getting issue types for project: {}", project_key);
 
         let issue_types = self.client.get_project_issue_types(project_key).await?;
 
-        let mut content = vec![MCPContent::text(format!("Found {} issue types for project {}:\n\n", issue_types.len(), project_key))];
+        let mut content = vec![MCPContent::text(format!(
+            "Found {} issue types for project {}:\n\n",
+            issue_types.len(),
+            project_key
+        ))];
 
         for issue_type in issue_types {
-            let issue_type_text = format!("• {} - {}\n", issue_type.name, issue_type.description.unwrap_or_default());
+            let issue_type_text = format!(
+                "• {} - {}\n",
+                issue_type.name,
+                issue_type.description.unwrap_or_default()
+            );
             content.push(MCPContent::text(issue_type_text));
         }
 
@@ -320,7 +370,10 @@ impl crate::mcp::server::MCPToolHandler for GetLinkTypesTool {
 
         let link_types = self.client.get_link_types().await?;
 
-        let mut content = vec![MCPContent::text(format!("Found {} link types:\n\n", link_types.len()))];
+        let mut content = vec![MCPContent::text(format!(
+            "Found {} link types:\n\n",
+            link_types.len()
+        ))];
 
         for link_type in link_types {
             let link_type_text = format!("• {} - {}\n", link_type.name, link_type.inward);

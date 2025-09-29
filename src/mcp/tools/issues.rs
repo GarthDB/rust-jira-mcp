@@ -59,8 +59,17 @@ impl crate::mcp::server::MCPToolHandler for SearchIssuesTool {
             let issue_text = format!(
                 "• {} - {} ({})\n",
                 issue.key,
-                issue.fields.get("summary").and_then(|s| s.as_str()).unwrap_or("No summary"),
-                issue.fields.get("status").and_then(|s| s.get("name")).and_then(|n| n.as_str()).unwrap_or("Unknown status")
+                issue
+                    .fields
+                    .get("summary")
+                    .and_then(|s| s.as_str())
+                    .unwrap_or("No summary"),
+                issue
+                    .fields
+                    .get("status")
+                    .and_then(|s| s.get("name"))
+                    .and_then(|n| n.as_str())
+                    .unwrap_or("Unknown status")
             );
             content.push(MCPContent::text(issue_text));
         }
@@ -94,17 +103,23 @@ impl crate::mcp::server::MCPToolHandler for CreateIssueTool {
         let project_key = args
             .get("project_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: project_key"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: project_key")
+            })?;
 
         let issue_type = args
             .get("issue_type")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: issue_type"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_type")
+            })?;
 
         let summary = args
             .get("summary")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: summary"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: summary")
+            })?;
 
         let description = args.get("description").and_then(|v| v.as_str());
 
@@ -158,7 +173,9 @@ impl crate::mcp::server::MCPToolHandler for UpdateIssueTool {
         let issue_key = args
             .get("issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: issue_key"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_key")
+            })?;
 
         info!("Updating Jira issue: {}", issue_key);
 
@@ -217,15 +234,31 @@ impl crate::mcp::server::MCPToolHandler for GetIssueTool {
         let issue_key = args
             .get("issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: issue_key"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_key")
+            })?;
 
         info!("Getting Jira issue: {}", issue_key);
 
         let issue = self.client.get_issue(issue_key).await?;
 
-        let summary = issue.fields.get("summary").and_then(|s| s.as_str()).unwrap_or("No summary");
-        let status = issue.fields.get("status").and_then(|s| s.get("name")).and_then(|n| n.as_str()).unwrap_or("Unknown status");
-        let assignee = issue.fields.get("assignee").and_then(|a| a.get("displayName")).and_then(|n| n.as_str()).unwrap_or("Unassigned");
+        let summary = issue
+            .fields
+            .get("summary")
+            .and_then(|s| s.as_str())
+            .unwrap_or("No summary");
+        let status = issue
+            .fields
+            .get("status")
+            .and_then(|s| s.get("name"))
+            .and_then(|n| n.as_str())
+            .unwrap_or("Unknown status");
+        let assignee = issue
+            .fields
+            .get("assignee")
+            .and_then(|a| a.get("displayName"))
+            .and_then(|n| n.as_str())
+            .unwrap_or("Unassigned");
 
         let response_text = format!(
             "Issue: {}\nSummary: {}\nStatus: {}\nAssignee: {}\nURL: {}/browse/{}",
@@ -243,4 +276,3 @@ impl crate::mcp::server::MCPToolHandler for GetIssueTool {
         })
     }
 }
-

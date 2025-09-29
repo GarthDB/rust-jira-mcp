@@ -23,15 +23,16 @@ impl CreateComponentTool {
 #[async_trait::async_trait]
 impl crate::mcp::server::MCPToolHandler for CreateComponentTool {
     async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
-        let name = args
-            .get("name")
-            .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: name"))?;
+        let name = args.get("name").and_then(|v| v.as_str()).ok_or_else(|| {
+            crate::error::JiraError::api_error("Missing required parameter: name")
+        })?;
 
         let project = args
             .get("project")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: project"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: project")
+            })?;
 
         let description = args.get("description").and_then(|v| v.as_str());
         let lead_account_id = args.get("lead_account_id").and_then(|v| v.as_str());
@@ -50,8 +51,7 @@ impl crate::mcp::server::MCPToolHandler for CreateComponentTool {
 
         let response_text = format!(
             "Component created successfully: {} for project {}",
-            created_component.name,
-            project
+            created_component.name, project
         );
 
         Ok(MCPToolResult {
@@ -83,12 +83,13 @@ impl crate::mcp::server::MCPToolHandler for UpdateComponentTool {
         let component_id = args
             .get("component_id")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: component_id"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: component_id")
+            })?;
 
-        let name = args
-            .get("name")
-            .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: name"))?;
+        let name = args.get("name").and_then(|v| v.as_str()).ok_or_else(|| {
+            crate::error::JiraError::api_error("Missing required parameter: name")
+        })?;
 
         let description = args.get("description").and_then(|v| v.as_str());
         let lead_account_id = args.get("lead_account_id").and_then(|v| v.as_str());
@@ -102,11 +103,11 @@ impl crate::mcp::server::MCPToolHandler for UpdateComponentTool {
             assignee_type: Some("PROJECT_LEAD".to_string()),
         };
 
-        self.client.update_component(component_id, &update_request).await?;
+        self.client
+            .update_component(component_id, &update_request)
+            .await?;
 
-        let response_text = format!(
-            "Component updated successfully: {component_id}"
-        );
+        let response_text = format!("Component updated successfully: {component_id}");
 
         Ok(MCPToolResult {
             content: vec![MCPContent::text(response_text)],
@@ -137,15 +138,15 @@ impl crate::mcp::server::MCPToolHandler for DeleteComponentTool {
         let component_id = args
             .get("component_id")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: component_id"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: component_id")
+            })?;
 
         info!("Deleting component: {}", component_id);
 
         self.client.delete_component(component_id).await?;
 
-        let response_text = format!(
-            "Component deleted successfully: {component_id}"
-        );
+        let response_text = format!("Component deleted successfully: {component_id}");
 
         Ok(MCPToolResult {
             content: vec![MCPContent::text(response_text)],
@@ -153,4 +154,3 @@ impl crate::mcp::server::MCPToolHandler for DeleteComponentTool {
         })
     }
 }
-

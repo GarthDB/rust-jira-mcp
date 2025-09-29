@@ -26,30 +26,53 @@ impl crate::mcp::server::MCPToolHandler for CloneIssueTool {
         let original_issue_key = args
             .get("original_issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: original_issue_key"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: original_issue_key")
+            })?;
 
         let project_key = args
             .get("project_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: project_key"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: project_key")
+            })?;
 
         let issue_type = args
             .get("issue_type")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: issue_type"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_type")
+            })?;
 
         let summary = args
             .get("summary")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: summary"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: summary")
+            })?;
 
         let description = args.get("description").and_then(|v| v.as_str());
-        let copy_attachments = args.get("copy_attachments").and_then(serde_json::Value::as_bool).unwrap_or(false);
-        let copy_work_logs = args.get("copy_work_logs").and_then(serde_json::Value::as_bool).unwrap_or(false);
-        let copy_watchers = args.get("copy_watchers").and_then(serde_json::Value::as_bool).unwrap_or(false);
-        let copy_links = args.get("copy_links").and_then(serde_json::Value::as_bool).unwrap_or(false);
+        let copy_attachments = args
+            .get("copy_attachments")
+            .and_then(serde_json::Value::as_bool)
+            .unwrap_or(false);
+        let copy_work_logs = args
+            .get("copy_work_logs")
+            .and_then(serde_json::Value::as_bool)
+            .unwrap_or(false);
+        let copy_watchers = args
+            .get("copy_watchers")
+            .and_then(serde_json::Value::as_bool)
+            .unwrap_or(false);
+        let copy_links = args
+            .get("copy_links")
+            .and_then(serde_json::Value::as_bool)
+            .unwrap_or(false);
 
-        info!("Cloning issue {} to project {} as {}", original_issue_key, project_key, issue_type);
+        info!(
+            "Cloning issue {} to project {} as {}",
+            original_issue_key, project_key, issue_type
+        );
 
         let clone_request = crate::types::jira::JiraIssueCloneRequest {
             project_key: project_key.to_string(),
@@ -64,7 +87,10 @@ impl crate::mcp::server::MCPToolHandler for CloneIssueTool {
             copy_links: Some(copy_links),
         };
 
-        let clone_response = self.client.clone_issue(original_issue_key, &clone_request).await?;
+        let clone_response = self
+            .client
+            .clone_issue(original_issue_key, &clone_request)
+            .await?;
 
         let response_text = format!(
             "Issue cloned successfully\nOriginal: {}\nCloned: {}\nProject: {}\nType: {}\nSummary: {}",
@@ -81,4 +107,3 @@ impl crate::mcp::server::MCPToolHandler for CloneIssueTool {
         })
     }
 }
-

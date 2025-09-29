@@ -25,20 +25,24 @@ impl crate::mcp::server::MCPToolHandler for GetIssueAttachmentsTool {
         let issue_key = args
             .get("issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: issue_key"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_key")
+            })?;
 
         info!("Getting attachments for issue: {}", issue_key);
 
         let attachments = self.client.get_issue_attachments(issue_key).await?;
 
-        let mut content = vec![MCPContent::text(format!("Found {} attachments for issue {}\n\n", attachments.len(), issue_key))];
+        let mut content = vec![MCPContent::text(format!(
+            "Found {} attachments for issue {}\n\n",
+            attachments.len(),
+            issue_key
+        ))];
 
         for attachment in attachments {
             let attachment_text = format!(
                 "• {} ({}) - {} bytes\n",
-                attachment.filename,
-                &attachment.mime_type,
-                attachment.size
+                attachment.filename, &attachment.mime_type, attachment.size
             );
             content.push(MCPContent::text(attachment_text));
         }
@@ -70,17 +74,23 @@ impl crate::mcp::server::MCPToolHandler for UploadAttachmentTool {
         let issue_key = args
             .get("issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: issue_key"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_key")
+            })?;
 
         let filename = args
             .get("filename")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: filename"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: filename")
+            })?;
 
         let content_base64 = args
             .get("content")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: content"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: content")
+            })?;
 
         info!("Uploading attachment {} to issue: {}", filename, issue_key);
 
@@ -91,7 +101,10 @@ impl crate::mcp::server::MCPToolHandler for UploadAttachmentTool {
 
         let mime_type = args.get("mime_type").and_then(|v| v.as_str());
 
-        let uploaded_attachments = self.client.upload_attachment(issue_key, filename, &content, mime_type).await?;
+        let uploaded_attachments = self
+            .client
+            .upload_attachment(issue_key, filename, &content, mime_type)
+            .await?;
 
         let response_text = format!(
             "Successfully uploaded {} attachment(s) to issue {}",
@@ -126,7 +139,9 @@ impl crate::mcp::server::MCPToolHandler for DeleteAttachmentTool {
         let attachment_id = args
             .get("attachment_id")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: attachment_id"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: attachment_id")
+            })?;
 
         info!("Deleting attachment: {}", attachment_id);
 
@@ -161,7 +176,9 @@ impl crate::mcp::server::MCPToolHandler for DownloadAttachmentTool {
         let attachment_id = args
             .get("attachment_id")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: attachment_id"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: attachment_id")
+            })?;
 
         info!("Downloading attachment: {}", attachment_id);
 

@@ -26,20 +26,24 @@ impl crate::mcp::server::MCPToolHandler for GetTransitionsTool {
         let issue_key = args
             .get("issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: issue_key"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_key")
+            })?;
 
         info!("Getting transitions for issue: {}", issue_key);
 
         let transitions = self.client.get_transitions(issue_key).await?;
 
-        let mut content = vec![MCPContent::text(format!("Found {} transitions for issue {}\n\n", transitions.len(), issue_key))];
+        let mut content = vec![MCPContent::text(format!(
+            "Found {} transitions for issue {}\n\n",
+            transitions.len(),
+            issue_key
+        ))];
 
         for transition in transitions {
             let transition_text = format!(
                 "• {} - {} (ID: {})\n",
-                transition.name,
-                transition.to.name,
-                transition.id
+                transition.name, transition.to.name, transition.id
             );
             content.push(MCPContent::text(transition_text));
         }
@@ -73,23 +77,31 @@ impl crate::mcp::server::MCPToolHandler for TransitionIssueTool {
         let issue_key = args
             .get("issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: issue_key"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_key")
+            })?;
 
         let transition_id = args
             .get("transition_id")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: transition_id"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: transition_id")
+            })?;
 
         let comment = args.get("comment").and_then(|v| v.as_str());
 
-        info!("Transitioning issue {} to transition {}", issue_key, transition_id);
+        info!(
+            "Transitioning issue {} to transition {}",
+            issue_key, transition_id
+        );
 
-        self.client.transition_issue(issue_key, transition_id, comment).await?;
+        self.client
+            .transition_issue(issue_key, transition_id, comment)
+            .await?;
 
         let response_text = format!(
             "Issue {} transitioned successfully to transition {}",
-            issue_key,
-            transition_id
+            issue_key, transition_id
         );
 
         Ok(MCPToolResult {
@@ -98,4 +110,3 @@ impl crate::mcp::server::MCPToolHandler for TransitionIssueTool {
         })
     }
 }
-

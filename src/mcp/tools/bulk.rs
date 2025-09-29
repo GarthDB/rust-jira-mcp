@@ -26,13 +26,18 @@ impl crate::mcp::server::MCPToolHandler for BulkUpdateIssuesTool {
         let issue_keys = args
             .get("issue_keys")
             .and_then(|v| v.as_array())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: issue_keys"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_keys")
+            })?;
 
-        let update_data = args
-            .get("update_data")
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: update_data"))?;
+        let update_data = args.get("update_data").ok_or_else(|| {
+            crate::error::JiraError::api_error("Missing required parameter: update_data")
+        })?;
 
-        let config = args.get("config").map(|c| serde_json::from_value(c.clone()).unwrap_or_default()).unwrap_or_default();
+        let config = args
+            .get("config")
+            .map(|c| serde_json::from_value(c.clone()).unwrap_or_default())
+            .unwrap_or_default();
 
         info!("Bulk updating {} issues", issue_keys.len());
 
@@ -41,7 +46,9 @@ impl crate::mcp::server::MCPToolHandler for BulkUpdateIssuesTool {
             .filter_map(|v| v.as_str().map(ToString::to_string))
             .collect();
 
-        self.client.bulk_update_issues(issue_keys_vec, update_data.clone(), Some(config)).await?;
+        self.client
+            .bulk_update_issues(issue_keys_vec, update_data.clone(), Some(config))
+            .await?;
 
         let response_text = format!(
             "Bulk update completed successfully for {} issues",
@@ -77,24 +84,42 @@ impl crate::mcp::server::MCPToolHandler for BulkTransitionIssuesTool {
         let issue_keys = args
             .get("issue_keys")
             .and_then(|v| v.as_array())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: issue_keys"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_keys")
+            })?;
 
         let transition_id = args
             .get("transition_id")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: transition_id"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: transition_id")
+            })?;
 
         let comment = args.get("comment").and_then(|v| v.as_str());
-        let config = args.get("config").map(|c| serde_json::from_value(c.clone()).unwrap_or_default()).unwrap_or_default();
+        let config = args
+            .get("config")
+            .map(|c| serde_json::from_value(c.clone()).unwrap_or_default())
+            .unwrap_or_default();
 
-        info!("Bulk transitioning {} issues to {}", issue_keys.len(), transition_id);
+        info!(
+            "Bulk transitioning {} issues to {}",
+            issue_keys.len(),
+            transition_id
+        );
 
         let issue_keys_vec: Vec<String> = issue_keys
             .iter()
             .filter_map(|v| v.as_str().map(ToString::to_string))
             .collect();
 
-        self.client.bulk_transition_issues(issue_keys_vec, transition_id.to_string(), comment.map(ToString::to_string), Some(config)).await?;
+        self.client
+            .bulk_transition_issues(
+                issue_keys_vec,
+                transition_id.to_string(),
+                comment.map(ToString::to_string),
+                Some(config),
+            )
+            .await?;
 
         let response_text = format!(
             "Bulk transition completed successfully for {} issues to transition {}",
@@ -131,14 +156,21 @@ impl crate::mcp::server::MCPToolHandler for BulkAddCommentsTool {
         let issue_keys = args
             .get("issue_keys")
             .and_then(|v| v.as_array())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: issue_keys"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_keys")
+            })?;
 
         let comment = args
             .get("comment")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: comment"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: comment")
+            })?;
 
-        let config = args.get("config").map(|c| serde_json::from_value(c.clone()).unwrap_or_default()).unwrap_or_default();
+        let config = args
+            .get("config")
+            .map(|c| serde_json::from_value(c.clone()).unwrap_or_default())
+            .unwrap_or_default();
 
         info!("Bulk adding comments to {} issues", issue_keys.len());
 
@@ -147,7 +179,9 @@ impl crate::mcp::server::MCPToolHandler for BulkAddCommentsTool {
             .filter_map(|v| v.as_str().map(ToString::to_string))
             .collect();
 
-        self.client.bulk_add_comments(issue_keys_vec, comment.to_string(), Some(config)).await?;
+        self.client
+            .bulk_add_comments(issue_keys_vec, comment.to_string(), Some(config))
+            .await?;
 
         let response_text = format!(
             "Bulk comment addition completed successfully for {} issues",
@@ -183,9 +217,14 @@ impl crate::mcp::server::MCPToolHandler for MixedBulkOperationsTool {
         let operations = args
             .get("operations")
             .and_then(|v| v.as_array())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: operations"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: operations")
+            })?;
 
-        let config = args.get("config").map(|c| serde_json::from_value(c.clone()).unwrap_or_default()).unwrap_or_default();
+        let config = args
+            .get("config")
+            .map(|c| serde_json::from_value(c.clone()).unwrap_or_default())
+            .unwrap_or_default();
 
         info!("Executing {} mixed bulk operations", operations.len());
 
@@ -194,7 +233,10 @@ impl crate::mcp::server::MCPToolHandler for MixedBulkOperationsTool {
             .filter_map(|v| serde_json::from_value(v.clone()).ok())
             .collect();
 
-        let results = self.client.execute_bulk_operations(operations_vec, config).await?;
+        let results = self
+            .client
+            .execute_bulk_operations(operations_vec, config)
+            .await?;
 
         let response_text = format!(
             "Mixed bulk operations completed successfully\nTotal operations: {}\nSuccessful: {}\nFailed: {}",
@@ -209,4 +251,3 @@ impl crate::mcp::server::MCPToolHandler for MixedBulkOperationsTool {
         })
     }
 }
-

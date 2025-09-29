@@ -24,21 +24,24 @@ impl crate::mcp::server::MCPToolHandler for GetIssueWorkLogsTool {
         let issue_key = args
             .get("issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: issue_key"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_key")
+            })?;
 
         info!("Getting work logs for issue: {}", issue_key);
 
         let work_logs = self.client.get_issue_work_logs(issue_key).await?;
 
-        let mut content = vec![MCPContent::text(format!("Found {} work logs for issue {}\n\n", work_logs.len(), issue_key))];
+        let mut content = vec![MCPContent::text(format!(
+            "Found {} work logs for issue {}\n\n",
+            work_logs.len(),
+            issue_key
+        ))];
 
         for work_log in work_logs {
             let work_log_text = format!(
                 "• {} - {} by {} on {}\n",
-                work_log.id,
-                work_log.time_spent,
-                work_log.author.display_name,
-                work_log.created
+                work_log.id, work_log.time_spent, work_log.author.display_name, work_log.created
             );
             content.push(MCPContent::text(work_log_text));
         }
@@ -70,12 +73,16 @@ impl crate::mcp::server::MCPToolHandler for AddWorkLogTool {
         let issue_key = args
             .get("issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: issue_key"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_key")
+            })?;
 
         let time_spent = args
             .get("time_spent")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: time_spent"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: time_spent")
+            })?;
 
         let comment = args.get("comment").and_then(|v| v.as_str());
         let started = args.get("started").and_then(|v| v.as_str());
@@ -89,7 +96,10 @@ impl crate::mcp::server::MCPToolHandler for AddWorkLogTool {
             visibility: None,
         };
 
-        let created_work_log = self.client.add_work_log(issue_key, &work_log_request).await?;
+        let created_work_log = self
+            .client
+            .add_work_log(issue_key, &work_log_request)
+            .await?;
 
         let response_text = format!(
             "Work log added successfully to issue {}\nWork log ID: {}\nTime spent: {}\nAuthor: {}",
@@ -126,17 +136,23 @@ impl crate::mcp::server::MCPToolHandler for UpdateWorkLogTool {
         let issue_key = args
             .get("issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: issue_key"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_key")
+            })?;
 
         let work_log_id = args
             .get("work_log_id")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: work_log_id"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: work_log_id")
+            })?;
 
         let time_spent = args
             .get("time_spent")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: time_spent"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: time_spent")
+            })?;
 
         let comment = args.get("comment").and_then(|v| v.as_str());
         let started = args.get("started").and_then(|v| v.as_str());
@@ -150,12 +166,13 @@ impl crate::mcp::server::MCPToolHandler for UpdateWorkLogTool {
             visibility: None,
         };
 
-        self.client.update_work_log(issue_key, work_log_id, &update_request).await?;
+        self.client
+            .update_work_log(issue_key, work_log_id, &update_request)
+            .await?;
 
         let response_text = format!(
             "Work log {} updated successfully for issue {}",
-            work_log_id,
-            issue_key
+            work_log_id, issue_key
         );
 
         Ok(MCPToolResult {
@@ -185,12 +202,16 @@ impl crate::mcp::server::MCPToolHandler for DeleteWorkLogTool {
         let issue_key = args
             .get("issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: issue_key"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_key")
+            })?;
 
         let work_log_id = args
             .get("work_log_id")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: work_log_id"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: work_log_id")
+            })?;
 
         info!("Deleting work log {} for issue: {}", work_log_id, issue_key);
 
@@ -198,8 +219,7 @@ impl crate::mcp::server::MCPToolHandler for DeleteWorkLogTool {
 
         let response_text = format!(
             "Work log {} deleted successfully from issue {}",
-            work_log_id,
-            issue_key
+            work_log_id, issue_key
         );
 
         Ok(MCPToolResult {
@@ -208,4 +228,3 @@ impl crate::mcp::server::MCPToolHandler for DeleteWorkLogTool {
         })
     }
 }
-

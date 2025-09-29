@@ -24,7 +24,9 @@ impl crate::mcp::server::MCPToolHandler for GetIssueWatchersTool {
         let issue_key = args
             .get("issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: issue_key"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_key")
+            })?;
 
         info!("Getting watchers for issue: {}", issue_key);
 
@@ -32,8 +34,7 @@ impl crate::mcp::server::MCPToolHandler for GetIssueWatchersTool {
 
         let response_text = format!(
             "Issue {} has {} watchers\n",
-            issue_key,
-            watchers.watch_count
+            issue_key, watchers.watch_count
         );
 
         Ok(MCPToolResult {
@@ -63,12 +64,16 @@ impl crate::mcp::server::MCPToolHandler for AddIssueWatcherTool {
         let issue_key = args
             .get("issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: issue_key"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_key")
+            })?;
 
         let account_id = args
             .get("account_id")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: account_id"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: account_id")
+            })?;
 
         info!("Adding watcher {} to issue: {}", account_id, issue_key);
 
@@ -76,8 +81,7 @@ impl crate::mcp::server::MCPToolHandler for AddIssueWatcherTool {
 
         let response_text = format!(
             "Watcher {} added successfully to issue {}",
-            account_id,
-            issue_key
+            account_id, issue_key
         );
 
         Ok(MCPToolResult {
@@ -107,21 +111,26 @@ impl crate::mcp::server::MCPToolHandler for RemoveIssueWatcherTool {
         let issue_key = args
             .get("issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: issue_key"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_key")
+            })?;
 
         let account_id = args
             .get("account_id")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: account_id"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: account_id")
+            })?;
 
         info!("Removing watcher {} from issue: {}", account_id, issue_key);
 
-        self.client.remove_issue_watcher(issue_key, account_id).await?;
+        self.client
+            .remove_issue_watcher(issue_key, account_id)
+            .await?;
 
         let response_text = format!(
             "Watcher {} removed successfully from issue {}",
-            account_id,
-            issue_key
+            account_id, issue_key
         );
 
         Ok(MCPToolResult {
@@ -130,4 +139,3 @@ impl crate::mcp::server::MCPToolHandler for RemoveIssueWatcherTool {
         })
     }
 }
-

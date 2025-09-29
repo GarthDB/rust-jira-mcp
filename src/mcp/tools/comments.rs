@@ -26,26 +26,26 @@ impl crate::mcp::server::MCPToolHandler for GetCommentsTool {
         let issue_key = args
             .get("issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: issue_key"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_key")
+            })?;
 
         info!("Getting comments for issue: {}", issue_key);
 
         let comments = self.client.get_comments(issue_key).await?;
 
-        let mut content = vec![MCPContent::text(format!("Found {} comments for issue {}\n\n", comments.len(), issue_key))];
+        let mut content = vec![MCPContent::text(format!(
+            "Found {} comments for issue {}\n\n",
+            comments.len(),
+            issue_key
+        ))];
 
         for comment in comments {
             let author = comment.author.display_name;
             let created = comment.created;
             let body = comment.body;
 
-            let comment_text = format!(
-                "• {} by {} on {}\n{}\n",
-                comment.id,
-                author,
-                created,
-                body
-            );
+            let comment_text = format!("• {} by {} on {}\n{}\n", comment.id, author, created, body);
             content.push(MCPContent::text(comment_text));
         }
 
@@ -78,12 +78,16 @@ impl crate::mcp::server::MCPToolHandler for AddCommentTool {
         let issue_key = args
             .get("issue_key")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: issue_key"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: issue_key")
+            })?;
 
         let comment = args
             .get("comment")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| crate::error::JiraError::api_error("Missing required parameter: comment"))?;
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: comment")
+            })?;
 
         info!("Adding comment to issue: {}", issue_key);
 
@@ -103,4 +107,3 @@ impl crate::mcp::server::MCPToolHandler for AddCommentTool {
         })
     }
 }
-

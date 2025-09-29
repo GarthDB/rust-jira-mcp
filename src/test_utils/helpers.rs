@@ -134,9 +134,7 @@ pub fn create_test_issue(
     JiraIssue {
         id: issue_id.to_string(),
         key: issue_key.to_string(),
-        self_url: format!(
-            "https://test-jira.example.com/rest/api/2/issue/{issue_id}"
-        ),
+        self_url: format!("https://test-jira.example.com/rest/api/2/issue/{issue_id}"),
         fields,
     }
 }

@@ -40,4 +40,3 @@ impl crate::mcp::server::MCPToolHandler for TestAuthTool {
         })
     }
 }
-
