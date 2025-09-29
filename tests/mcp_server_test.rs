@@ -36,9 +36,13 @@ fn test_mcp_server_has_tools() {
     // We can't directly access the tools HashMap, but we can test through list_tools
     let tools = MCPServer::list_tools();
     assert!(!tools.is_empty());
-    
+
     // Add a simple assertion to ensure we have a reasonable number of tools
-    assert!(tools.len() > 10, "Expected more than 10 tools, got {}", tools.len());
+    assert!(
+        tools.len() > 10,
+        "Expected more than 10 tools, got {}",
+        tools.len()
+    );
 }
 
 #[test]

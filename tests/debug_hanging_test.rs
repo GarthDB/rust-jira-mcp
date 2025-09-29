@@ -21,7 +21,7 @@ fn test_jira_client_creation() {
 #[test]
 fn test_mcp_server_list_tools() {
     use rust_jira_mcp::mcp::server::MCPServer;
-    
+
     let tools = MCPServer::list_tools();
     assert!(!tools.is_empty());
 }
@@ -29,7 +29,7 @@ fn test_mcp_server_list_tools() {
 #[test]
 fn test_mcp_server_creation_minimal() {
     use rust_jira_mcp::mcp::server::MCPServer;
-    
+
     let config = JiraConfig {
         api_base_url: "https://test-jira.example.com/rest/api/2".to_string(),
         email: "test@example.com".to_string(),
