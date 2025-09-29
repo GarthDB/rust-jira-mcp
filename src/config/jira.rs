@@ -1,3 +1,4 @@
+use crate::config::secrets::SecretManager;
 use anyhow::{Context, Result};
 use config::{Config as ConfigBuilder, Environment, File};
 use serde::{Deserialize, Serialize};
@@ -90,5 +91,79 @@ impl JiraConfig {
     #[must_use]
     pub fn timeout_duration(&self) -> std::time::Duration {
         std::time::Duration::from_secs(self.timeout_seconds.unwrap_or(30))
+    }
+
+    /// Load configuration with secret management
+    ///
+    /// # Errors
+    ///
+    /// This function will return an error if:
+    /// - Configuration loading fails
+    /// - Secret resolution fails
+    /// - Required environment variables are missing
+    pub async fn load_with_secrets(secret_manager: &SecretManager) -> Result<Self> {
+        let mut config = Self::load()?;
+
+        // Override sensitive fields with secrets if available
+        if let Some(token) = secret_manager.get_secret("personal_access_token").await? {
+            config.personal_access_token = token;
+        }
+
+        if let Some(email) = secret_manager.get_secret("email").await? {
+            config.email = email;
+        }
+
+        Ok(config)
+    }
+
+    /// Validate the configuration
+    ///
+    /// # Errors
+    ///
+    /// This function will return an error if:
+    /// - Email format is invalid
+    /// - Personal access token is too short
+    /// - API base URL format is invalid
+    pub fn validate(&self) -> Result<()> {
+        use crate::config::validation::ConfigValidator;
+
+        let validator = ConfigValidator::new()
+            .add_rule(
+                crate::config::validation::ValidationRule::new("email".to_string())
+                    .required()
+                    .custom_validator(|email| {
+                        if email.contains('@')
+                            && email.contains('.')
+                            && !email.starts_with('@')
+                            && !email.ends_with('@')
+                        {
+                            Ok(())
+                        } else {
+                            Err("Invalid email format".to_string())
+                        }
+                    }),
+            )
+            .add_rule(
+                crate::config::validation::ValidationRule::new("personal_access_token".to_string())
+                    .required()
+                    .min_length(10),
+            )
+            .add_rule(
+                crate::config::validation::ValidationRule::new("api_base_url".to_string())
+                    .required()
+                    .custom_validator(|url| {
+                        if url.starts_with("http://") || url.starts_with("https://") {
+                            Ok(())
+                        } else {
+                            Err("Invalid URL format".to_string())
+                        }
+                    }),
+            );
+
+        validator.validate("email", &self.email)?;
+        validator.validate("personal_access_token", &self.personal_access_token)?;
+        validator.validate("api_base_url", &self.api_base_url)?;
+
+        Ok(())
     }
 }

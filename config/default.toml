@@ -1,0 +1,17 @@
+# Default Jira MCP Configuration
+# This file contains default configuration values
+
+[default]
+api_base_url = "https://jira.corp.adobe.com/rest/api/2"
+max_results = 50
+timeout_seconds = 30
+strict_ssl = true
+
+# Logging configuration
+log_file = "~/Desktop/jira-api.log"
+
+# Note: Sensitive values like email and personal_access_token should be set via:
+# 1. Environment variables (JIRA_EMAIL, JIRA_PERSONAL_ACCESS_TOKEN)
+# 2. .env file
+# 3. Secrets file (secrets.toml)
+# 4. Command line arguments
