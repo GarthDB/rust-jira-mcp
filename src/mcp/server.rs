@@ -456,9 +456,9 @@ impl MCPServer {
                 }
                 Err(e) => {
                     error!("Error reading from stdin: {}", e);
-                    return Err(crate::error::JiraError::Unknown {
-                        message: format!("IO error: {e}"),
-                    });
+                    return Err(crate::error::JiraError::unknown_error(&format!(
+                        "IO error: {e}"
+                    )));
                 }
             }
         }
@@ -1818,9 +1818,10 @@ impl MCPServer {
         if let Some(handler) = self.tools.get(&tool_call.name) {
             handler.handle(tool_call.arguments).await
         } else {
-            Err(crate::error::JiraError::Unknown {
-                message: format!("Unknown tool: {}", tool_call.name),
-            })
+            Err(crate::error::JiraError::unknown_error(&format!(
+                "Unknown tool: {}",
+                tool_call.name
+            )))
         }
     }
 }
