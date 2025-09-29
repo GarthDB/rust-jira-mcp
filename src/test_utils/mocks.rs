@@ -24,16 +24,21 @@ impl JiraMockBuilder {
     }
 
     /// Get the base URL for the mock server
+    #[must_use]
     pub fn base_url(&self) -> &str {
         &self.base_url
     }
 
     /// Get the Zephyr base URL for the mock server
+    #[must_use]
     pub fn zephyr_base_url(&self) -> &str {
         &self.zephyr_base_url
     }
 
     /// Create a Jira client configured to use this mock server
+    /// # Panics
+    /// This function panics if `JiraClient::new` fails.
+    #[must_use]
     pub fn create_client(&self) -> JiraClient {
         let config = JiraConfig {
             api_base_url: format!("{}/rest/api/2", self.base_url),
@@ -109,7 +114,7 @@ impl JiraMockBuilder {
             }
         });
 
-        let path = format!("/rest/api/2/issue/{}", issue_key);
+        let path = format!("/rest/api/2/issue/{issue_key}");
         self.server
             .mock("GET", &*path)
             .with_status(200)
@@ -125,7 +130,7 @@ impl JiraMockBuilder {
             "errors": {}
         });
 
-        let path = format!("/rest/api/2/issue/{}", issue_key);
+        let path = format!("/rest/api/2/issue/{issue_key}");
         self.server
             .mock("GET", &*path)
             .with_status(404)
@@ -191,7 +196,7 @@ impl JiraMockBuilder {
 
     /// Mock a successful issue update
     pub async fn mock_update_issue(&mut self, issue_key: &str) -> Mock {
-        let path = format!("/rest/api/2/issue/{}", issue_key);
+        let path = format!("/rest/api/2/issue/{issue_key}");
         self.server.mock("PUT", &*path).with_status(204).create()
     }
 
@@ -210,7 +215,7 @@ impl JiraMockBuilder {
             "updated": "2024-01-01T10:00:00.000+0000"
         });
 
-        let path = format!("/rest/api/2/issue/{}/comment", issue_key);
+        let path = format!("/rest/api/2/issue/{issue_key}/comment");
         self.server
             .mock("POST", &*path)
             .with_status(201)
@@ -238,7 +243,7 @@ impl JiraMockBuilder {
             ]
         });
 
-        let path = format!("/rest/api/2/issue/{}/comment", issue_key);
+        let path = format!("/rest/api/2/issue/{issue_key}/comment");
         self.server
             .mock("GET", &*path)
             .with_status(200)
@@ -264,7 +269,7 @@ impl JiraMockBuilder {
             ]
         });
 
-        let path = format!("/rest/api/2/issue/{}/transitions", issue_key);
+        let path = format!("/rest/api/2/issue/{issue_key}/transitions");
         self.server
             .mock("GET", &*path)
             .with_status(200)
@@ -275,7 +280,7 @@ impl JiraMockBuilder {
 
     /// Mock a successful issue transition
     pub async fn mock_transition_issue(&mut self, issue_key: &str) -> Mock {
-        let path = format!("/rest/api/2/issue/{}/transitions", issue_key);
+        let path = format!("/rest/api/2/issue/{issue_key}/transitions");
         self.server.mock("POST", &*path).with_status(204).create()
     }
 

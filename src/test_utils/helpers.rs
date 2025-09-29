@@ -7,6 +7,7 @@ use std::collections::HashMap;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 /// Helper function to create a test Jira configuration with custom values
+#[must_use]
 pub fn create_test_config(
     api_base_url: Option<&str>,
     email: Option<&str>,
@@ -19,7 +20,7 @@ pub fn create_test_config(
             .to_string(),
         email: email.unwrap_or("test@example.com").to_string(),
         personal_access_token: token.unwrap_or("test-token-12345").to_string(),
-        default_project: project.map(|s| s.to_string()),
+        default_project: project.map(ToString::to_string),
         max_results: Some(50),
         timeout_seconds: Some(30),
         log_file: None,
@@ -28,6 +29,7 @@ pub fn create_test_config(
 }
 
 /// Helper function to create a Jira user for testing
+#[must_use]
 pub fn create_test_user(
     account_id: Option<&str>,
     display_name: Option<&str>,
@@ -36,13 +38,14 @@ pub fn create_test_user(
     JiraUser {
         account_id: account_id.unwrap_or("test-user-123").to_string(),
         display_name: display_name.unwrap_or("Test User").to_string(),
-        email_address: email.map(|s| s.to_string()),
+        email_address: email.map(ToString::to_string),
         active: true,
         time_zone: Some("UTC".to_string()),
     }
 }
 
 /// Helper function to create a Jira project for testing
+#[must_use]
 pub fn create_test_project(id: Option<&str>, key: Option<&str>, name: Option<&str>) -> JiraProject {
     JiraProject {
         id: id.unwrap_or("10000").to_string(),
@@ -54,6 +57,7 @@ pub fn create_test_project(id: Option<&str>, key: Option<&str>, name: Option<&st
 }
 
 /// Helper function to create a Jira status for testing
+#[must_use]
 pub fn create_test_status(
     id: Option<&str>,
     name: Option<&str>,
@@ -74,6 +78,7 @@ pub fn create_test_status(
 }
 
 /// Helper function to create a Jira priority for testing
+#[must_use]
 pub fn create_test_priority(id: Option<&str>, name: Option<&str>) -> JiraPriority {
     JiraPriority {
         id: id.unwrap_or("3").to_string(),
@@ -86,6 +91,7 @@ pub fn create_test_priority(id: Option<&str>, name: Option<&str>) -> JiraPriorit
 }
 
 /// Helper function to create a Jira issue type for testing
+#[must_use]
 pub fn create_test_issue_type(
     id: Option<&str>,
     name: Option<&str>,
@@ -103,6 +109,7 @@ pub fn create_test_issue_type(
 }
 
 /// Helper function to create a complete Jira issue for testing
+#[must_use]
 pub fn create_test_issue(
     id: Option<&str>,
     key: Option<&str>,
@@ -127,15 +134,13 @@ pub fn create_test_issue(
     JiraIssue {
         id: issue_id.to_string(),
         key: issue_key.to_string(),
-        self_url: format!(
-            "https://test-jira.example.com/rest/api/2/issue/{}",
-            issue_id
-        ),
+        self_url: format!("https://test-jira.example.com/rest/api/2/issue/{issue_id}"),
         fields,
     }
 }
 
 /// Helper function to create a Jira comment for testing
+#[must_use]
 pub fn create_test_comment(
     id: Option<&str>,
     body: Option<&str>,
@@ -151,6 +156,7 @@ pub fn create_test_comment(
 }
 
 /// Helper function to create a Jira work log for testing
+#[must_use]
 pub fn create_test_work_log(
     id: Option<&str>,
     comment: Option<&str>,
@@ -159,7 +165,7 @@ pub fn create_test_work_log(
 ) -> JiraWorkLog {
     JiraWorkLog {
         id: id.unwrap_or("10001").to_string(),
-        comment: comment.map(|s| s.to_string()),
+        comment: comment.map(ToString::to_string),
         created: current_timestamp(),
         updated: Some(current_timestamp()),
         time_spent: time_spent.unwrap_or("1h 30m").to_string(),
@@ -169,6 +175,7 @@ pub fn create_test_work_log(
 }
 
 /// Helper function to create a Zephyr test case for testing
+#[must_use]
 pub fn create_test_zephyr_test_case(
     id: Option<&str>,
     key: Option<&str>,
@@ -193,6 +200,7 @@ pub fn create_test_zephyr_test_case(
 }
 
 /// Helper function to create a Zephyr test step for testing
+#[must_use]
 pub fn create_test_zephyr_test_step(
     id: Option<&str>,
     step: Option<&str>,
@@ -204,14 +212,15 @@ pub fn create_test_zephyr_test_step(
         step: step
             .unwrap_or("Step 1: Navigate to the login page")
             .to_string(),
-        data: data.map(|s| s.to_string()),
-        result: result.map(|s| s.to_string()),
+        data: data.map(ToString::to_string),
+        result: result.map(ToString::to_string),
         order: 1,
         test_case_id: Some("10001".to_string()),
     }
 }
 
 /// Helper function to get current timestamp in Jira format
+#[must_use]
 pub fn current_timestamp() -> String {
     let now = SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -220,18 +229,20 @@ pub fn current_timestamp() -> String {
     // Convert to Jira timestamp format (ISO 8601)
     let secs = now.as_secs();
     let nanos = now.subsec_nanos();
-    let _millis = secs * 1000 + (nanos / 1_000_000) as u64;
+    let _millis = secs * 1000 + u64::from(nanos / 1_000_000);
 
     // This is a simplified version - in real code you'd use chrono
     "2024-01-01T10:00:00.000+0000".to_string()
 }
 
 /// Helper function to create a JSON response for testing
-pub fn create_json_response(data: serde_json::Value) -> String {
+#[must_use]
+pub fn create_json_response(data: &serde_json::Value) -> String {
     data.to_string()
 }
 
 /// Helper function to create an error response for testing
+#[must_use]
 pub fn create_error_response(_status: u16, message: &str) -> serde_json::Value {
     json!({
         "errorMessages": [message],
@@ -240,7 +251,8 @@ pub fn create_error_response(_status: u16, message: &str) -> serde_json::Value {
 }
 
 /// Helper function to create a success response for testing
-pub fn create_success_response(data: serde_json::Value) -> serde_json::Value {
+#[must_use]
+pub fn create_success_response(data: &serde_json::Value) -> serde_json::Value {
     json!({
         "status": "success",
         "data": data
@@ -248,6 +260,7 @@ pub fn create_success_response(data: serde_json::Value) -> serde_json::Value {
 }
 
 /// Helper function to create a bulk operation response for testing
+#[must_use]
 pub fn create_bulk_operation_response(
     total: usize,
     successful: usize,
@@ -270,6 +283,8 @@ pub fn create_bulk_operation_response(
 }
 
 /// Helper function to assert that a result is an error with a specific message
+/// # Panics
+/// This function panics if the result is Ok or if the error message doesn't contain the expected text.
 pub fn assert_error_message<T>(
     result: Result<T, Box<dyn std::error::Error>>,
     expected_message: &str,
@@ -280,31 +295,37 @@ pub fn assert_error_message<T>(
             let error_message = e.to_string();
             assert!(
                 error_message.contains(expected_message),
-                "Expected error message to contain '{}', but got '{}'",
-                expected_message,
-                error_message
+                "Expected error message to contain '{expected_message}', but got '{error_message}'"
             );
         }
     }
 }
 
 /// Helper function to assert that a result is an error of a specific type
+/// # Panics
+/// This function panics if the result is Ok or if the error doesn't match the expected error.
 pub fn assert_error_type<T, E: std::fmt::Debug + PartialEq>(
     result: Result<T, E>,
-    expected_error: E,
+    expected_error: &E,
 ) {
     match result {
         Ok(_) => panic!("Expected error but got Ok"),
-        Err(e) => assert_eq!(e, expected_error),
+        Err(e) => assert_eq!(e, *expected_error),
     }
 }
 
 /// Helper function to create a test environment with temporary files
+/// # Panics
+/// This function panics if it fails to create a temporary directory.
+#[must_use]
 pub fn create_test_env() -> tempfile::TempDir {
     tempfile::tempdir().expect("Failed to create temporary directory")
 }
 
 /// Helper function to create a test configuration file
+/// # Panics
+/// This function panics if it fails to serialize the config or write the file.
+#[must_use]
 pub fn create_test_config_file(
     temp_dir: &tempfile::TempDir,
     config: &JiraConfig,
@@ -316,6 +337,9 @@ pub fn create_test_config_file(
 }
 
 /// Helper function to create a test log file
+/// # Panics
+/// This function panics if it fails to write the log file.
+#[must_use]
 pub fn create_test_log_file(temp_dir: &tempfile::TempDir) -> std::path::PathBuf {
     let log_path = temp_dir.path().join("test.log");
     std::fs::write(&log_path, "Test log content\n").expect("Failed to write log file");

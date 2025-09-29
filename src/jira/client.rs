@@ -614,6 +614,7 @@ impl JiraClient {
     /// # Errors
     ///
     /// Returns an error if the link creation fails.
+    #[allow(dead_code)]
     pub async fn link_issues(
         &self,
         inward_issue_key: &str,

@@ -6,6 +6,7 @@ use serde_json::json;
 use std::collections::HashMap;
 
 /// Create a standard test configuration for unit tests
+#[must_use]
 pub fn test_jira_config() -> JiraConfig {
     JiraConfig {
         api_base_url: "https://test-jira.example.com/rest/api/2".to_string(),
@@ -20,6 +21,7 @@ pub fn test_jira_config() -> JiraConfig {
 }
 
 /// Create a test configuration for integration tests (with mock server)
+#[must_use]
 pub fn mock_jira_config(base_url: &str) -> JiraConfig {
     JiraConfig {
         api_base_url: base_url.to_string(),
@@ -34,6 +36,7 @@ pub fn mock_jira_config(base_url: &str) -> JiraConfig {
 }
 
 /// Create a sample Jira issue for testing
+#[must_use]
 pub fn sample_jira_issue() -> JiraIssue {
     let mut fields = HashMap::new();
     fields.insert(
@@ -54,6 +57,7 @@ pub fn sample_jira_issue() -> JiraIssue {
 }
 
 /// Create a sample Jira comment for testing
+#[must_use]
 pub fn sample_jira_comment() -> JiraComment {
     JiraComment {
         id: "10001".to_string(),
@@ -71,6 +75,7 @@ pub fn sample_jira_comment() -> JiraComment {
 }
 
 /// Create a sample Jira work log for testing
+#[must_use]
 pub fn sample_jira_work_log() -> JiraWorkLog {
     JiraWorkLog {
         id: "10001".to_string(),
@@ -90,6 +95,7 @@ pub fn sample_jira_work_log() -> JiraWorkLog {
 }
 
 /// Create a sample Zephyr test case for testing
+#[must_use]
 pub fn sample_zephyr_test_case() -> ZephyrTestCase {
     ZephyrTestCase {
         id: Some("10001".to_string()),
@@ -109,6 +115,7 @@ pub fn sample_zephyr_test_case() -> ZephyrTestCase {
 }
 
 /// Create a sample Zephyr test step for testing
+#[must_use]
 pub fn sample_zephyr_test_step() -> ZephyrTestStep {
     ZephyrTestStep {
         id: Some("10001".to_string()),
@@ -121,6 +128,7 @@ pub fn sample_zephyr_test_step() -> ZephyrTestStep {
 }
 
 /// Create sample JSON responses for mocking API calls
+#[must_use]
 pub fn sample_issue_response() -> serde_json::Value {
     json!({
         "id": "12345",
@@ -181,6 +189,7 @@ pub fn sample_issue_response() -> serde_json::Value {
 }
 
 /// Create sample search results response
+#[must_use]
 pub fn sample_search_response() -> serde_json::Value {
     json!({
         "expand": "names,schema",
@@ -193,6 +202,7 @@ pub fn sample_search_response() -> serde_json::Value {
 
 /// Create sample error response
 /// Create a sample Jira issue
+#[must_use]
 pub fn sample_issue() -> JiraIssue {
     JiraIssue {
         id: "12345".to_string(),
@@ -210,6 +220,7 @@ pub fn sample_issue() -> JiraIssue {
     }
 }
 
+#[must_use]
 pub fn sample_error_response(_status: u16, message: &str) -> serde_json::Value {
     json!({
         "errorMessages": [message],
@@ -218,6 +229,7 @@ pub fn sample_error_response(_status: u16, message: &str) -> serde_json::Value {
 }
 
 /// Create sample bulk operation response
+#[must_use]
 pub fn sample_bulk_operation_response() -> serde_json::Value {
     json!({
         "results": [
