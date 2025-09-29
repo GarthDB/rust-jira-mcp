@@ -58,8 +58,8 @@ run_coverage() {
     # Clean previous coverage data
     cargo clean --target-dir target/llvm-cov-target 2>/dev/null || true
     
-    # Run coverage analysis
-    cargo llvm-cov --html --output-dir target/llvm-cov/html
+    # Run coverage analysis, excluding test utilities and test files
+    cargo llvm-cov --html --output-dir target/llvm-cov/html --ignore-filename-regex="test_utils|tests/"
     
     print_success "Coverage analysis complete!"
     print_status "HTML report generated at: target/llvm-cov/html/index.html"
@@ -80,7 +80,7 @@ open_report() {
 # Function to generate LCOV report
 generate_lcov() {
     print_status "Generating LCOV format report..."
-    cargo llvm-cov --lcov --output-path lcov.info
+    cargo llvm-cov --lcov --output-path lcov.info --ignore-filename-regex="test_utils|tests/"
     print_success "LCOV report generated: lcov.info"
 }
 
@@ -88,8 +88,8 @@ generate_lcov() {
 show_summary() {
     print_status "Generating coverage summary..."
     
-    # Generate LCOV first
-    cargo llvm-cov --lcov --output-path lcov.info > /dev/null 2>&1
+    # Generate LCOV first, excluding test utilities and test files
+    cargo llvm-cov --lcov --output-path lcov.info --ignore-filename-regex="test_utils|tests/" > /dev/null 2>&1
     
     if [ -f "lcov.info" ]; then
         # Extract coverage percentage using grep and awk
