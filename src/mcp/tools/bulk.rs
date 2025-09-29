@@ -11,6 +11,8 @@ pub struct BulkUpdateIssuesTool {
 
 impl BulkUpdateIssuesTool {
     #[must_use]
+    /// # Panics
+    /// This function panics if `JiraClient::new` fails.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -36,7 +38,7 @@ impl crate::mcp::server::MCPToolHandler for BulkUpdateIssuesTool {
 
         let issue_keys_vec: Vec<String> = issue_keys
             .iter()
-            .filter_map(|v| v.as_str().map(|s| s.to_string()))
+            .filter_map(|v| v.as_str().map(ToString::to_string))
             .collect();
 
         self.client.bulk_update_issues(issue_keys_vec, update_data.clone(), Some(config)).await?;
@@ -60,6 +62,8 @@ pub struct BulkTransitionIssuesTool {
 
 impl BulkTransitionIssuesTool {
     #[must_use]
+    /// # Panics
+    /// This function panics if `JiraClient::new` fails.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -87,10 +91,10 @@ impl crate::mcp::server::MCPToolHandler for BulkTransitionIssuesTool {
 
         let issue_keys_vec: Vec<String> = issue_keys
             .iter()
-            .filter_map(|v| v.as_str().map(|s| s.to_string()))
+            .filter_map(|v| v.as_str().map(ToString::to_string))
             .collect();
 
-        self.client.bulk_transition_issues(issue_keys_vec, transition_id.to_string(), comment.map(|c| c.to_string()), Some(config)).await?;
+        self.client.bulk_transition_issues(issue_keys_vec, transition_id.to_string(), comment.map(ToString::to_string), Some(config)).await?;
 
         let response_text = format!(
             "Bulk transition completed successfully for {} issues to transition {}",
@@ -112,6 +116,8 @@ pub struct BulkAddCommentsTool {
 
 impl BulkAddCommentsTool {
     #[must_use]
+    /// # Panics
+    /// This function panics if `JiraClient::new` fails.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -138,7 +144,7 @@ impl crate::mcp::server::MCPToolHandler for BulkAddCommentsTool {
 
         let issue_keys_vec: Vec<String> = issue_keys
             .iter()
-            .filter_map(|v| v.as_str().map(|s| s.to_string()))
+            .filter_map(|v| v.as_str().map(ToString::to_string))
             .collect();
 
         self.client.bulk_add_comments(issue_keys_vec, comment.to_string(), Some(config)).await?;
@@ -162,6 +168,8 @@ pub struct MixedBulkOperationsTool {
 
 impl MixedBulkOperationsTool {
     #[must_use]
+    /// # Panics
+    /// This function panics if `JiraClient::new` fails.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),

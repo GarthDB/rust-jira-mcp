@@ -11,6 +11,8 @@ pub struct CreateComponentTool {
 
 impl CreateComponentTool {
     #[must_use]
+    /// # Panics
+    /// This function panics if `JiraClient::new` fails.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -38,9 +40,9 @@ impl crate::mcp::server::MCPToolHandler for CreateComponentTool {
 
         let component_request = crate::types::jira::JiraComponentCreateRequest {
             name: name.to_string(),
-            description: description.map(|d| d.to_string()),
+            description: description.map(ToString::to_string),
             project: project.to_string(),
-            lead_account_id: lead_account_id.map(|l| l.to_string()),
+            lead_account_id: lead_account_id.map(ToString::to_string),
             assignee_type: Some("PROJECT_LEAD".to_string()),
         };
 
@@ -66,6 +68,8 @@ pub struct UpdateComponentTool {
 
 impl UpdateComponentTool {
     #[must_use]
+    /// # Panics
+    /// This function panics if `JiraClient::new` fails.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -93,16 +97,15 @@ impl crate::mcp::server::MCPToolHandler for UpdateComponentTool {
 
         let update_request = crate::types::jira::JiraComponentUpdateRequest {
             name: Some(name.to_string()),
-            description: description.map(|d| d.to_string()),
-            lead_account_id: lead_account_id.map(|l| l.to_string()),
+            description: description.map(ToString::to_string),
+            lead_account_id: lead_account_id.map(ToString::to_string),
             assignee_type: Some("PROJECT_LEAD".to_string()),
         };
 
         self.client.update_component(component_id, &update_request).await?;
 
         let response_text = format!(
-            "Component updated successfully: {}",
-            component_id
+            "Component updated successfully: {component_id}"
         );
 
         Ok(MCPToolResult {
@@ -119,6 +122,8 @@ pub struct DeleteComponentTool {
 
 impl DeleteComponentTool {
     #[must_use]
+    /// # Panics
+    /// This function panics if `JiraClient::new` fails.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -139,8 +144,7 @@ impl crate::mcp::server::MCPToolHandler for DeleteComponentTool {
         self.client.delete_component(component_id).await?;
 
         let response_text = format!(
-            "Component deleted successfully: {}",
-            component_id
+            "Component deleted successfully: {component_id}"
         );
 
         Ok(MCPToolResult {

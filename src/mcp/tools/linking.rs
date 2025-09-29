@@ -11,6 +11,8 @@ pub struct GetIssueLinksTool {
 
 impl GetIssueLinksTool {
     #[must_use]
+    /// # Panics
+    /// This function panics if `JiraClient::new` fails.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -55,6 +57,8 @@ pub struct CreateIssueLinkTool {
 
 impl CreateIssueLinkTool {
     #[must_use]
+    /// # Panics
+    /// This function panics if `JiraClient::new` fails.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -103,10 +107,7 @@ impl crate::mcp::server::MCPToolHandler for CreateIssueLinkTool {
         self.client.create_issue_link(&link_request).await?;
 
         let response_text = format!(
-            "Link created successfully between {} and {} with type {}",
-            inward_issue,
-            outward_issue,
-            link_type
+            "Link created successfully between {inward_issue} and {outward_issue} with type {link_type}"
         );
 
         Ok(MCPToolResult {
@@ -123,6 +124,8 @@ pub struct DeleteIssueLinkTool {
 
 impl DeleteIssueLinkTool {
     #[must_use]
+    /// # Panics
+    /// This function panics if `JiraClient::new` fails.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -143,8 +146,7 @@ impl crate::mcp::server::MCPToolHandler for DeleteIssueLinkTool {
         self.client.delete_issue_link(link_id).await?;
 
         let response_text = format!(
-            "Issue link deleted successfully: {}",
-            link_id
+            "Issue link deleted successfully: {link_id}"
         );
 
         Ok(MCPToolResult {
