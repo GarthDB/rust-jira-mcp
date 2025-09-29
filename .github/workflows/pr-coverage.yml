@@ -40,16 +40,8 @@ jobs:
     
     - name: Run coverage analysis
       run: |
-        # Set up coverage environment
-        export CARGO_INCREMENTAL=0
-        export RUSTFLAGS="-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off -Zno-landing-pads"
-        export LLVM_PROFILE_FILE="cargo-test-%p-%m.profraw"
-        
-        # Run tests
-        cargo test --workspace --all-features --quiet
-        
-        # Generate coverage report
-        cargo llvm-cov --workspace --all-features --lcov --output-path lcov.info
+        # Run tests with coverage using cargo-llvm-cov
+        cargo llvm-cov --workspace --all-features --lcov --output-path lcov.info --quiet
     
     - name: Generate PR coverage comment
       uses: actions/github-script@v7
