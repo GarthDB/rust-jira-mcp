@@ -41,6 +41,7 @@ use crate::mcp::tools::{
     GetProjectConfigTool,
     GetProjectMetadataTool,
     GetTransitionsTool,
+    LinkIssuesTool,
     MixedBulkOperationsTool,
     RemoveIssueWatcherTool,
     SearchIssuesTool,
@@ -221,6 +222,10 @@ impl MCPServer {
         tools.insert(
             "create_jira_issue_link".to_string(),
             Box::new(CreateIssueLinkTool::new(config.clone())),
+        );
+        tools.insert(
+            "link_jira_issues".to_string(),
+            Box::new(LinkIssuesTool::new(config.clone())),
         );
         tools.insert(
             "delete_jira_issue_link".to_string(),
@@ -1741,7 +1746,7 @@ impl MCPServer {
         vec![
             MCPTool {
                 name: "clone_jira_issue".to_string(),
-                description: "Clone an existing Jira issue with optional copying of attachments, comments, work logs, watchers, and links".to_string(),
+                description: "Clone an existing Jira issue with optional copying of attachments, comments, work logs, watchers, links, and field mapping".to_string(),
                 input_schema: json!({
                     "type": "object",
                     "properties": {
@@ -1784,6 +1789,27 @@ impl MCPServer {
                         "copy_links": {
                             "type": "boolean",
                             "description": "Whether to copy links from the original issue"
+                        },
+                        "field_mapping": {
+                            "type": "object",
+                            "description": "Field mapping configuration for cloning",
+                            "properties": {
+                                "copy_fields": {
+                                    "type": "array",
+                                    "items": {"type": "string"},
+                                    "description": "List of field IDs to copy from the original issue (e.g., ['priority', 'labels', 'components'])"
+                                },
+                                "exclude_fields": {
+                                    "type": "array",
+                                    "items": {"type": "string"},
+                                    "description": "List of field IDs to exclude from copying (e.g., ['assignee', 'reporter', 'status'])"
+                                },
+                                "custom_field_mapping": {
+                                    "type": "object",
+                                    "description": "Map original field IDs to new field IDs for custom field mapping",
+                                    "additionalProperties": {"type": "string"}
+                                }
+                            }
                         }
                     },
                     "required": ["original_issue_key", "project_key", "issue_type", "summary"]

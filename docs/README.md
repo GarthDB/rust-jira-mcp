@@ -26,6 +26,12 @@ Welcome to the comprehensive documentation for the Rust Jira MCP Server. This do
 - **[Zephyr Integration](tool-examples.md#zephyr-test-management-tools)** - Test management features
 - **[Advanced Patterns](tool-examples.md#advanced-usage-patterns)** - Advanced usage patterns
 
+### Testing & Development
+- **[Testing Guide](testing-guide.md)** - Comprehensive testing framework and usage
+- **[Xtask Commands](testing-guide.md#available-commands)** - All available testing commands
+- **[Fixture Management](testing-guide.md#fixture-management)** - Test data collection and generation
+- **[Safety Features](testing-guide.md#safety-features)** - Safe testing practices
+
 ### Troubleshooting & Performance
 - **[Troubleshooting Guide](troubleshooting.md)** - Common issues and solutions
 - **[Performance Guide](performance.md)** - Optimization and benchmarking

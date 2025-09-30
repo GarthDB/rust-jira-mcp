@@ -6,6 +6,7 @@ use std::collections::HashMap;
 pub struct JiraIssue {
     pub id: String,
     pub key: String,
+    #[serde(rename = "self")]
     pub self_url: String,
     pub fields: HashMap<String, serde_json::Value>,
 }
@@ -16,54 +17,96 @@ pub struct JiraProject {
     pub id: String,
     pub key: String,
     pub name: String,
+    #[serde(rename = "projectTypeKey")]
     pub project_type_key: String,
+    #[serde(rename = "self")]
     pub self_url: String,
+    #[serde(rename = "avatarUrls")]
+    pub avatar_urls: Option<JiraAvatarUrls>,
 }
 
 /// Jira user representation
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct JiraUser {
-    pub account_id: String,
-    pub display_name: String,
+    #[serde(rename = "self")]
+    pub self_url: String,
+    pub name: String,
+    pub key: String,
+    pub account_id: Option<String>,
+    #[serde(rename = "emailAddress")]
     pub email_address: Option<String>,
+    #[serde(rename = "avatarUrls")]
+    pub avatar_urls: Option<JiraAvatarUrls>,
+    #[serde(rename = "displayName")]
+    pub display_name: String,
     pub active: bool,
+    #[serde(rename = "timeZone")]
     pub time_zone: Option<String>,
+}
+
+/// Jira avatar URLs representation
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[allow(clippy::struct_field_names)]
+pub struct JiraAvatarUrls {
+    #[serde(rename = "48x48")]
+    pub size_48: String,
+    #[serde(rename = "24x24")]
+    pub size_24: String,
+    #[serde(rename = "16x16")]
+    pub size_16: String,
+    #[serde(rename = "32x32")]
+    pub size_32: String,
 }
 
 /// Jira issue type representation
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct JiraIssueType {
+    #[serde(rename = "self")]
+    pub self_url: String,
     pub id: String,
     pub name: String,
     pub description: Option<String>,
+    #[serde(rename = "iconUrl")]
     pub icon_url: Option<String>,
     pub subtask: bool,
+    #[serde(rename = "avatarId")]
+    pub avatar_id: Option<i32>,
 }
 
 /// Jira priority representation
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct JiraPriority {
+    #[serde(rename = "self")]
+    pub self_url: String,
     pub id: String,
     pub name: String,
     pub description: Option<String>,
+    #[serde(rename = "iconUrl")]
     pub icon_url: Option<String>,
 }
 
 /// Jira status representation
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct JiraStatus {
+    #[serde(rename = "self")]
+    pub self_url: String,
     pub id: String,
     pub name: String,
     pub description: Option<String>,
+    #[serde(rename = "iconUrl")]
     pub icon_url: Option<String>,
+    #[serde(rename = "statusCategory")]
     pub status_category: JiraStatusCategory,
 }
 
 /// Jira status category representation
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct JiraStatusCategory {
+    #[serde(rename = "self")]
+    pub self_url: String,
     pub id: i32,
     pub key: String,
+    #[serde(rename = "colorName")]
     pub color_name: String,
     pub name: String,
 }
@@ -74,6 +117,7 @@ pub struct JiraComponent {
     pub id: String,
     pub name: String,
     pub description: Option<String>,
+    #[serde(rename = "self")]
     pub self_url: String,
 }
 
@@ -167,7 +211,9 @@ impl Default for TransitionProperties {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct JiraSearchResult {
     pub expand: Option<String>,
+    #[serde(rename = "startAt")]
     pub start_at: i32,
+    #[serde(rename = "maxResults")]
     pub max_results: i32,
     pub total: i32,
     pub issues: Vec<JiraIssue>,
@@ -432,6 +478,7 @@ pub struct JiraLinkType {
     pub name: String,
     pub inward: String,
     pub outward: String,
+    #[serde(rename = "self")]
     pub self_url: String,
 }
 
@@ -439,6 +486,7 @@ pub struct JiraLinkType {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct JiraIssueLink {
     pub id: String,
+    #[serde(rename = "self")]
     pub self_url: String,
     pub link_type: JiraLinkType,
     pub inward_issue: Option<JiraIssue>,
@@ -484,6 +532,7 @@ pub struct JiraCommentVisibility {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct JiraAttachment {
     pub id: String,
+    #[serde(rename = "self")]
     pub self_url: String,
     pub filename: String,
     pub author: JiraUser,
@@ -635,6 +684,7 @@ pub struct JiraWatcher {
 /// Jira watchers response
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct JiraWatchersResponse {
+    #[serde(rename = "self")]
     pub self_url: String,
     pub is_watching: bool,
     pub watch_count: i32,

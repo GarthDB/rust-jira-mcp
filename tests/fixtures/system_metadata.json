@@ -1,0 +1,65 @@
+{
+  "custom_fields": [],
+  "labels": [
+    "mock",
+    "test",
+    "synthetic",
+    "automated"
+  ],
+  "link_types": [
+    {
+      "id": "10000",
+      "inward": "relates to",
+      "name": "Relates",
+      "outward": "relates to"
+    },
+    {
+      "id": "10001",
+      "inward": "is blocked by",
+      "name": "Blocks",
+      "outward": "blocks"
+    }
+  ],
+  "priorities_and_statuses": {
+    "priorities": [
+      {
+        "id": "1",
+        "name": "Highest"
+      },
+      {
+        "id": "8",
+        "name": "Normal"
+      },
+      {
+        "id": "5",
+        "name": "Low"
+      }
+    ],
+    "statuses": [
+      {
+        "id": "10019",
+        "name": "Backlog",
+        "statusCategory": {
+          "key": "new",
+          "name": "To Do"
+        }
+      },
+      {
+        "id": "3",
+        "name": "In Progress",
+        "statusCategory": {
+          "key": "indeterminate",
+          "name": "In Progress"
+        }
+      },
+      {
+        "id": "10033",
+        "name": "Done",
+        "statusCategory": {
+          "key": "done",
+          "name": "Done"
+        }
+      }
+    ]
+  }
+}

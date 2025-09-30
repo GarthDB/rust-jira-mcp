@@ -7,10 +7,10 @@ use std::time::Duration;
 fn create_test_data() -> Vec<(String, serde_json::Value)> {
     (0..1000)
         .map(|i| {
-            let key = format!("test_key_{}", i);
+            let key = format!("test_key_{i}");
             let value = json!({
                 "id": i,
-                "name": format!("item_{}", i),
+                "name": format!("item_{i}"),
                 "data": vec![i; 10],
                 "metadata": {
                     "created": "2024-01-01T00:00:00.000+0000",
@@ -22,13 +22,14 @@ fn create_test_data() -> Vec<(String, serde_json::Value)> {
         .collect()
 }
 
+#[allow(clippy::cast_sign_loss)]
 fn benchmark_cache_insertion(c: &mut Criterion) {
     let mut group = c.benchmark_group("cache_insertion");
     group.measurement_time(Duration::from_secs(10));
 
     let test_data = create_test_data();
 
-    for cache_size in [100, 500, 1000].iter() {
+    for cache_size in &[100, 500, 1000] {
         group.bench_with_input(
             BenchmarkId::new("moka_cache", cache_size),
             cache_size,
@@ -40,8 +41,8 @@ fn benchmark_cache_insertion(c: &mut Criterion) {
                         for (key, value) in &test_data[..cache_size] {
                             cache.insert(key.clone(), value.clone()).await;
                         }
-                    })
-                })
+                    });
+                });
             },
         );
     }
@@ -49,6 +50,7 @@ fn benchmark_cache_insertion(c: &mut Criterion) {
     group.finish();
 }
 
+#[allow(clippy::cast_sign_loss)]
 fn benchmark_cache_retrieval(c: &mut Criterion) {
     let mut group = c.benchmark_group("cache_retrieval");
     group.measurement_time(Duration::from_secs(10));
@@ -70,20 +72,21 @@ fn benchmark_cache_retrieval(c: &mut Criterion) {
                 for (key, _) in &test_data[..100] {
                     black_box(cache.get(key).await);
                 }
-            })
-        })
+            });
+        });
     });
 
     group.finish();
 }
 
+#[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
 fn benchmark_cache_hit_rates(c: &mut Criterion) {
     let mut group = c.benchmark_group("cache_hit_rates");
     group.measurement_time(Duration::from_secs(10));
 
     let test_data = create_test_data();
 
-    for hit_rate in [0.1, 0.5, 0.9].iter() {
+    for hit_rate in &[0.1, 0.5, 0.9] {
         group.bench_with_input(
             BenchmarkId::new("cache_hit_rate", (hit_rate * 100.0) as u32),
             hit_rate,
@@ -99,6 +102,11 @@ fn benchmark_cache_hit_rates(c: &mut Criterion) {
 
                         // Simulate different hit rates
                         let total_requests = 1000;
+                        #[allow(
+                            clippy::cast_sign_loss,
+                            clippy::cast_possible_truncation,
+                            clippy::cast_precision_loss
+                        )]
                         let hits = (total_requests as f64 * hit_rate) as usize;
 
                         for i in 0..total_requests {
@@ -111,8 +119,8 @@ fn benchmark_cache_hit_rates(c: &mut Criterion) {
                             };
                             black_box(cache.get(&key).await);
                         }
-                    })
-                })
+                    });
+                });
             },
         );
     }
@@ -128,30 +136,30 @@ fn benchmark_cache_key_generation(c: &mut Criterion) {
         b.iter(|| {
             for i in 0..1000 {
                 black_box(CacheKeyGenerator::api_response(
-                    &format!("endpoint_{}", i),
-                    &format!("params_{}", i),
+                    &format!("endpoint_{i}"),
+                    &format!("params_{i}"),
                 ));
             }
-        })
+        });
     });
 
     group.bench_function("search_key", |b| {
         b.iter(|| {
             for i in 0..1000 {
-                black_box(CacheKeyGenerator::search(&format!("jql_{}", i), i, i * 2));
+                black_box(CacheKeyGenerator::search(&format!("jql_{i}"), i, i * 2));
             }
-        })
+        });
     });
 
     group.bench_function("parsed_object_key", |b| {
         b.iter(|| {
             for i in 0..1000 {
                 black_box(CacheKeyGenerator::parsed_object(
-                    &format!("type_{}", i),
-                    &format!("id_{}", i),
+                    &format!("type_{i}"),
+                    &format!("id_{i}"),
                 ));
             }
-        })
+        });
     });
 
     group.finish();
@@ -168,7 +176,7 @@ fn benchmark_cache_manager_operations(c: &mut Criterion) {
             rt.block_on(async {
                 // Test API responses cache
                 for i in 0..100 {
-                    let key = format!("api_response_{}", i);
+                    let key = format!("api_response_{i}");
                     let value = json!({
                         "id": i,
                         "data": vec![i; 10]
@@ -178,7 +186,7 @@ fn benchmark_cache_manager_operations(c: &mut Criterion) {
 
                 // Test parsed objects cache
                 for i in 0..100 {
-                    let key = format!("parsed_object_{}", i);
+                    let key = format!("parsed_object_{i}");
                     let value = json!({
                         "id": i,
                         "parsed": true
@@ -188,7 +196,7 @@ fn benchmark_cache_manager_operations(c: &mut Criterion) {
 
                 // Test config cache
                 for i in 0..50 {
-                    let key = format!("config_{}", i);
+                    let key = format!("config_{i}");
                     let value = json!({
                         "setting": i,
                         "enabled": true
@@ -198,8 +206,8 @@ fn benchmark_cache_manager_operations(c: &mut Criterion) {
 
                 // Get stats
                 black_box(cache_manager.get_stats().await);
-            })
-        })
+            });
+        });
     });
 
     group.finish();
@@ -209,7 +217,7 @@ fn benchmark_concurrent_cache_access(c: &mut Criterion) {
     let mut group = c.benchmark_group("concurrent_cache_access");
     group.measurement_time(Duration::from_secs(10));
 
-    for concurrency in [1, 2, 4, 8, 16].iter() {
+    for concurrency in &[1, 2, 4, 8, 16] {
         group.bench_with_input(
             BenchmarkId::new("concurrent_cache_ops", concurrency),
             concurrency,
@@ -223,7 +231,7 @@ fn benchmark_concurrent_cache_access(c: &mut Criterion) {
                                 let cache = Arc::clone(&cache);
                                 tokio::spawn(async move {
                                     for j in 0..100 {
-                                        let key = format!("key_{}_{}", i, j);
+                                        let key = format!("key_{i}_{j}");
                                         let value = json!({
                                             "id": i * 100 + j,
                                             "data": vec![i * 100 + j; 5]
@@ -237,8 +245,8 @@ fn benchmark_concurrent_cache_access(c: &mut Criterion) {
 
                         let results: Vec<_> = futures::future::join_all(handles).await;
                         black_box(results);
-                    })
-                })
+                    });
+                });
             },
         );
     }

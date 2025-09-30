@@ -11,6 +11,9 @@ pub struct GetLabelsTool {
 
 impl GetLabelsTool {
     #[must_use]
+    /// # Panics
+    ///
+    /// Panics if the `JiraClient` cannot be created from the provided configuration.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -49,6 +52,9 @@ pub struct CreateLabelTool {
 
 impl CreateLabelTool {
     #[must_use]
+    /// # Panics
+    ///
+    /// Panics if the `JiraClient` cannot be created from the provided configuration.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -87,6 +93,9 @@ pub struct UpdateLabelTool {
 
 impl UpdateLabelTool {
     #[must_use]
+    /// # Panics
+    ///
+    /// Panics if the `JiraClient` cannot be created from the provided configuration.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -116,7 +125,7 @@ impl crate::mcp::server::MCPToolHandler for UpdateLabelTool {
 
         self.client.update_label(name, &update_request).await?;
 
-        let response_text = format!("Label updated successfully: {} -> {}", name, new_name);
+        let response_text = format!("Label updated successfully: {name} -> {new_name}");
 
         Ok(MCPToolResult {
             content: vec![MCPContent::text(response_text)],
@@ -132,6 +141,9 @@ pub struct DeleteLabelTool {
 
 impl DeleteLabelTool {
     #[must_use]
+    /// # Panics
+    ///
+    /// Panics if the `JiraClient` cannot be created from the provided configuration.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -150,7 +162,7 @@ impl crate::mcp::server::MCPToolHandler for DeleteLabelTool {
 
         self.client.delete_label(name).await?;
 
-        let response_text = format!("Label deleted successfully: {}", name);
+        let response_text = format!("Label deleted successfully: {name}");
 
         Ok(MCPToolResult {
             content: vec![MCPContent::text(response_text)],

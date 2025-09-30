@@ -12,6 +12,9 @@ pub struct GetIssueAttachmentsTool {
 
 impl GetIssueAttachmentsTool {
     #[must_use]
+    /// # Panics
+    ///
+    /// Panics if the `JiraClient` cannot be created from the provided configuration.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -61,6 +64,9 @@ pub struct UploadAttachmentTool {
 
 impl UploadAttachmentTool {
     #[must_use]
+    /// # Panics
+    ///
+    /// Panics if the `JiraClient` cannot be created from the provided configuration.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -126,6 +132,9 @@ pub struct DeleteAttachmentTool {
 
 impl DeleteAttachmentTool {
     #[must_use]
+    /// # Panics
+    ///
+    /// Panics if the `JiraClient` cannot be created from the provided configuration.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -147,7 +156,7 @@ impl crate::mcp::server::MCPToolHandler for DeleteAttachmentTool {
 
         self.client.delete_attachment(attachment_id).await?;
 
-        let response_text = format!("Attachment {} deleted successfully", attachment_id);
+        let response_text = format!("Attachment {attachment_id} deleted successfully");
 
         Ok(MCPToolResult {
             content: vec![MCPContent::text(response_text)],
@@ -163,6 +172,9 @@ pub struct DownloadAttachmentTool {
 
 impl DownloadAttachmentTool {
     #[must_use]
+    /// # Panics
+    ///
+    /// Panics if the `JiraClient` cannot be created from the provided configuration.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),

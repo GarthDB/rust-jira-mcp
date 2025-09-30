@@ -45,6 +45,7 @@ impl Profiler {
 
     /// Get detailed timing information
     #[must_use]
+    #[allow(clippy::cast_precision_loss)]
     pub fn get_timing_report(&self) -> TimingReport {
         let total_elapsed = self.elapsed();
         let mut segments = Vec::new();
@@ -58,7 +59,7 @@ impl Profiler {
         } else {
             let mut last_time = self.start_time;
 
-            for (name, time) in self.checkpoints.iter() {
+            for (name, time) in &self.checkpoints {
                 let segment_duration = time.duration_since(last_time);
                 let percentage =
                     (segment_duration.as_nanos() as f64 / total_elapsed.as_nanos() as f64) * 100.0;
@@ -175,6 +176,7 @@ impl PerformanceUtils {
     }
 
     /// Benchmark a function multiple times and return statistics
+    #[allow(clippy::cast_possible_truncation)]
     pub fn benchmark<F, T>(iterations: usize, f: F) -> BenchmarkResult
     where
         F: Fn() -> T,
@@ -221,6 +223,7 @@ pub struct BenchmarkResult {
 impl BenchmarkResult {
     /// Get the operations per second
     #[must_use]
+    #[allow(clippy::cast_precision_loss)]
     pub fn ops_per_second(&self) -> f64 {
         if self.total_duration.as_secs_f64() > 0.0 {
             self.iterations as f64 / self.total_duration.as_secs_f64()

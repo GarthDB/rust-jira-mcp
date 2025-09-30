@@ -22,6 +22,10 @@ pub struct JiraClientOptimized {
 
 impl JiraClientOptimized {
     /// Create a new optimized Jira client
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the client configuration is invalid or if the underlying client cannot be created.
     pub fn new(config: JiraConfig) -> Result<Self> {
         let base_client = Arc::new(BaseClient::new(config.clone())?);
         let metrics = Arc::new(PerformanceMetrics::new());
@@ -36,12 +40,20 @@ impl JiraClientOptimized {
     }
 
     /// Get a Jira issue with caching
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the issue cannot be retrieved or if there are network/API issues.
     pub async fn get_issue(&self, issue_key: &str) -> Result<JiraIssue> {
         let endpoint = format!("issue/{issue_key}");
         self.base_client.get_cached(&endpoint).await
     }
 
     /// Search for Jira issues with optimized caching
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the search fails or if there are network/API issues.
     pub async fn search_issues(
         &self,
         jql: &str,
@@ -93,11 +105,19 @@ impl JiraClientOptimized {
     }
 
     /// Create a new Jira issue with optimized serialization
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the issue creation fails or if there are network/API issues.
     pub async fn create_issue(&self, issue_data: &serde_json::Value) -> Result<JiraIssue> {
         self.base_client.post_optimized("issue", issue_data).await
     }
 
     /// Update a Jira issue with optimized error handling
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the issue update fails or if there are network/API issues.
     pub async fn update_issue(
         &self,
         issue_key: &str,
@@ -112,6 +132,10 @@ impl JiraClientOptimized {
     }
 
     /// Add a comment with optimized serialization
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the comment creation fails or if there are network/API issues.
     pub async fn add_comment(&self, issue_key: &str, comment_body: &str) -> Result<JiraComment> {
         let endpoint = format!("issue/{issue_key}/comment");
         let comment_data = json!({
@@ -123,6 +147,10 @@ impl JiraClientOptimized {
     }
 
     /// Get comments with caching
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the comments cannot be retrieved or if there are network/API issues.
     pub async fn get_comments(&self, issue_key: &str) -> Result<Vec<JiraComment>> {
         let endpoint = format!("issue/{issue_key}/comment");
         let response: serde_json::Value = self.base_client.get_cached(&endpoint).await?;
@@ -144,6 +172,10 @@ impl JiraClientOptimized {
     }
 
     /// Get transitions with caching
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the transitions cannot be retrieved or if there are network/API issues.
     pub async fn get_transitions(&self, issue_key: &str) -> Result<Vec<JiraTransition>> {
         let endpoint = format!("issue/{issue_key}/transitions");
         let response: serde_json::Value = self.base_client.get_cached(&endpoint).await?;
@@ -165,6 +197,10 @@ impl JiraClientOptimized {
     }
 
     /// Transition an issue with optimized serialization
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the transition fails or if there are network/API issues.
     pub async fn transition_issue(
         &self,
         issue_key: &str,
@@ -192,6 +228,10 @@ impl JiraClientOptimized {
     }
 
     /// Execute bulk operations with optimized batching
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the bulk operations fail or if there are network/API issues.
     pub async fn execute_bulk_operations(
         &self,
         operations: Vec<BulkOperationItem>,

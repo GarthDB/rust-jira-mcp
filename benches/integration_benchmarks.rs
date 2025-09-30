@@ -25,8 +25,8 @@ fn benchmark_client_creation(c: &mut Criterion) {
     group.bench_function("optimized_client_new", |b| {
         b.iter(|| {
             let config = create_test_config();
-            black_box(OptimizedJiraClient::new(config).unwrap())
-        })
+            black_box(OptimizedJiraClient::new(config).unwrap());
+        });
     });
 
     group.finish();
@@ -39,12 +39,12 @@ fn benchmark_json_serialization(c: &mut Criterion) {
     let test_data = create_large_test_data();
 
     group.bench_function("serialize_large_object", |b| {
-        b.iter(|| black_box(serde_json::to_string(&test_data).unwrap()))
+        b.iter(|| black_box(serde_json::to_string(&test_data).unwrap()));
     });
 
     group.bench_function("deserialize_large_object", |b| {
         let json_str = serde_json::to_string(&test_data).unwrap();
-        b.iter(|| black_box(serde_json::from_str::<serde_json::Value>(&json_str).unwrap()))
+        b.iter(|| black_box(serde_json::from_str::<serde_json::Value>(&json_str).unwrap()));
     });
 
     group.finish();
@@ -69,7 +69,7 @@ fn benchmark_search_operations(c: &mut Criterion) {
         group.bench_with_input(BenchmarkId::new("search_jql", i), jql, |b, &_jql| {
             b.iter(|| {
                 let rt = tokio::runtime::Runtime::new().unwrap();
-                rt.block_on(async {
+                let _ = rt.block_on(async {
                     // This would normally make a real API call
                     // For benchmarking, we'll simulate the operation
                     tokio::time::sleep(Duration::from_millis(10)).await;
@@ -77,8 +77,8 @@ fn benchmark_search_operations(c: &mut Criterion) {
                         "total": 100,
                         "issues": vec![create_test_issue(); 10]
                     }))
-                })
-            })
+                });
+            });
         });
     }
 
@@ -92,7 +92,7 @@ fn benchmark_bulk_operations(c: &mut Criterion) {
     let config = create_test_config();
     let _client = OptimizedJiraClient::new(config).unwrap();
 
-    for batch_size in [10, 50, 100].iter() {
+    for batch_size in &[10, 50, 100] {
         group.bench_with_input(
             BenchmarkId::new("bulk_update", batch_size),
             batch_size,
@@ -116,8 +116,8 @@ fn benchmark_bulk_operations(c: &mut Criterion) {
                         }
 
                         black_box(results);
-                    })
-                })
+                    });
+                });
             },
         );
     }
@@ -136,15 +136,15 @@ fn benchmark_caching_performance(c: &mut Criterion) {
             let rt = tokio::runtime::Runtime::new().unwrap();
             rt.block_on(async {
                 for i in 0..1000 {
-                    let key = format!("test_key_{}", i);
+                    let key = format!("test_key_{i}");
                     let value = json!({
                         "id": i,
                         "data": vec![i; 10]
                     });
                     cache_manager.api_responses.insert(key, value).await;
                 }
-            })
-        })
+            });
+        });
     });
 
     group.bench_function("cache_retrieval", |b| {
@@ -152,7 +152,7 @@ fn benchmark_caching_performance(c: &mut Criterion) {
         rt.block_on(async {
             // Pre-populate cache
             for i in 0..100 {
-                let key = format!("test_key_{}", i);
+                let key = format!("test_key_{i}");
                 let value = json!({
                     "id": i,
                     "data": vec![i; 10]
@@ -165,11 +165,11 @@ fn benchmark_caching_performance(c: &mut Criterion) {
             let rt = tokio::runtime::Runtime::new().unwrap();
             rt.block_on(async {
                 for i in 0..100 {
-                    let key = format!("test_key_{}", i);
+                    let key = format!("test_key_{i}");
                     black_box(cache_manager.api_responses.get(&key).await);
                 }
-            })
-        })
+            });
+        });
     });
 
     group.finish();
@@ -185,7 +185,7 @@ fn benchmark_memory_usage(c: &mut Criterion) {
             for i in 0..10000 {
                 let obj = json!({
                     "id": i,
-                    "name": format!("object_{}", i),
+                    "name": format!("object_{i}"),
                     "data": vec![i; 100],
                     "metadata": {
                         "created": "2024-01-01T00:00:00.000+0000",
@@ -196,18 +196,18 @@ fn benchmark_memory_usage(c: &mut Criterion) {
                 objects.push(obj);
             }
             black_box(objects);
-        })
+        });
     });
 
     group.bench_function("string_operations", |b| {
         b.iter(|| {
             let mut strings = Vec::new();
             for i in 0..10000 {
-                let s = format!("string_{}_with_lots_of_data_{}", i, i * 2);
+                let s = format!("string_{i}_with_lots_of_data_{}", i * 2);
                 strings.push(s);
             }
             black_box(strings);
-        })
+        });
     });
 
     group.finish();
@@ -217,7 +217,7 @@ fn benchmark_concurrent_requests(c: &mut Criterion) {
     let mut group = c.benchmark_group("concurrent_requests");
     group.measurement_time(Duration::from_secs(15));
 
-    for concurrency in [1, 5, 10, 20, 50].iter() {
+    for concurrency in &[1, 5, 10, 20, 50] {
         group.bench_with_input(
             BenchmarkId::new("concurrent_api_calls", concurrency),
             concurrency,
@@ -240,8 +240,8 @@ fn benchmark_concurrent_requests(c: &mut Criterion) {
 
                         let results: Vec<_> = futures::future::join_all(handles).await;
                         black_box(results);
-                    })
-                })
+                    });
+                });
             },
         );
     }
@@ -257,7 +257,7 @@ fn benchmark_error_handling(c: &mut Criterion) {
         b.iter(|| {
             let error = rust_jira_mcp::error::JiraError::api_error("Test error message");
             black_box(error);
-        })
+        });
     });
 
     group.bench_function("error_serialization", |b| {
@@ -265,7 +265,7 @@ fn benchmark_error_handling(c: &mut Criterion) {
             let error = rust_jira_mcp::error::JiraError::api_error("Test error message");
             let json = error.to_string();
             black_box(json);
-        })
+        });
     });
 
     group.finish();

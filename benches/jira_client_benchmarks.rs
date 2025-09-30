@@ -26,7 +26,7 @@ fn benchmark_http_client_creation(c: &mut Criterion) {
     group.measurement_time(Duration::from_secs(10));
 
     group.bench_function("jira_client_new", |b| {
-        b.iter(|| black_box(JiraClient::new(create_test_config()).unwrap()))
+        b.iter(|| black_box(JiraClient::new(create_test_config()).unwrap()));
     });
 
     group.finish();
@@ -72,14 +72,14 @@ fn benchmark_json_parsing(c: &mut Criterion) {
         b.iter(|| {
             let json_str = serde_json::to_string(&issue_json).unwrap();
             black_box(serde_json::from_str::<serde_json::Value>(&json_str).unwrap())
-        })
+        });
     });
 
     group.bench_function("parse_search_result", |b| {
         b.iter(|| {
             let json_str = serde_json::to_string(&search_result_json).unwrap();
             black_box(serde_json::from_str::<serde_json::Value>(&json_str).unwrap())
-        })
+        });
     });
 
     group.finish();
@@ -97,8 +97,8 @@ fn benchmark_rate_limiting(c: &mut Criterion) {
             // For now, we'll simulate the wait time
             tokio::runtime::Runtime::new()
                 .unwrap()
-                .block_on(async { tokio::time::sleep(Duration::from_millis(1)).await })
-        })
+                .block_on(async { tokio::time::sleep(Duration::from_millis(1)).await });
+        });
     });
 
     group.finish();
@@ -112,10 +112,10 @@ fn benchmark_memory_usage(c: &mut Criterion) {
         b.iter(|| {
             let mut strings = Vec::new();
             for i in 0..1000 {
-                strings.push(format!("test_string_{}", i));
+                strings.push(format!("test_string_{i}"));
             }
             black_box(strings)
-        })
+        });
     });
 
     group.bench_function("json_value_allocations", |b| {
@@ -124,12 +124,12 @@ fn benchmark_memory_usage(c: &mut Criterion) {
             for i in 0..1000 {
                 values.push(json!({
                     "id": i,
-                    "name": format!("item_{}", i),
+                    "name": format!("item_{i}"),
                     "data": vec![i; 10]
                 }));
             }
             black_box(values)
-        })
+        });
     });
 
     group.finish();
@@ -139,7 +139,7 @@ fn benchmark_concurrent_operations(c: &mut Criterion) {
     let mut group = c.benchmark_group("concurrent_operations");
     group.measurement_time(Duration::from_secs(10));
 
-    for concurrency in [1, 2, 4, 8, 16].iter() {
+    for concurrency in &[1, 2, 4, 8, 16] {
         group.bench_with_input(
             BenchmarkId::new("concurrent_json_parsing", concurrency),
             concurrency,
@@ -160,9 +160,9 @@ fn benchmark_concurrent_operations(c: &mut Criterion) {
                             .collect();
 
                         let results: Vec<_> = futures::future::join_all(handles).await;
-                        black_box(results)
-                    })
-                })
+                        black_box(results);
+                    });
+                });
             },
         );
     }

@@ -108,6 +108,10 @@ fn test_config_validation_error_serialization() {
             (
                 ConfigValidationError::MissingRequiredField(f1),
                 ConfigValidationError::MissingRequiredField(f2),
+            )
+            | (
+                ConfigValidationError::ConfigFileNotFound(f1),
+                ConfigValidationError::ConfigFileNotFound(f2),
             ) => {
                 assert_eq!(f1, f2);
             }
@@ -136,12 +140,6 @@ fn test_config_validation_error_serialization() {
             ) => {
                 assert_eq!(f1, f2);
                 assert_eq!(p1, p2);
-            }
-            (
-                ConfigValidationError::ConfigFileNotFound(f1),
-                ConfigValidationError::ConfigFileNotFound(f2),
-            ) => {
-                assert_eq!(f1, f2);
             }
             (
                 ConfigValidationError::ConfigFileParseError(f1, e1),
@@ -221,7 +219,7 @@ fn test_validation_rule_debug() {
         .min_length(5)
         .custom_validator(|_| Ok(()));
 
-    let debug_str = format!("{:?}", rule);
+    let debug_str = format!("{rule:?}");
     assert!(debug_str.contains("test_field"));
     assert!(debug_str.contains("required: true"));
     assert!(debug_str.contains("min_length: Some(5)"));
@@ -348,10 +346,10 @@ fn test_config_validator_validate_numeric_range() {
     // Let's test the pattern matching instead
     let rule = rule.custom_validator(|value| {
         if let Ok(num) = value.parse::<i64>() {
-            if !(1..=300).contains(&num) {
-                Err("Timeout must be between 1 and 300".to_string())
-            } else {
+            if (1..=300).contains(&num) {
                 Ok(())
+            } else {
+                Err("Timeout must be between 1 and 300".to_string())
             }
         } else {
             Err("Invalid number format".to_string())
@@ -482,10 +480,10 @@ fn test_validation_rule_builder_pattern() {
         .required()
         .min_length(5)
         .custom_validator(|value| {
-            if !value.contains('@') {
-                Err("Must contain @".to_string())
-            } else {
+            if value.contains('@') {
                 Ok(())
+            } else {
+                Err("Must contain @".to_string())
             }
         });
 

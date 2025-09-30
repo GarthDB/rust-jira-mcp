@@ -44,6 +44,10 @@ impl AsyncTaskManager {
     }
 
     /// Execute a task with concurrency control
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the task execution fails or if there are issues with concurrency control.
     pub async fn execute_task<F, T>(
         &self,
         task_id: String,
@@ -379,12 +383,13 @@ impl<T> Clone for AsyncBatchProcessor<T> {
     }
 }
 
-lazy_static::lazy_static! {
-    pub static ref GLOBAL_TASK_MANAGER: AsyncTaskManager = AsyncTaskManager::new(
-        50, // Max 50 concurrent tasks
-        crate::performance::get_global_metrics()
-    );
-}
+static GLOBAL_TASK_MANAGER: std::sync::LazyLock<AsyncTaskManager> =
+    std::sync::LazyLock::new(|| {
+        AsyncTaskManager::new(
+            50, // Max 50 concurrent tasks
+            crate::performance::get_global_metrics(),
+        )
+    });
 
 /// Get the global task manager
 #[must_use]

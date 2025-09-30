@@ -1,0 +1,294 @@
+{
+  "minimal_issue": {
+    "fields": {
+      "description": "Test issue description",
+      "issuetype": {
+        "id": "10001",
+        "name": "Story",
+        "self": "https://jira.example.com/rest/api/2/issuetype/10001",
+        "subtask": false
+      },
+      "priority": {
+        "id": "3",
+        "name": "Medium",
+        "self": "https://jira.example.com/rest/api/2/priority/3"
+      },
+      "project": {
+        "id": "10000",
+        "key": "TEST",
+        "name": "Test Project",
+        "projectTypeKey": "software",
+        "self": "https://jira.example.com/rest/api/2/project/10000"
+      },
+      "reporter": {
+        "active": true,
+        "displayName": "Test User",
+        "key": "testuser",
+        "name": "testuser",
+        "self": "https://jira.example.com/rest/api/2/user?username=testuser"
+      },
+      "status": {
+        "id": "10001",
+        "name": "To Do",
+        "self": "https://jira.example.com/rest/api/2/status/10001",
+        "statusCategory": {
+          "colorName": "blue-gray",
+          "id": 2,
+          "key": "new",
+          "name": "To Do",
+          "self": "https://jira.example.com/rest/api/2/statuscategory/2"
+        }
+      },
+      "summary": "Test Issue Summary"
+    },
+    "id": "20001",
+    "key": "TEST-1",
+    "self": "https://jira.example.com/rest/api/2/issue/TEST-1"
+  },
+  "valid_issue": {
+    "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations",
+    "fields": {
+      "aggregateprogress": {
+        "progress": 0,
+        "total": 0
+      },
+      "aggregatetimeestimate": null,
+      "aggregatetimeoriginalestimate": null,
+      "aggregatetimespent": null,
+      "archivedby": null,
+      "archiveddate": null,
+      "assignee": {
+        "active": true,
+        "avatarUrls": {
+          "16x16": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000",
+          "24x24": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000",
+          "32x32": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000",
+          "48x48": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000"
+        },
+        "displayName": "Test User 73",
+        "emailAddress": "testuser1@example.com",
+        "key": "user1",
+        "name": "user1",
+        "self": "https://jira.example.com/rest/api/2/user?username=garthdb",
+        "timeZone": "America/Boise"
+      },
+      "attachment": [],
+      "comment": {
+        "comments": [],
+        "maxResults": 0,
+        "startAt": 0,
+        "total": 0
+      },
+      "components": [
+        {
+          "id": "181920",
+          "name": "Build system",
+          "self": "https://jira.example.com/rest/api/2/component/181920"
+        }
+      ],
+      "created": "2022-12-19T17:35:08.000+0000",
+      "creator": {
+        "active": true,
+        "avatarUrls": {
+          "16x16": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000",
+          "24x24": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000",
+          "32x32": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000",
+          "48x48": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000"
+        },
+        "displayName": "Test User 73",
+        "emailAddress": "testuser71@example.com",
+        "key": "user71",
+        "name": "user71",
+        "self": "https://jira.example.com/rest/api/2/user?username=brownlee",
+        "timeZone": "America/Los_Angeles"
+      },
+      "customfield_10001": null,
+      "customfield_10002": null,
+      "customfield_10003": null,
+      "customfield_10004": null,
+      "customfield_10405": null,
+      "customfield_10407": null,
+      "customfield_10410": null,
+      "customfield_10602": null,
+      "customfield_10603": null,
+      "customfield_10802": null,
+      "customfield_10804": null,
+      "customfield_10903": null,
+      "customfield_11001": null,
+      "customfield_11002": null,
+      "customfield_11403": null,
+      "customfield_11700": null,
+      "customfield_11800": "DNA-1267",
+      "customfield_11901": null,
+      "customfield_11902": null,
+      "customfield_12100": null,
+      "customfield_12611": null,
+      "customfield_12801": null,
+      "customfield_13101": null,
+      "customfield_13402": null,
+      "customfield_13403": null,
+      "customfield_13419": null,
+      "customfield_13700": null,
+      "customfield_13805": null,
+      "customfield_14105": null,
+      "customfield_14116": null,
+      "customfield_14402": null,
+      "customfield_14601": null,
+      "customfield_14807": null,
+      "customfield_14808": null,
+      "customfield_14809": null,
+      "customfield_15200": "2|hctdt3:",
+      "customfield_15321": null,
+      "customfield_15505": null,
+      "customfield_15600": null,
+      "customfield_15900": null,
+      "customfield_15901": null,
+      "customfield_16201": null,
+      "customfield_16401": null,
+      "customfield_16402": null,
+      "customfield_16800": null,
+      "customfield_16802": null,
+      "customfield_17100": null,
+      "customfield_17502": null,
+      "customfield_18030": null,
+      "customfield_18031": null,
+      "customfield_18034": null,
+      "customfield_18201": null,
+      "customfield_18202": null,
+      "customfield_18203": null,
+      "customfield_18205": null,
+      "customfield_18208": null,
+      "customfield_19000": null,
+      "customfield_19402": null,
+      "customfield_19907": null,
+      "customfield_20601": null,
+      "customfield_20811": null,
+      "customfield_21400": null,
+      "customfield_21401": null,
+      "customfield_21701": null,
+      "customfield_22803": null,
+      "customfield_24000": null,
+      "customfield_25800": null,
+      "customfield_25801": null,
+      "customfield_26100": null,
+      "customfield_27100": null,
+      "customfield_27501": null,
+      "customfield_27900": null,
+      "customfield_28301": null,
+      "customfield_28500": null,
+      "customfield_28602": null,
+      "customfield_28604": null,
+      "customfield_28700": null,
+      "customfield_29500": null,
+      "customfield_30300": null,
+      "customfield_30400": "{summaryBean=com.atlassian.jira.plugin.devstatus.rest.SummaryBean@1b81d37c[summary={pullrequest=com.atlassian.jira.plugin.devstatus.rest.SummaryItemBean@33afe70b[overall=PullRequestOverallBean{stateCount=0, state='OPEN', details=PullRequestOverallDetails{openCount=0, mergedCount=0, declinedCount=0}},byInstanceType={}], build=com.atlassian.jira.plugin.devstatus.rest.SummaryItemBean@106edf22[overall=com.atlassian.jira.plugin.devstatus.summary.beans.BuildOverallBean@5c35f59b[failedBuildCount=0,successfulBuildCount=0,unknownBuildCount=0,count=0,lastUpdated=<null>,lastUpdatedTimestamp=<null>],byInstanceType={}], review=com.atlassian.jira.plugin.devstatus.rest.SummaryItemBean@7faab175[overall=com.atlassian.jira.plugin.devstatus.summary.beans.ReviewsOverallBean@757787bf[stateCount=0,state=<null>,dueDate=<null>,overDue=false,count=0,lastUpdated=<null>,lastUpdatedTimestamp=<null>],byInstanceType={}], deployment-environment=com.atlassian.jira.plugin.devstatus.rest.SummaryItemBean@1386c1fc[overall=com.atlassian.jira.plugin.devstatus.summary.beans.DeploymentOverallBean@606c673a[topEnvironments=[],showProjects=false,successfulCount=0,count=0,lastUpdated=<null>,lastUpdatedTimestamp=<null>],byInstanceType={}], repository=com.atlassian.jira.plugin.devstatus.rest.SummaryItemBean@4ae7435b[overall=com.atlassian.jira.plugin.devstatus.summary.beans.CommitOverallBean@3e47fc7[count=0,lastUpdated=<null>,lastUpdatedTimestamp=<null>],byInstanceType={}], branch=com.atlassian.jira.plugin.devstatus.rest.SummaryItemBean@26c8d766[overall=com.atlassian.jira.plugin.devstatus.summary.beans.BranchOverallBean@251e2132[count=0,lastUpdated=<null>,lastUpdatedTimestamp=<null>],byInstanceType={}]},errors=[],configErrors=[]], devSummaryJson={\"cachedValue\":{\"errors\":[],\"configErrors\":[],\"summary\":{\"pullrequest\":{\"overall\":{\"count\":0,\"lastUpdated\":null,\"stateCount\":0,\"state\":\"OPEN\",\"details\":{\"openCount\":0,\"mergedCount\":0,\"declinedCount\":0,\"total\":0},\"open\":true},\"byInstanceType\":{}},\"build\":{\"overall\":{\"count\":0,\"lastUpdated\":null,\"failedBuildCount\":0,\"successfulBuildCount\":0,\"unknownBuildCount\":0},\"byInstanceType\":{}},\"review\":{\"overall\":{\"count\":0,\"lastUpdated\":null,\"stateCount\":0,\"state\":null,\"dueDate\":null,\"overDue\":false,\"completed\":false},\"byInstanceType\":{}},\"deployment-environment\":{\"overall\":{\"count\":0,\"lastUpdated\":null,\"topEnvironments\":[],\"showProjects\":false,\"successfulCount\":0},\"byInstanceType\":{}},\"repository\":{\"overall\":{\"count\":0,\"lastUpdated\":null},\"byInstanceType\":{}},\"branch\":{\"overall\":{\"count\":0,\"lastUpdated\":null},\"byInstanceType\":{}}}},\"isStale\":true}}",
+      "customfield_30500": null,
+      "customfield_30700": null,
+      "customfield_30701": null,
+      "customfield_31600": [],
+      "customfield_31601": null,
+      "customfield_35100": null,
+      "customfield_35101": null,
+      "customfield_36803": null,
+      "customfield_39738": "9223372036854775807",
+      "description": "Test issue description for DNA-64",
+      "duedate": null,
+      "environment": null,
+      "fixVersions": [],
+      "issuelinks": [],
+      "issuetype": {
+        "avatarId": 18815,
+        "description": "Created by Jira Software - do not edit or delete. Issue type for a user story.",
+        "iconUrl": "https://jira.example.com/secure/viewavatar?size=xsmall&avatarId=18815&avatarType=issuetype",
+        "id": "30004",
+        "name": "Story",
+        "self": "https://jira.example.com/rest/api/2/issuetype/7",
+        "subtask": false
+      },
+      "labels": [],
+      "lastViewed": "2025-09-30T18:13:30.607+0000",
+      "priority": {
+        "iconUrl": "https://jira.example.com/images/icons/priorities/normal.png",
+        "id": "30003",
+        "name": "Normal",
+        "self": "https://jira.example.com/rest/api/2/priority/8"
+      },
+      "progress": {
+        "progress": 0,
+        "total": 0
+      },
+      "project": {
+        "avatarUrls": {
+          "16x16": "https://jira.example.com/secure/projectavatar?pid=10000&avatarId=10000",
+          "24x24": "https://jira.example.com/secure/projectavatar?pid=10000&avatarId=10000",
+          "32x32": "https://jira.example.com/secure/projectavatar?pid=10000&avatarId=10000",
+          "48x48": "https://jira.example.com/secure/projectavatar?pid=10000&avatarId=10000"
+        },
+        "id": "10001",
+        "key": "TEST1",
+        "name": "Test Project 43",
+        "projectTypeKey": "software",
+        "self": "https://jira.example.com/rest/api/2/project/34107"
+      },
+      "reporter": {
+        "active": true,
+        "avatarUrls": {
+          "16x16": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000",
+          "24x24": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000",
+          "32x32": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000",
+          "48x48": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000"
+        },
+        "displayName": "Test User 73",
+        "emailAddress": "testuser71@example.com",
+        "key": "user71",
+        "name": "user71",
+        "self": "https://jira.example.com/rest/api/2/user?username=brownlee",
+        "timeZone": "America/Los_Angeles"
+      },
+      "resolution": null,
+      "resolutiondate": null,
+      "status": {
+        "description": "The issue is open and ready for the assignee to start work on it.",
+        "iconUrl": "https://jira.example.com/images/icons/statuses/visible.png",
+        "id": "30002",
+        "name": "Backlog",
+        "self": "https://jira.example.com/rest/api/2/status/10019",
+        "statusCategory": {
+          "colorName": "default",
+          "id": 2,
+          "key": "new",
+          "name": "To Do",
+          "self": "https://jira.example.com/rest/api/2/statuscategory/2"
+        }
+      },
+      "subtasks": [],
+      "summary": "Test Issue Summary 64",
+      "timeestimate": null,
+      "timeoriginalestimate": null,
+      "timespent": null,
+      "timetracking": {},
+      "updated": "2023-10-04T21:26:41.000+0000",
+      "versions": [],
+      "votes": {
+        "hasVoted": false,
+        "self": "https://jira.example.com/rest/api/2/issue/DNA-1244/votes",
+        "votes": 0
+      },
+      "watches": {
+        "isWatching": false,
+        "self": "https://jira.example.com/rest/api/2/issue/DNA-1244/watchers",
+        "watchCount": 1
+      },
+      "worklog": {
+        "maxResults": 20,
+        "startAt": 0,
+        "total": 0,
+        "worklogs": []
+      },
+      "workratio": -1
+    },
+    "id": "20124",
+    "key": "DNA-64",
+    "self": "https://jira.example.com/rest/api/2/issue/11970438"
+  }
+}

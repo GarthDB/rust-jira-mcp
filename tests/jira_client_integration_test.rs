@@ -253,7 +253,7 @@ async fn test_jira_client_configuration_validation() {
 
     // Test with invalid configuration (empty API URL)
     let invalid_config = JiraConfig {
-        api_base_url: "".to_string(),
+        api_base_url: String::new(),
         email: "test@example.com".to_string(),
         personal_access_token: "test-token".to_string(),
         default_project: Some("TEST".to_string()),
@@ -349,7 +349,7 @@ async fn test_jira_client_http_client_configuration() {
     let http_client = client.http_client();
 
     // Test that the HTTP client is properly configured
-    let _http_client = http_client;
+    let _ = http_client;
 
     // Test that we can access the client's configuration
     assert_eq!(
@@ -374,8 +374,7 @@ async fn test_jira_client_retry_status_codes() {
     for code in retry_codes {
         assert!(
             JiraClient::should_retry(code),
-            "Status code {} should be retryable",
-            code
+            "Status code {code} should be retryable"
         );
     }
 
@@ -393,8 +392,7 @@ async fn test_jira_client_retry_status_codes() {
     for code in non_retry_codes {
         assert!(
             !JiraClient::should_retry(code),
-            "Status code {} should not be retryable",
-            code
+            "Status code {code} should not be retryable"
         );
     }
 }

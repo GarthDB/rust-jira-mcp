@@ -36,9 +36,13 @@ pub fn create_test_user(
     email: Option<&str>,
 ) -> JiraUser {
     JiraUser {
-        account_id: account_id.unwrap_or("test-user-123").to_string(),
-        display_name: display_name.unwrap_or("Test User").to_string(),
+        self_url: "https://jira.example.com/rest/api/2/user?username=testuser".to_string(),
+        name: "testuser".to_string(),
+        key: "testuser".to_string(),
+        account_id: account_id.map(ToString::to_string),
         email_address: email.map(ToString::to_string),
+        avatar_urls: None,
+        display_name: display_name.unwrap_or("Test User").to_string(),
         active: true,
         time_zone: Some("UTC".to_string()),
     }
@@ -53,6 +57,7 @@ pub fn create_test_project(id: Option<&str>, key: Option<&str>, name: Option<&st
         name: name.unwrap_or("Test Project").to_string(),
         project_type_key: "software".to_string(),
         self_url: "https://test-jira.example.com/rest/api/2/project/10000".to_string(),
+        avatar_urls: None,
     }
 }
 
@@ -64,11 +69,13 @@ pub fn create_test_status(
     category: Option<&str>,
 ) -> JiraStatus {
     JiraStatus {
+        self_url: "https://test-jira.example.com/rest/api/2/status/1".to_string(),
         id: id.unwrap_or("1").to_string(),
         name: name.unwrap_or("To Do").to_string(),
         description: Some("Test status description".to_string()),
         icon_url: Some("https://test-jira.example.com/images/icons/statuses/todo.svg".to_string()),
         status_category: JiraStatusCategory {
+            self_url: "https://test-jira.example.com/rest/api/2/statuscategory/2".to_string(),
             id: 2,
             key: category.unwrap_or("new").to_string(),
             color_name: "blue-gray".to_string(),
@@ -81,6 +88,7 @@ pub fn create_test_status(
 #[must_use]
 pub fn create_test_priority(id: Option<&str>, name: Option<&str>) -> JiraPriority {
     JiraPriority {
+        self_url: "https://test-jira.example.com/rest/api/2/priority/3".to_string(),
         id: id.unwrap_or("3").to_string(),
         name: name.unwrap_or("Medium").to_string(),
         description: Some("Medium priority".to_string()),
@@ -98,6 +106,7 @@ pub fn create_test_issue_type(
     subtask: Option<bool>,
 ) -> JiraIssueType {
     JiraIssueType {
+        self_url: "https://test-jira.example.com/rest/api/2/issuetype/10001".to_string(),
         id: id.unwrap_or("10001").to_string(),
         name: name.unwrap_or("Story").to_string(),
         description: Some("Test issue type description".to_string()),
@@ -105,6 +114,7 @@ pub fn create_test_issue_type(
             "https://test-jira.example.com/images/icons/issuetypes/story.svg".to_string(),
         ),
         subtask: subtask.unwrap_or(false),
+        avatar_id: Some(10001),
     }
 }
 

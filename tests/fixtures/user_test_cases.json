@@ -1,0 +1,44 @@
+{
+  "minimal_user": {
+    "active": true,
+    "displayName": "Test User",
+    "key": "testuser",
+    "name": "testuser",
+    "self": "https://jira.example.com/rest/api/2/user?username=testuser"
+  },
+  "user_with_email": {
+    "active": true,
+    "displayName": "Test User 2",
+    "emailAddress": "testuser2@example.com",
+    "key": "testuser2",
+    "name": "testuser2",
+    "self": "https://jira.example.com/rest/api/2/user?username=testuser2",
+    "timeZone": "UTC"
+  },
+  "valid_user": {
+    "active": true,
+    "applicationRoles": {
+      "items": [],
+      "size": 1
+    },
+    "avatarUrls": {
+      "16x16": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000",
+      "24x24": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000",
+      "32x32": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000",
+      "48x48": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000"
+    },
+    "deleted": false,
+    "displayName": "Test User 240",
+    "emailAddress": "testuser1@example.com",
+    "expand": "groups,applicationRoles",
+    "groups": {
+      "items": [],
+      "size": 10
+    },
+    "key": "user1",
+    "locale": "en_US",
+    "name": "user1",
+    "self": "https://jira.example.com/rest/api/2/user?username=garthdb",
+    "timeZone": "America/Boise"
+  }
+}

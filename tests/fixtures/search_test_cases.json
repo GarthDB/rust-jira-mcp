@@ -1,0 +1,801 @@
+{
+  "empty_search_result": {
+    "expand": "names,schema",
+    "issues": [],
+    "maxResults": 50,
+    "startAt": 0,
+    "total": 0
+  },
+  "search_with_issues": {
+    "expand": "names,schema",
+    "issues": [
+      {
+        "fields": {
+          "status": {
+            "id": "10001",
+            "name": "To Do",
+            "self": "https://jira.example.com/rest/api/2/status/10001"
+          },
+          "summary": "Test Issue Summary"
+        },
+        "id": "20001",
+        "key": "TEST-1",
+        "self": "https://jira.example.com/rest/api/2/issue/TEST-1"
+      }
+    ],
+    "maxResults": 50,
+    "startAt": 0,
+    "total": 1
+  },
+  "valid_search_result": {
+    "expand": "schema,names",
+    "issues": [
+      {
+        "expand": "operations,versionedRepresentations,editmeta,changelog,renderedFields",
+        "fields": {
+          "aggregateprogress": {
+            "progress": 0,
+            "total": 0
+          },
+          "aggregatetimeestimate": null,
+          "aggregatetimeoriginalestimate": null,
+          "aggregatetimespent": null,
+          "assignee": {
+            "active": true,
+            "avatarUrls": {
+              "16x16": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000",
+              "24x24": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000",
+              "32x32": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000",
+              "48x48": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000"
+            },
+            "displayName": "Test User 239",
+            "emailAddress": "testuser71@example.com",
+            "key": "user71",
+            "name": "user71",
+            "self": "https://jira.example.com/rest/api/2/user?username=brownlee",
+            "timeZone": "America/Los_Angeles"
+          },
+          "components": [],
+          "created": "2025-06-10T19:47:39.000+0000",
+          "creator": {
+            "active": true,
+            "avatarUrls": {
+              "16x16": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000",
+              "24x24": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000",
+              "32x32": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000",
+              "48x48": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000"
+            },
+            "displayName": "Test User 239",
+            "emailAddress": "testuser71@example.com",
+            "key": "user71",
+            "name": "user71",
+            "self": "https://jira.example.com/rest/api/2/user?username=brownlee",
+            "timeZone": "America/Los_Angeles"
+          },
+          "customfield_10001": null,
+          "customfield_10002": null,
+          "customfield_10003": null,
+          "customfield_10004": null,
+          "customfield_10405": null,
+          "customfield_10407": null,
+          "customfield_10410": null,
+          "customfield_10602": null,
+          "customfield_10603": null,
+          "customfield_10802": null,
+          "customfield_10804": null,
+          "customfield_10903": null,
+          "customfield_11001": null,
+          "customfield_11002": [
+            "com.atlassian.greenhopper.service.sprint.Sprint@5c513a8e[id=203188,rapidViewId=43833,state=ACTIVE,name=Data System -9/8 to 9/26,startDate=2025-09-08T22:41:00.000Z,endDate=2025-09-26T22:41:00.000Z,completeDate=<null>,activatedDate=2025-09-10T23:10:21.871Z,sequence=203188,goal=<null>,synced=false,autoStartStop=false,incompleteIssuesDestinationId=<null>]"
+          ],
+          "customfield_11403": null,
+          "customfield_11700": null,
+          "customfield_11800": null,
+          "customfield_11901": null,
+          "customfield_11902": null,
+          "customfield_12100": null,
+          "customfield_12611": null,
+          "customfield_12801": null,
+          "customfield_13101": null,
+          "customfield_13402": null,
+          "customfield_13419": null,
+          "customfield_13805": null,
+          "customfield_14105": null,
+          "customfield_14116": null,
+          "customfield_14402": null,
+          "customfield_14601": null,
+          "customfield_14807": null,
+          "customfield_15200": "2|i3wc2m:k",
+          "customfield_15321": null,
+          "customfield_15505": null,
+          "customfield_15600": null,
+          "customfield_15900": null,
+          "customfield_15901": null,
+          "customfield_16201": null,
+          "customfield_16401": null,
+          "customfield_16402": null,
+          "customfield_16800": null,
+          "customfield_16802": null,
+          "customfield_17100": null,
+          "customfield_17502": null,
+          "customfield_18030": null,
+          "customfield_18031": null,
+          "customfield_18034": null,
+          "customfield_18201": null,
+          "customfield_18202": null,
+          "customfield_18203": null,
+          "customfield_18205": null,
+          "customfield_18208": null,
+          "customfield_18505": null,
+          "customfield_19000": null,
+          "customfield_19402": null,
+          "customfield_19907": null,
+          "customfield_20601": null,
+          "customfield_20811": null,
+          "customfield_21400": null,
+          "customfield_21401": null,
+          "customfield_21701": null,
+          "customfield_22803": null,
+          "customfield_24000": null,
+          "customfield_25800": null,
+          "customfield_25801": null,
+          "customfield_26100": null,
+          "customfield_27100": null,
+          "customfield_27501": null,
+          "customfield_27502": null,
+          "customfield_27503": null,
+          "customfield_27504": null,
+          "customfield_27900": null,
+          "customfield_28301": null,
+          "customfield_28500": null,
+          "customfield_28502": null,
+          "customfield_28503": null,
+          "customfield_28504": null,
+          "customfield_28601": null,
+          "customfield_28602": null,
+          "customfield_28603": null,
+          "customfield_28604": null,
+          "customfield_28700": null,
+          "customfield_28701": null,
+          "customfield_28703": null,
+          "customfield_28704": null,
+          "customfield_29000": null,
+          "customfield_29300": null,
+          "customfield_29301": null,
+          "customfield_29500": null,
+          "customfield_30300": null,
+          "customfield_30400": "{summaryBean=com.atlassian.jira.plugin.devstatus.rest.SummaryBean@5daf3f15[summary={pullrequest=com.atlassian.jira.plugin.devstatus.rest.SummaryItemBean@3769eb76[overall=PullRequestOverallBean{stateCount=0, state='OPEN', details=PullRequestOverallDetails{openCount=0, mergedCount=0, declinedCount=0}},byInstanceType={}], build=com.atlassian.jira.plugin.devstatus.rest.SummaryItemBean@18b45f2a[overall=com.atlassian.jira.plugin.devstatus.summary.beans.BuildOverallBean@60fe2511[failedBuildCount=0,successfulBuildCount=0,unknownBuildCount=0,count=0,lastUpdated=<null>,lastUpdatedTimestamp=<null>],byInstanceType={}], review=com.atlassian.jira.plugin.devstatus.rest.SummaryItemBean@38a4ca1e[overall=com.atlassian.jira.plugin.devstatus.summary.beans.ReviewsOverallBean@3822d3b2[stateCount=0,state=<null>,dueDate=<null>,overDue=false,count=0,lastUpdated=<null>,lastUpdatedTimestamp=<null>],byInstanceType={}], deployment-environment=com.atlassian.jira.plugin.devstatus.rest.SummaryItemBean@2559693[overall=com.atlassian.jira.plugin.devstatus.summary.beans.DeploymentOverallBean@1392ed65[topEnvironments=[],showProjects=false,successfulCount=0,count=0,lastUpdated=<null>,lastUpdatedTimestamp=<null>],byInstanceType={}], repository=com.atlassian.jira.plugin.devstatus.rest.SummaryItemBean@d782133[overall=com.atlassian.jira.plugin.devstatus.summary.beans.CommitOverallBean@23e9dc6d[count=0,lastUpdated=<null>,lastUpdatedTimestamp=<null>],byInstanceType={}], branch=com.atlassian.jira.plugin.devstatus.rest.SummaryItemBean@da6378d[overall=com.atlassian.jira.plugin.devstatus.summary.beans.BranchOverallBean@9db1a99[count=0,lastUpdated=<null>,lastUpdatedTimestamp=<null>],byInstanceType={}]},errors=[],configErrors=[]], devSummaryJson={\"cachedValue\":{\"errors\":[],\"configErrors\":[],\"summary\":{\"pullrequest\":{\"overall\":{\"count\":0,\"lastUpdated\":null,\"stateCount\":0,\"state\":\"OPEN\",\"details\":{\"openCount\":0,\"mergedCount\":0,\"declinedCount\":0,\"total\":0},\"open\":true},\"byInstanceType\":{}},\"build\":{\"overall\":{\"count\":0,\"lastUpdated\":null,\"failedBuildCount\":0,\"successfulBuildCount\":0,\"unknownBuildCount\":0},\"byInstanceType\":{}},\"review\":{\"overall\":{\"count\":0,\"lastUpdated\":null,\"stateCount\":0,\"state\":null,\"dueDate\":null,\"overDue\":false,\"completed\":false},\"byInstanceType\":{}},\"deployment-environment\":{\"overall\":{\"count\":0,\"lastUpdated\":null,\"topEnvironments\":[],\"showProjects\":false,\"successfulCount\":0},\"byInstanceType\":{}},\"repository\":{\"overall\":{\"count\":0,\"lastUpdated\":null},\"byInstanceType\":{}},\"branch\":{\"overall\":{\"count\":0,\"lastUpdated\":null},\"byInstanceType\":{}}}},\"isStale\":true}}",
+          "customfield_30500": null,
+          "customfield_30700": null,
+          "customfield_30701": null,
+          "customfield_31600": [],
+          "customfield_31601": null,
+          "customfield_35100": null,
+          "customfield_35101": null,
+          "customfield_36803": null,
+          "customfield_39738": "9223372036854775807",
+          "description": "Test issue description for DNA-213",
+          "duedate": null,
+          "environment": null,
+          "fixVersions": [],
+          "issuelinks": [
+            {
+              "id": "16087076",
+              "outwardIssue": {
+                "fields": {
+                  "issuetype": {
+                    "avatarId": 18807,
+                    "description": "Created by Jira Software - do not edit or delete. Issue type for a big user story that needs to be broken down.",
+                    "iconUrl": "https://jira.example.com/secure/viewavatar?size=xsmall&avatarId=18807&avatarType=issuetype",
+                    "id": "6",
+                    "name": "Epic",
+                    "self": "https://jira.example.com/rest/api/2/issuetype/6",
+                    "subtask": false
+                  },
+                  "priority": {
+                    "iconUrl": "https://jira.example.com/images/icons/priorities/normal.png",
+                    "id": "8",
+                    "name": "Normal",
+                    "self": "https://jira.example.com/rest/api/2/priority/8"
+                  },
+                  "status": {
+                    "description": "The issue is open and ready for the assignee to start work on it.",
+                    "iconUrl": "https://jira.example.com/images/icons/statuses/visible.png",
+                    "id": "10019",
+                    "name": "Backlog",
+                    "self": "https://jira.example.com/rest/api/2/status/10019",
+                    "statusCategory": {
+                      "colorName": "default",
+                      "id": 2,
+                      "key": "new",
+                      "name": "To Do",
+                      "self": "https://jira.example.com/rest/api/2/statuscategory/2"
+                    }
+                  },
+                  "summary": "Present a share-out to summarize the data system on-site"
+                },
+                "id": "18136180",
+                "key": "DNA-1466",
+                "self": "https://jira.example.com/rest/api/2/issue/18136180"
+              },
+              "self": "https://jira.example.com/rest/api/2/issueLink/16087076",
+              "type": {
+                "id": "10800",
+                "inward": "is child task of",
+                "name": "Child-Issue",
+                "outward": "is parent task of",
+                "self": "https://jira.example.com/rest/api/2/issueLinkType/10800"
+              }
+            },
+            {
+              "id": "16087077",
+              "outwardIssue": {
+                "fields": {
+                  "issuetype": {
+                    "avatarId": 18807,
+                    "description": "Created by Jira Software - do not edit or delete. Issue type for a big user story that needs to be broken down.",
+                    "iconUrl": "https://jira.example.com/secure/viewavatar?size=xsmall&avatarId=18807&avatarType=issuetype",
+                    "id": "6",
+                    "name": "Epic",
+                    "self": "https://jira.example.com/rest/api/2/issuetype/6",
+                    "subtask": false
+                  },
+                  "priority": {
+                    "iconUrl": "https://jira.example.com/images/icons/priorities/normal.png",
+                    "id": "8",
+                    "name": "Normal",
+                    "self": "https://jira.example.com/rest/api/2/priority/8"
+                  },
+                  "status": {
+                    "description": "The issue is open and ready for the assignee to start work on it.",
+                    "iconUrl": "https://jira.example.com/images/icons/statuses/visible.png",
+                    "id": "10019",
+                    "name": "Backlog",
+                    "self": "https://jira.example.com/rest/api/2/status/10019",
+                    "statusCategory": {
+                      "colorName": "default",
+                      "id": 2,
+                      "key": "new",
+                      "name": "To Do",
+                      "self": "https://jira.example.com/rest/api/2/statuscategory/2"
+                    }
+                  },
+                  "summary": "Develop a 'system roadmap' based on themes from on-site"
+                },
+                "id": "18136184",
+                "key": "DNA-1467",
+                "self": "https://jira.example.com/rest/api/2/issue/18136184"
+              },
+              "self": "https://jira.example.com/rest/api/2/issueLink/16087077",
+              "type": {
+                "id": "10800",
+                "inward": "is child task of",
+                "name": "Child-Issue",
+                "outward": "is parent task of",
+                "self": "https://jira.example.com/rest/api/2/issueLinkType/10800"
+              }
+            },
+            {
+              "id": "16087072",
+              "outwardIssue": {
+                "fields": {
+                  "issuetype": {
+                    "avatarId": 18807,
+                    "description": "Created by Jira Software - do not edit or delete. Issue type for a big user story that needs to be broken down.",
+                    "iconUrl": "https://jira.example.com/secure/viewavatar?size=xsmall&avatarId=18807&avatarType=issuetype",
+                    "id": "6",
+                    "name": "Epic",
+                    "self": "https://jira.example.com/rest/api/2/issuetype/6",
+                    "subtask": false
+                  },
+                  "priority": {
+                    "iconUrl": "https://jira.example.com/images/icons/priorities/normal.png",
+                    "id": "8",
+                    "name": "Normal",
+                    "self": "https://jira.example.com/rest/api/2/priority/8"
+                  },
+                  "status": {
+                    "description": "",
+                    "iconUrl": "https://jira.example.com/",
+                    "id": "10033",
+                    "name": "Done",
+                    "self": "https://jira.example.com/rest/api/2/status/10033",
+                    "statusCategory": {
+                      "colorName": "success",
+                      "id": 3,
+                      "key": "done",
+                      "name": "Done",
+                      "self": "https://jira.example.com/rest/api/2/statuscategory/3"
+                    }
+                  },
+                  "summary": "Create system governance documentation and set up initial communication structure"
+                },
+                "id": "18136167",
+                "key": "DNA-1465",
+                "self": "https://jira.example.com/rest/api/2/issue/18136167"
+              },
+              "self": "https://jira.example.com/rest/api/2/issueLink/16087072",
+              "type": {
+                "id": "10800",
+                "inward": "is child task of",
+                "name": "Child-Issue",
+                "outward": "is parent task of",
+                "self": "https://jira.example.com/rest/api/2/issueLinkType/10800"
+              }
+            },
+            {
+              "id": "16087087",
+              "outwardIssue": {
+                "fields": {
+                  "issuetype": {
+                    "avatarId": 18815,
+                    "description": "Created by Jira Software - do not edit or delete. Issue type for a user story.",
+                    "iconUrl": "https://jira.example.com/secure/viewavatar?size=xsmall&avatarId=18815&avatarType=issuetype",
+                    "id": "7",
+                    "name": "Story",
+                    "self": "https://jira.example.com/rest/api/2/issuetype/7",
+                    "subtask": false
+                  },
+                  "priority": {
+                    "iconUrl": "https://jira.example.com/images/icons/priorities/normal.png",
+                    "id": "8",
+                    "name": "Normal",
+                    "self": "https://jira.example.com/rest/api/2/priority/8"
+                  },
+                  "status": {
+                    "description": "",
+                    "iconUrl": "https://jira.example.com/",
+                    "id": "10033",
+                    "name": "Done",
+                    "self": "https://jira.example.com/rest/api/2/status/10033",
+                    "statusCategory": {
+                      "colorName": "success",
+                      "id": 3,
+                      "key": "done",
+                      "name": "Done",
+                      "self": "https://jira.example.com/rest/api/2/statuscategory/3"
+                    }
+                  },
+                  "summary": "Create an agenda for data system (tokens) on-site"
+                },
+                "id": "17553076",
+                "key": "DNA-1453",
+                "self": "https://jira.example.com/rest/api/2/issue/17553076"
+              },
+              "self": "https://jira.example.com/rest/api/2/issueLink/16087087",
+              "type": {
+                "id": "10800",
+                "inward": "is child task of",
+                "name": "Child-Issue",
+                "outward": "is parent task of",
+                "self": "https://jira.example.com/rest/api/2/issueLinkType/10800"
+              }
+            },
+            {
+              "id": "16087633",
+              "outwardIssue": {
+                "fields": {
+                  "issuetype": {
+                    "avatarId": 18815,
+                    "description": "Created by Jira Software - do not edit or delete. Issue type for a user story.",
+                    "iconUrl": "https://jira.example.com/secure/viewavatar?size=xsmall&avatarId=18815&avatarType=issuetype",
+                    "id": "7",
+                    "name": "Story",
+                    "self": "https://jira.example.com/rest/api/2/issuetype/7",
+                    "subtask": false
+                  },
+                  "priority": {
+                    "iconUrl": "https://jira.example.com/images/icons/priorities/normal.png",
+                    "id": "8",
+                    "name": "Normal",
+                    "self": "https://jira.example.com/rest/api/2/priority/8"
+                  },
+                  "status": {
+                    "description": "",
+                    "iconUrl": "https://jira.example.com/",
+                    "id": "10033",
+                    "name": "Done",
+                    "self": "https://jira.example.com/rest/api/2/status/10033",
+                    "statusCategory": {
+                      "colorName": "success",
+                      "id": 3,
+                      "key": "done",
+                      "name": "Done",
+                      "self": "https://jira.example.com/rest/api/2/statuscategory/3"
+                    }
+                  },
+                  "summary": "Get status updates from implementations on design data usage"
+                },
+                "id": "17820551",
+                "key": "DNA-1460",
+                "self": "https://jira.example.com/rest/api/2/issue/17820551"
+              },
+              "self": "https://jira.example.com/rest/api/2/issueLink/16087633",
+              "type": {
+                "id": "10800",
+                "inward": "is child task of",
+                "name": "Child-Issue",
+                "outward": "is parent task of",
+                "self": "https://jira.example.com/rest/api/2/issueLinkType/10800"
+              }
+            },
+            {
+              "id": "16087088",
+              "outwardIssue": {
+                "fields": {
+                  "issuetype": {
+                    "avatarId": 18815,
+                    "description": "Created by Jira Software - do not edit or delete. Issue type for a user story.",
+                    "iconUrl": "https://jira.example.com/secure/viewavatar?size=xsmall&avatarId=18815&avatarType=issuetype",
+                    "id": "7",
+                    "name": "Story",
+                    "self": "https://jira.example.com/rest/api/2/issuetype/7",
+                    "subtask": false
+                  },
+                  "priority": {
+                    "iconUrl": "https://jira.example.com/images/icons/priorities/normal.png",
+                    "id": "8",
+                    "name": "Normal",
+                    "self": "https://jira.example.com/rest/api/2/priority/8"
+                  },
+                  "status": {
+                    "description": "",
+                    "iconUrl": "https://jira.example.com/",
+                    "id": "10033",
+                    "name": "Done",
+                    "self": "https://jira.example.com/rest/api/2/status/10033",
+                    "statusCategory": {
+                      "colorName": "success",
+                      "id": 3,
+                      "key": "done",
+                      "name": "Done",
+                      "self": "https://jira.example.com/rest/api/2/statuscategory/3"
+                    }
+                  },
+                  "summary": "Clarify the reduce complexity strategy presentation"
+                },
+                "id": "17820552",
+                "key": "DNA-1461",
+                "self": "https://jira.example.com/rest/api/2/issue/17820552"
+              },
+              "self": "https://jira.example.com/rest/api/2/issueLink/16087088",
+              "type": {
+                "id": "10800",
+                "inward": "is child task of",
+                "name": "Child-Issue",
+                "outward": "is parent task of",
+                "self": "https://jira.example.com/rest/api/2/issueLinkType/10800"
+              }
+            }
+          ],
+          "issuetype": {
+            "avatarId": 18810,
+            "description": "",
+            "iconUrl": "https://jira.example.com/secure/viewavatar?size=xsmall&avatarId=18810&avatarType=issuetype",
+            "id": "30134",
+            "name": "Initiative",
+            "self": "https://jira.example.com/rest/api/2/issuetype/12201",
+            "subtask": false
+          },
+          "labels": [],
+          "lastViewed": "2025-09-22T21:35:33.997+0000",
+          "priority": {
+            "iconUrl": "https://jira.example.com/images/icons/priorities/normal.png",
+            "id": "30003",
+            "name": "Normal",
+            "self": "https://jira.example.com/rest/api/2/priority/8"
+          },
+          "progress": {
+            "progress": 0,
+            "total": 0
+          },
+          "project": {
+            "avatarUrls": {
+              "16x16": "https://jira.example.com/secure/projectavatar?pid=10000&avatarId=10000",
+              "24x24": "https://jira.example.com/secure/projectavatar?pid=10000&avatarId=10000",
+              "32x32": "https://jira.example.com/secure/projectavatar?pid=10000&avatarId=10000",
+              "48x48": "https://jira.example.com/secure/projectavatar?pid=10000&avatarId=10000"
+            },
+            "id": "10001",
+            "key": "TEST1",
+            "name": "Test Project 111",
+            "projectTypeKey": "software",
+            "self": "https://jira.example.com/rest/api/2/project/34107"
+          },
+          "reporter": {
+            "active": true,
+            "avatarUrls": {
+              "16x16": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000",
+              "24x24": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000",
+              "32x32": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000",
+              "48x48": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000"
+            },
+            "displayName": "Test User 239",
+            "emailAddress": "testuser71@example.com",
+            "key": "user71",
+            "name": "user71",
+            "self": "https://jira.example.com/rest/api/2/user?username=brownlee",
+            "timeZone": "America/Los_Angeles"
+          },
+          "resolution": null,
+          "resolutiondate": null,
+          "status": {
+            "description": "This issue is being actively worked on at the moment by the assignee.",
+            "iconUrl": "https://jira.example.com/images/icons/statuses/inprogress.png",
+            "id": "30010",
+            "name": "In Progress",
+            "self": "https://jira.example.com/rest/api/2/status/3",
+            "statusCategory": {
+              "colorName": "inprogress",
+              "id": 4,
+              "key": "indeterminate",
+              "name": "In Progress",
+              "self": "https://jira.example.com/rest/api/2/statuscategory/4"
+            }
+          },
+          "subtasks": [],
+          "summary": "Test Issue Summary 213",
+          "timeestimate": null,
+          "timeoriginalestimate": null,
+          "timespent": null,
+          "updated": "2025-09-22T21:28:13.000+0000",
+          "versions": [],
+          "votes": {
+            "hasVoted": false,
+            "self": "https://jira.example.com/rest/api/2/issue/DNA-1452/votes",
+            "votes": 0
+          },
+          "watches": {
+            "isWatching": false,
+            "self": "https://jira.example.com/rest/api/2/issue/DNA-1452/watchers",
+            "watchCount": 1
+          },
+          "workratio": -1
+        },
+        "id": "20360",
+        "key": "DNA-213",
+        "self": "https://jira.example.com/rest/api/2/issue/17553074"
+      },
+      {
+        "expand": "operations,versionedRepresentations,editmeta,changelog,renderedFields",
+        "fields": {
+          "aggregateprogress": {
+            "progress": 0,
+            "total": 0
+          },
+          "aggregatetimeestimate": null,
+          "aggregatetimeoriginalestimate": null,
+          "aggregatetimespent": null,
+          "assignee": {
+            "active": false,
+            "avatarUrls": {
+              "16x16": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000",
+              "24x24": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000",
+              "32x32": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000",
+              "48x48": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000"
+            },
+            "displayName": "Test User 240",
+            "emailAddress": "testuser240@example.com",
+            "key": "user240",
+            "name": "user240",
+            "self": "https://jira.example.com/rest/api/2/user?username=rosier",
+            "timeZone": "Etc/UTC"
+          },
+          "components": [],
+          "created": "2025-02-28T21:29:50.000+0000",
+          "creator": {
+            "active": false,
+            "avatarUrls": {
+              "16x16": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000",
+              "24x24": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000",
+              "32x32": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000",
+              "48x48": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000"
+            },
+            "displayName": "Test User 240",
+            "emailAddress": "testuser240@example.com",
+            "key": "user240",
+            "name": "user240",
+            "self": "https://jira.example.com/rest/api/2/user?username=rosier",
+            "timeZone": "Etc/UTC"
+          },
+          "customfield_10001": null,
+          "customfield_10002": null,
+          "customfield_10003": null,
+          "customfield_10004": null,
+          "customfield_10405": null,
+          "customfield_10407": null,
+          "customfield_10410": null,
+          "customfield_10602": null,
+          "customfield_10603": null,
+          "customfield_10802": null,
+          "customfield_10804": null,
+          "customfield_10903": null,
+          "customfield_11001": null,
+          "customfield_11002": null,
+          "customfield_11403": null,
+          "customfield_11700": null,
+          "customfield_11800": null,
+          "customfield_11801": "S2 merge comms",
+          "customfield_11802": {
+            "disabled": false,
+            "id": "10900",
+            "self": "https://jira.example.com/rest/api/2/customFieldOption/10900",
+            "value": "Done"
+          },
+          "customfield_11803": "ghx-label-10",
+          "customfield_11901": null,
+          "customfield_11902": null,
+          "customfield_12100": null,
+          "customfield_12611": null,
+          "customfield_12801": null,
+          "customfield_13101": null,
+          "customfield_13402": null,
+          "customfield_13403": null,
+          "customfield_13419": null,
+          "customfield_13700": null,
+          "customfield_13805": null,
+          "customfield_14105": null,
+          "customfield_14116": null,
+          "customfield_14402": null,
+          "customfield_14601": null,
+          "customfield_14807": null,
+          "customfield_14808": null,
+          "customfield_14809": null,
+          "customfield_15200": "2|he4nz3:",
+          "customfield_15321": null,
+          "customfield_15505": null,
+          "customfield_15600": null,
+          "customfield_15900": null,
+          "customfield_15901": null,
+          "customfield_16201": null,
+          "customfield_16401": null,
+          "customfield_16402": null,
+          "customfield_16800": null,
+          "customfield_16802": null,
+          "customfield_17100": null,
+          "customfield_17502": null,
+          "customfield_18030": null,
+          "customfield_18031": null,
+          "customfield_18034": null,
+          "customfield_18201": null,
+          "customfield_18202": null,
+          "customfield_18203": null,
+          "customfield_18205": null,
+          "customfield_18208": null,
+          "customfield_19000": null,
+          "customfield_19402": null,
+          "customfield_19907": null,
+          "customfield_20601": null,
+          "customfield_20811": null,
+          "customfield_21400": null,
+          "customfield_21401": null,
+          "customfield_21701": null,
+          "customfield_22803": null,
+          "customfield_24000": null,
+          "customfield_25800": null,
+          "customfield_25801": null,
+          "customfield_26100": null,
+          "customfield_27100": null,
+          "customfield_27501": null,
+          "customfield_27900": null,
+          "customfield_28301": null,
+          "customfield_28500": null,
+          "customfield_28502": null,
+          "customfield_28503": null,
+          "customfield_28602": null,
+          "customfield_28603": null,
+          "customfield_28604": null,
+          "customfield_28700": null,
+          "customfield_29000": null,
+          "customfield_29500": null,
+          "customfield_30001": "ghx-label-11",
+          "customfield_30300": null,
+          "customfield_30400": "{summaryBean=com.atlassian.jira.plugin.devstatus.rest.SummaryBean@18d0153d[summary={pullrequest=com.atlassian.jira.plugin.devstatus.rest.SummaryItemBean@2a086ebf[overall=PullRequestOverallBean{stateCount=0, state='OPEN', details=PullRequestOverallDetails{openCount=0, mergedCount=0, declinedCount=0}},byInstanceType={}], build=com.atlassian.jira.plugin.devstatus.rest.SummaryItemBean@4585eb1c[overall=com.atlassian.jira.plugin.devstatus.summary.beans.BuildOverallBean@2c911885[failedBuildCount=0,successfulBuildCount=0,unknownBuildCount=0,count=0,lastUpdated=<null>,lastUpdatedTimestamp=<null>],byInstanceType={}], review=com.atlassian.jira.plugin.devstatus.rest.SummaryItemBean@8825aba[overall=com.atlassian.jira.plugin.devstatus.summary.beans.ReviewsOverallBean@763b68be[stateCount=0,state=<null>,dueDate=<null>,overDue=false,count=0,lastUpdated=<null>,lastUpdatedTimestamp=<null>],byInstanceType={}], deployment-environment=com.atlassian.jira.plugin.devstatus.rest.SummaryItemBean@1c0ca06e[overall=com.atlassian.jira.plugin.devstatus.summary.beans.DeploymentOverallBean@387dc65a[topEnvironments=[],showProjects=false,successfulCount=0,count=0,lastUpdated=<null>,lastUpdatedTimestamp=<null>],byInstanceType={}], repository=com.atlassian.jira.plugin.devstatus.rest.SummaryItemBean@22301c65[overall=com.atlassian.jira.plugin.devstatus.summary.beans.CommitOverallBean@f63fe05[count=0,lastUpdated=<null>,lastUpdatedTimestamp=<null>],byInstanceType={}], branch=com.atlassian.jira.plugin.devstatus.rest.SummaryItemBean@76152057[overall=com.atlassian.jira.plugin.devstatus.summary.beans.BranchOverallBean@208c77d9[count=0,lastUpdated=<null>,lastUpdatedTimestamp=<null>],byInstanceType={}]},errors=[],configErrors=[]], devSummaryJson={\"cachedValue\":{\"errors\":[],\"configErrors\":[],\"summary\":{\"pullrequest\":{\"overall\":{\"count\":0,\"lastUpdated\":null,\"stateCount\":0,\"state\":\"OPEN\",\"details\":{\"openCount\":0,\"mergedCount\":0,\"declinedCount\":0,\"total\":0},\"open\":true},\"byInstanceType\":{}},\"build\":{\"overall\":{\"count\":0,\"lastUpdated\":null,\"failedBuildCount\":0,\"successfulBuildCount\":0,\"unknownBuildCount\":0},\"byInstanceType\":{}},\"review\":{\"overall\":{\"count\":0,\"lastUpdated\":null,\"stateCount\":0,\"state\":null,\"dueDate\":null,\"overDue\":false,\"completed\":false},\"byInstanceType\":{}},\"deployment-environment\":{\"overall\":{\"count\":0,\"lastUpdated\":null,\"topEnvironments\":[],\"showProjects\":false,\"successfulCount\":0},\"byInstanceType\":{}},\"repository\":{\"overall\":{\"count\":0,\"lastUpdated\":null},\"byInstanceType\":{}},\"branch\":{\"overall\":{\"count\":0,\"lastUpdated\":null},\"byInstanceType\":{}}}},\"isStale\":true}}",
+          "customfield_30500": null,
+          "customfield_30700": null,
+          "customfield_30701": null,
+          "customfield_31600": [],
+          "customfield_31601": null,
+          "customfield_35100": null,
+          "customfield_35101": null,
+          "customfield_36803": null,
+          "customfield_39738": "9223372036854775807",
+          "description": "Test issue description for DNA-214",
+          "duedate": null,
+          "environment": null,
+          "fixVersions": [],
+          "issuelinks": [],
+          "issuetype": {
+            "avatarId": 18807,
+            "description": "Created by Jira Software - do not edit or delete. Issue type for a big user story that needs to be broken down.",
+            "iconUrl": "https://jira.example.com/secure/viewavatar?size=xsmall&avatarId=18807&avatarType=issuetype",
+            "id": "30015",
+            "name": "Epic",
+            "self": "https://jira.example.com/rest/api/2/issuetype/6",
+            "subtask": false
+          },
+          "labels": [],
+          "lastViewed": null,
+          "priority": {
+            "iconUrl": "https://jira.example.com/images/icons/priorities/normal.png",
+            "id": "30003",
+            "name": "Normal",
+            "self": "https://jira.example.com/rest/api/2/priority/8"
+          },
+          "progress": {
+            "progress": 0,
+            "total": 0
+          },
+          "project": {
+            "avatarUrls": {
+              "16x16": "https://jira.example.com/secure/projectavatar?pid=10000&avatarId=10000",
+              "24x24": "https://jira.example.com/secure/projectavatar?pid=10000&avatarId=10000",
+              "32x32": "https://jira.example.com/secure/projectavatar?pid=10000&avatarId=10000",
+              "48x48": "https://jira.example.com/secure/projectavatar?pid=10000&avatarId=10000"
+            },
+            "id": "10001",
+            "key": "TEST1",
+            "name": "Test Project 111",
+            "projectTypeKey": "software",
+            "self": "https://jira.example.com/rest/api/2/project/34107"
+          },
+          "reporter": {
+            "active": false,
+            "avatarUrls": {
+              "16x16": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000",
+              "24x24": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000",
+              "32x32": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000",
+              "48x48": "https://jira.example.com/secure/useravatar?ownerId=anon&avatarId=10000"
+            },
+            "displayName": "Test User 240",
+            "emailAddress": "testuser240@example.com",
+            "key": "user240",
+            "name": "user240",
+            "self": "https://jira.example.com/rest/api/2/user?username=rosier",
+            "timeZone": "Etc/UTC"
+          },
+          "resolution": null,
+          "resolutiondate": null,
+          "status": {
+            "description": "This issue is being actively worked on at the moment by the assignee.",
+            "iconUrl": "https://jira.example.com/images/icons/statuses/inprogress.png",
+            "id": "30010",
+            "name": "In Progress",
+            "self": "https://jira.example.com/rest/api/2/status/3",
+            "statusCategory": {
+              "colorName": "inprogress",
+              "id": 4,
+              "key": "indeterminate",
+              "name": "In Progress",
+              "self": "https://jira.example.com/rest/api/2/statuscategory/4"
+            }
+          },
+          "subtasks": [],
+          "summary": "Test Issue Summary 214",
+          "timeestimate": null,
+          "timeoriginalestimate": null,
+          "timespent": null,
+          "updated": "2025-04-03T21:43:14.000+0000",
+          "versions": [],
+          "votes": {
+            "hasVoted": false,
+            "self": "https://jira.example.com/rest/api/2/issue/DNA-1406/votes",
+            "votes": 0
+          },
+          "watches": {
+            "isWatching": false,
+            "self": "https://jira.example.com/rest/api/2/issue/DNA-1406/watchers",
+            "watchCount": 0
+          },
+          "workratio": -1
+        },
+        "id": "20361",
+        "key": "DNA-214",
+        "self": "https://jira.example.com/rest/api/2/issue/16872059"
+      }
+    ],
+    "maxResults": 10,
+    "startAt": 0,
+    "total": 2
+  }
+}

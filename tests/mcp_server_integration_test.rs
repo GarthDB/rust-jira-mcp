@@ -27,14 +27,14 @@ async fn setup_mock_server() -> (mockito::ServerGuard, String) {
 #[tokio::test]
 async fn test_mcp_server_tool_calling_get_issue() {
     let (mut mock_server, base_url) = setup_mock_server().await;
-    let config = create_test_config(&format!("{}/rest/api/2", base_url));
+    let config = create_test_config(&format!("{base_url}/rest/api/2"));
     let server = MCPServer::new(config);
 
     // Mock the Jira API response
     let mock_response = json!({
         "id": "12345",
         "key": "TEST-123",
-        "self": format!("{}/rest/api/2/issue/12345", base_url),
+        "self": format!("{base_url}/rest/api/2/issue/12345"),
         "fields": {
             "summary": "Test Issue",
             "description": "This is a test issue",
@@ -62,22 +62,19 @@ async fn test_mcp_server_tool_calling_get_issue() {
 
     let result = server.call_tool(tool_call).await;
     // The tool call might succeed or fail depending on the implementation
-    match result {
-        Ok(tool_result) => {
-            // If successful, check the result structure
-            assert!(!tool_result.content.is_empty() || tool_result.is_error.unwrap_or(false));
-        }
-        Err(_) => {
-            // If it fails, that's also acceptable for this test
-            // This is acceptable for this test
-        }
+    if let Ok(tool_result) = result {
+        // If successful, check the result structure
+        assert!(!tool_result.content.is_empty() || tool_result.is_error.unwrap_or(false));
+    } else {
+        // If it fails, that's also acceptable for this test
+        // This is acceptable for this test
     }
 }
 
 #[tokio::test]
 async fn test_mcp_server_tool_calling_search_issues() {
     let (mut mock_server, base_url) = setup_mock_server().await;
-    let config = create_test_config(&format!("{}/rest/api/2", base_url));
+    let config = create_test_config(&format!("{base_url}/rest/api/2"));
     let server = MCPServer::new(config);
 
     // Mock the Jira API response
@@ -90,7 +87,7 @@ async fn test_mcp_server_tool_calling_search_issues() {
             {
                 "id": "12345",
                 "key": "TEST-123",
-                "self": format!("{}/rest/api/2/issue/12345", base_url),
+                "self": format!("{base_url}/rest/api/2/issue/12345"),
                 "fields": {
                     "summary": "Test Issue 1",
                     "status": {
@@ -136,22 +133,19 @@ async fn test_mcp_server_tool_calling_search_issues() {
 
     let result = server.call_tool(tool_call).await;
     // The tool call might succeed or fail depending on the implementation
-    match result {
-        Ok(tool_result) => {
-            // If successful, check the result structure
-            assert!(!tool_result.content.is_empty() || tool_result.is_error.unwrap_or(false));
-        }
-        Err(_) => {
-            // If it fails, that's also acceptable for this test
-            // This is acceptable for this test
-        }
+    if let Ok(tool_result) = result {
+        // If successful, check the result structure
+        assert!(!tool_result.content.is_empty() || tool_result.is_error.unwrap_or(false));
+    } else {
+        // If it fails, that's also acceptable for this test
+        // This is acceptable for this test
     }
 }
 
 #[tokio::test]
 async fn test_mcp_server_tool_calling_create_issue() {
     let (mut mock_server, base_url) = setup_mock_server().await;
-    let config = create_test_config(&format!("{}/rest/api/2", base_url));
+    let config = create_test_config(&format!("{base_url}/rest/api/2"));
     let server = MCPServer::new(config);
 
     // Mock the Jira API response
@@ -182,22 +176,19 @@ async fn test_mcp_server_tool_calling_create_issue() {
 
     let result = server.call_tool(tool_call).await;
     // The tool call might succeed or fail depending on the implementation
-    match result {
-        Ok(tool_result) => {
-            // If successful, check the result structure
-            assert!(!tool_result.content.is_empty() || tool_result.is_error.unwrap_or(false));
-        }
-        Err(_) => {
-            // If it fails, that's also acceptable for this test
-            // This is acceptable for this test
-        }
+    if let Ok(tool_result) = result {
+        // If successful, check the result structure
+        assert!(!tool_result.content.is_empty() || tool_result.is_error.unwrap_or(false));
+    } else {
+        // If it fails, that's also acceptable for this test
+        // This is acceptable for this test
     }
 }
 
 #[tokio::test]
 async fn test_mcp_server_tool_calling_add_comment() {
     let (mut mock_server, base_url) = setup_mock_server().await;
-    let config = create_test_config(&format!("{}/rest/api/2", base_url));
+    let config = create_test_config(&format!("{base_url}/rest/api/2"));
     let server = MCPServer::new(config);
 
     // Mock the Jira API response
@@ -232,22 +223,19 @@ async fn test_mcp_server_tool_calling_add_comment() {
 
     let result = server.call_tool(tool_call).await;
     // The tool call might succeed or fail depending on the implementation
-    match result {
-        Ok(tool_result) => {
-            // If successful, check the result structure
-            assert!(!tool_result.content.is_empty() || tool_result.is_error.unwrap_or(false));
-        }
-        Err(_) => {
-            // If it fails, that's also acceptable for this test
-            // This is acceptable for this test
-        }
+    if let Ok(tool_result) = result {
+        // If successful, check the result structure
+        assert!(!tool_result.content.is_empty() || tool_result.is_error.unwrap_or(false));
+    } else {
+        // If it fails, that's also acceptable for this test
+        // This is acceptable for this test
     }
 }
 
 #[tokio::test]
 async fn test_mcp_server_tool_calling_bulk_operations() {
     let (mut mock_server, base_url) = setup_mock_server().await;
-    let config = create_test_config(&format!("{}/rest/api/2", base_url));
+    let config = create_test_config(&format!("{base_url}/rest/api/2"));
     let server = MCPServer::new(config);
 
     // Mock the Jira API responses for bulk operations
@@ -272,22 +260,19 @@ async fn test_mcp_server_tool_calling_bulk_operations() {
 
     let result = server.call_tool(tool_call).await;
     // The bulk operations might succeed or fail depending on the implementation
-    match result {
-        Ok(tool_result) => {
-            // If successful, check the result structure
-            assert!(!tool_result.content.is_empty() || tool_result.is_error.unwrap_or(false));
-        }
-        Err(_) => {
-            // If it fails, that's also acceptable for this test
-            // This is acceptable for this test
-        }
+    if let Ok(tool_result) = result {
+        // If successful, check the result structure
+        assert!(!tool_result.content.is_empty() || tool_result.is_error.unwrap_or(false));
+    } else {
+        // If it fails, that's also acceptable for this test
+        // This is acceptable for this test
     }
 }
 
 #[tokio::test]
 async fn test_mcp_server_tool_calling_zephyr_operations() {
     let (mut mock_server, base_url) = setup_mock_server().await;
-    let config = create_test_config(&format!("{}/rest/api/2", base_url));
+    let config = create_test_config(&format!("{base_url}/rest/api/2"));
     let server = MCPServer::new(config);
 
     // Mock the Zephyr API response
@@ -330,22 +315,19 @@ async fn test_mcp_server_tool_calling_zephyr_operations() {
 
     let result = server.call_tool(tool_call).await;
     // The Zephyr operations might succeed or fail depending on the implementation
-    match result {
-        Ok(tool_result) => {
-            // If successful, check the result structure
-            assert!(!tool_result.content.is_empty() || tool_result.is_error.unwrap_or(false));
-        }
-        Err(_) => {
-            // If it fails, that's also acceptable for this test
-            // This is acceptable for this test
-        }
+    if let Ok(tool_result) = result {
+        // If successful, check the result structure
+        assert!(!tool_result.content.is_empty() || tool_result.is_error.unwrap_or(false));
+    } else {
+        // If it fails, that's also acceptable for this test
+        // This is acceptable for this test
     }
 }
 
 #[tokio::test]
 async fn test_mcp_server_tool_calling_unknown_tool() {
     let (_server, base_url) = setup_mock_server().await;
-    let config = create_test_config(&format!("{}/rest/api/2", base_url));
+    let config = create_test_config(&format!("{base_url}/rest/api/2"));
     let server = MCPServer::new(config);
 
     // Test call tool with unknown tool
@@ -364,7 +346,7 @@ async fn test_mcp_server_tool_calling_unknown_tool() {
 #[tokio::test]
 async fn test_mcp_server_tool_calling_http_error() {
     let (mut mock_server, base_url) = setup_mock_server().await;
-    let config = create_test_config(&format!("{}/rest/api/2", base_url));
+    let config = create_test_config(&format!("{base_url}/rest/api/2"));
     let server = MCPServer::new(config);
 
     // Mock HTTP error response
@@ -400,7 +382,7 @@ async fn test_mcp_server_tool_calling_http_error() {
 #[tokio::test]
 async fn test_mcp_server_tool_calling_authentication_error() {
     let (mut mock_server, base_url) = setup_mock_server().await;
-    let config = create_test_config(&format!("{}/rest/api/2", base_url));
+    let config = create_test_config(&format!("{base_url}/rest/api/2"));
     let server = MCPServer::new(config);
 
     // Mock authentication error response
@@ -436,7 +418,7 @@ async fn test_mcp_server_tool_calling_authentication_error() {
 #[tokio::test]
 async fn test_mcp_server_tool_calling_attachment_operations() {
     let (mut mock_server, base_url) = setup_mock_server().await;
-    let config = create_test_config(&format!("{}/rest/api/2", base_url));
+    let config = create_test_config(&format!("{base_url}/rest/api/2"));
     let server = MCPServer::new(config);
 
     // Mock the Jira API response for attachments
@@ -477,22 +459,19 @@ async fn test_mcp_server_tool_calling_attachment_operations() {
 
     let result = server.call_tool(tool_call).await;
     // The attachment operations might succeed or fail depending on the implementation
-    match result {
-        Ok(tool_result) => {
-            // If successful, check the result structure
-            assert!(!tool_result.content.is_empty() || tool_result.is_error.unwrap_or(false));
-        }
-        Err(_) => {
-            // If it fails, that's also acceptable for this test
-            // This is acceptable for this test
-        }
+    if let Ok(tool_result) = result {
+        // If successful, check the result structure
+        assert!(!tool_result.content.is_empty() || tool_result.is_error.unwrap_or(false));
+    } else {
+        // If it fails, that's also acceptable for this test
+        // This is acceptable for this test
     }
 }
 
 #[tokio::test]
 async fn test_mcp_server_tool_calling_worklog_operations() {
     let (mut mock_server, base_url) = setup_mock_server().await;
-    let config = create_test_config(&format!("{}/rest/api/2", base_url));
+    let config = create_test_config(&format!("{base_url}/rest/api/2"));
     let server = MCPServer::new(config);
 
     // Mock the Jira API response for work logs
@@ -529,22 +508,19 @@ async fn test_mcp_server_tool_calling_worklog_operations() {
 
     let result = server.call_tool(tool_call).await;
     // The work log operations might succeed or fail depending on the implementation
-    match result {
-        Ok(tool_result) => {
-            // If successful, check the result structure
-            assert!(!tool_result.content.is_empty() || tool_result.is_error.unwrap_or(false));
-        }
-        Err(_) => {
-            // If it fails, that's also acceptable for this test
-            // This is acceptable for this test
-        }
+    if let Ok(tool_result) = result {
+        // If successful, check the result structure
+        assert!(!tool_result.content.is_empty() || tool_result.is_error.unwrap_or(false));
+    } else {
+        // If it fails, that's also acceptable for this test
+        // This is acceptable for this test
     }
 }
 
 #[tokio::test]
 async fn test_mcp_server_tool_calling_watcher_operations() {
     let (mut mock_server, base_url) = setup_mock_server().await;
-    let config = create_test_config(&format!("{}/rest/api/2", base_url));
+    let config = create_test_config(&format!("{base_url}/rest/api/2"));
     let server = MCPServer::new(config);
 
     // Mock the Jira API response for watchers
@@ -582,22 +558,19 @@ async fn test_mcp_server_tool_calling_watcher_operations() {
 
     let result = server.call_tool(tool_call).await;
     // The watcher operations might succeed or fail depending on the implementation
-    match result {
-        Ok(tool_result) => {
-            // If successful, check the result structure
-            assert!(!tool_result.content.is_empty() || tool_result.is_error.unwrap_or(false));
-        }
-        Err(_) => {
-            // If it fails, that's also acceptable for this test
-            // This is acceptable for this test
-        }
+    if let Ok(tool_result) = result {
+        // If successful, check the result structure
+        assert!(!tool_result.content.is_empty() || tool_result.is_error.unwrap_or(false));
+    } else {
+        // If it fails, that's also acceptable for this test
+        // This is acceptable for this test
     }
 }
 
 #[tokio::test]
 async fn test_mcp_server_tool_calling_label_operations() {
     let (mut mock_server, base_url) = setup_mock_server().await;
-    let config = create_test_config(&format!("{}/rest/api/2", base_url));
+    let config = create_test_config(&format!("{base_url}/rest/api/2"));
     let server = MCPServer::new(config);
 
     // Mock the Jira API response for labels
@@ -629,22 +602,19 @@ async fn test_mcp_server_tool_calling_label_operations() {
 
     let result = server.call_tool(tool_call).await;
     // The label operations might succeed or fail depending on the implementation
-    match result {
-        Ok(tool_result) => {
-            // If successful, check the result structure
-            assert!(!tool_result.content.is_empty() || tool_result.is_error.unwrap_or(false));
-        }
-        Err(_) => {
-            // If it fails, that's also acceptable for this test
-            // This is acceptable for this test
-        }
+    if let Ok(tool_result) = result {
+        // If successful, check the result structure
+        assert!(!tool_result.content.is_empty() || tool_result.is_error.unwrap_or(false));
+    } else {
+        // If it fails, that's also acceptable for this test
+        // This is acceptable for this test
     }
 }
 
 #[tokio::test]
 async fn test_mcp_server_tool_calling_component_operations() {
     let (mut mock_server, base_url) = setup_mock_server().await;
-    let config = create_test_config(&format!("{}/rest/api/2", base_url));
+    let config = create_test_config(&format!("{base_url}/rest/api/2"));
     let server = MCPServer::new(config);
 
     // Mock the Jira API response for components
@@ -675,14 +645,11 @@ async fn test_mcp_server_tool_calling_component_operations() {
 
     let result = server.call_tool(tool_call).await;
     // The component operations might succeed or fail depending on the implementation
-    match result {
-        Ok(tool_result) => {
-            // If successful, check the result structure
-            assert!(!tool_result.content.is_empty() || tool_result.is_error.unwrap_or(false));
-        }
-        Err(_) => {
-            // If it fails, that's also acceptable for this test
-            // This is acceptable for this test
-        }
+    if let Ok(tool_result) = result {
+        // If successful, check the result structure
+        assert!(!tool_result.content.is_empty() || tool_result.is_error.unwrap_or(false));
+    } else {
+        // If it fails, that's also acceptable for this test
+        // This is acceptable for this test
     }
 }
