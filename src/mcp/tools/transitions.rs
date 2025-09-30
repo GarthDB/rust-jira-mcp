@@ -99,9 +99,8 @@ impl crate::mcp::server::MCPToolHandler for TransitionIssueTool {
             .transition_issue(issue_key, transition_id, comment)
             .await?;
 
-          let response_text = format!(
-            "Issue {issue_key} transitioned successfully to transition {transition_id}"
-        );
+        let response_text =
+            format!("Issue {issue_key} transitioned successfully to transition {transition_id}");
 
         Ok(MCPToolResult {
             content: vec![MCPContent::text(response_text)],

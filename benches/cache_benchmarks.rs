@@ -34,15 +34,15 @@ fn benchmark_cache_insertion(c: &mut Criterion) {
             BenchmarkId::new("moka_cache", cache_size),
             cache_size,
             |b, &cache_size| {
-        b.iter(|| {
-            let cache = MokaCache::new(cache_size as u64, Duration::from_secs(300));
-            let rt = tokio::runtime::Runtime::new().unwrap();
-            rt.block_on(async {
-                for (key, value) in &test_data[..cache_size] {
-                    cache.insert(key.clone(), value.clone()).await;
-                }
-            });
-        });
+                b.iter(|| {
+                    let cache = MokaCache::new(cache_size as u64, Duration::from_secs(300));
+                    let rt = tokio::runtime::Runtime::new().unwrap();
+                    rt.block_on(async {
+                        for (key, value) in &test_data[..cache_size] {
+                            cache.insert(key.clone(), value.clone()).await;
+                        }
+                    });
+                });
             },
         );
     }
@@ -102,7 +102,11 @@ fn benchmark_cache_hit_rates(c: &mut Criterion) {
 
                         // Simulate different hit rates
                         let total_requests = 1000;
-                        #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation, clippy::cast_precision_loss)]
+                        #[allow(
+                            clippy::cast_sign_loss,
+                            clippy::cast_possible_truncation,
+                            clippy::cast_precision_loss
+                        )]
                         let hits = (total_requests as f64 * hit_rate) as usize;
 
                         for i in 0..total_requests {

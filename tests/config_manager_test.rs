@@ -576,12 +576,12 @@ async fn test_config_source_serialization() {
 
         // Compare by matching the variants since PartialEq is not implemented
         match (&source, &deserialized) {
-            (ConfigSource::Default, ConfigSource::Default) | 
-            (ConfigSource::Environment, ConfigSource::Environment) | 
-            (ConfigSource::DotEnv, ConfigSource::DotEnv) => {}
-            (ConfigSource::Toml(path1), ConfigSource::Toml(path2)) | 
-            (ConfigSource::Yaml(path1), ConfigSource::Yaml(path2)) | 
-            (ConfigSource::Json(path1), ConfigSource::Json(path2)) => assert_eq!(path1, path2),
+            (ConfigSource::Default, ConfigSource::Default)
+            | (ConfigSource::Environment, ConfigSource::Environment)
+            | (ConfigSource::DotEnv, ConfigSource::DotEnv) => {}
+            (ConfigSource::Toml(path1), ConfigSource::Toml(path2))
+            | (ConfigSource::Yaml(path1), ConfigSource::Yaml(path2))
+            | (ConfigSource::Json(path1), ConfigSource::Json(path2)) => assert_eq!(path1, path2),
             _ => panic!("Serialization/deserialization mismatch"),
         }
     }

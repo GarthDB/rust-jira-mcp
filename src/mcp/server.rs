@@ -36,12 +36,12 @@ use crate::mcp::tools::{
     GetLabelsTool,
     // Issue Linking Tools
     GetLinkTypesTool,
-    LinkIssuesTool,
     GetPrioritiesAndStatusesTool,
     GetProjectComponentsTool,
     GetProjectConfigTool,
     GetProjectMetadataTool,
     GetTransitionsTool,
+    LinkIssuesTool,
     MixedBulkOperationsTool,
     RemoveIssueWatcherTool,
     SearchIssuesTool,

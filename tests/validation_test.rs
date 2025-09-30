@@ -108,7 +108,8 @@ fn test_config_validation_error_serialization() {
             (
                 ConfigValidationError::MissingRequiredField(f1),
                 ConfigValidationError::MissingRequiredField(f2),
-            ) | (
+            )
+            | (
                 ConfigValidationError::ConfigFileNotFound(f1),
                 ConfigValidationError::ConfigFileNotFound(f2),
             ) => {

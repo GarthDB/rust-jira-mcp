@@ -52,7 +52,10 @@ fn parse_basic_parameters(args: &serde_json::Value) -> Result<(String, String, S
 
 /// Parse optional parameters for issue cloning
 fn parse_optional_parameters(args: &serde_json::Value) -> (Option<String>, bool, bool, bool, bool) {
-    let description = args.get("description").and_then(|v| v.as_str()).map(ToString::to_string);
+    let description = args
+        .get("description")
+        .and_then(|v| v.as_str())
+        .map(ToString::to_string);
     let copy_attachments = args
         .get("copy_attachments")
         .and_then(serde_json::Value::as_bool)
@@ -70,7 +73,13 @@ fn parse_optional_parameters(args: &serde_json::Value) -> (Option<String>, bool,
         .and_then(serde_json::Value::as_bool)
         .unwrap_or(false);
 
-    (description, copy_attachments, copy_work_logs, copy_watchers, copy_links)
+    (
+        description,
+        copy_attachments,
+        copy_work_logs,
+        copy_watchers,
+        copy_links,
+    )
 }
 
 /// Parse field mapping parameters for issue cloning
@@ -104,9 +113,7 @@ fn parse_field_mapping(args: &serde_json::Value) -> Option<crate::types::jira::J
         .and_then(|v| v.as_object())
         .map(|obj| {
             obj.iter()
-                .filter_map(|(k, v)| {
-                    v.as_str().map(|s| (k.clone(), s.to_string()))
-                })
+                .filter_map(|(k, v)| v.as_str().map(|s| (k.clone(), s.to_string())))
                 .collect()
         });
 
@@ -122,7 +129,7 @@ impl crate::mcp::server::MCPToolHandler for CloneIssueTool {
     async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
         // Parse all parameters using helper functions
         let (original_issue_key, project_key, issue_type, summary) = parse_basic_parameters(&args)?;
-        let (description, copy_attachments, copy_work_logs, copy_watchers, copy_links) = 
+        let (description, copy_attachments, copy_work_logs, copy_watchers, copy_links) =
             parse_optional_parameters(&args);
         let field_mapping = parse_field_mapping(&args);
 

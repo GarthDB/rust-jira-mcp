@@ -731,10 +731,10 @@ fn test_bulk_operation_type_serialization() {
 
         // Compare by matching the variants since PartialEq is not implemented
         match (operation_type, deserialized) {
-            (BulkOperationType::Update, BulkOperationType::Update) | 
-            (BulkOperationType::Transition, BulkOperationType::Transition) | 
-            (BulkOperationType::AddComment, BulkOperationType::AddComment) | 
-            (BulkOperationType::Mixed, BulkOperationType::Mixed) => {}
+            (BulkOperationType::Update, BulkOperationType::Update)
+            | (BulkOperationType::Transition, BulkOperationType::Transition)
+            | (BulkOperationType::AddComment, BulkOperationType::AddComment)
+            | (BulkOperationType::Mixed, BulkOperationType::Mixed) => {}
             _ => panic!("Serialization/deserialization mismatch"),
         }
     }

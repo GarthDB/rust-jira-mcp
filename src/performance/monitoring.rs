@@ -374,7 +374,9 @@ impl PerformanceMonitor {
 
     /// Clean up old alerts (older than 1 hour)
     fn cleanup_old_alerts(alerts: &mut Vec<Alert>) {
-        let cutoff_time = Instant::now().checked_sub(Duration::from_secs(3600)).unwrap(); // 1 hour
+        let cutoff_time = Instant::now()
+            .checked_sub(Duration::from_secs(3600))
+            .unwrap(); // 1 hour
         alerts.retain(|alert| alert.timestamp > cutoff_time);
     }
 
@@ -466,12 +468,13 @@ pub struct AlertStats {
     pub low_alerts: usize,
 }
 
-static GLOBAL_PERFORMANCE_MONITOR: std::sync::LazyLock<PerformanceMonitor> = std::sync::LazyLock::new(|| {
-    PerformanceMonitor::new(
-        crate::performance::get_global_metrics(),
-        AlertThresholds::default()
-    )
-});
+static GLOBAL_PERFORMANCE_MONITOR: std::sync::LazyLock<PerformanceMonitor> =
+    std::sync::LazyLock::new(|| {
+        PerformanceMonitor::new(
+            crate::performance::get_global_metrics(),
+            AlertThresholds::default(),
+        )
+    });
 
 /// Get the global performance monitor
 #[must_use]

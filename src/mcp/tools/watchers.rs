@@ -85,9 +85,7 @@ impl crate::mcp::server::MCPToolHandler for AddIssueWatcherTool {
 
         self.client.add_issue_watcher(issue_key, account_id).await?;
 
-          let response_text = format!(
-            "Watcher {account_id} added successfully to issue {issue_key}"
-        );
+        let response_text = format!("Watcher {account_id} added successfully to issue {issue_key}");
 
         Ok(MCPToolResult {
             content: vec![MCPContent::text(response_text)],
@@ -136,9 +134,8 @@ impl crate::mcp::server::MCPToolHandler for RemoveIssueWatcherTool {
             .remove_issue_watcher(issue_key, account_id)
             .await?;
 
-          let response_text = format!(
-            "Watcher {account_id} removed successfully from issue {issue_key}"
-        );
+        let response_text =
+            format!("Watcher {account_id} removed successfully from issue {issue_key}");
 
         Ok(MCPToolResult {
             content: vec![MCPContent::text(response_text)],

@@ -340,9 +340,8 @@ impl PerformanceMonitor {
     }
 }
 
-static GLOBAL_METRICS: std::sync::LazyLock<Arc<PerformanceMetrics>> = std::sync::LazyLock::new(|| {
-    Arc::new(PerformanceMetrics::new())
-});
+static GLOBAL_METRICS: std::sync::LazyLock<Arc<PerformanceMetrics>> =
+    std::sync::LazyLock::new(|| Arc::new(PerformanceMetrics::new()));
 
 /// Get the global performance metrics instance
 #[must_use]

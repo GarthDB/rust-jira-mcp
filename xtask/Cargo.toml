@@ -1,0 +1,47 @@
+[package]
+name = "xtask"
+version = "0.1.0"
+edition = "2021"
+authors = ["GarthDB <garthdb@example.com>"]
+description = "Build tasks and utilities for rust-jira-mcp"
+
+[[bin]]
+name = "xtask"
+path = "src/main.rs"
+
+[dependencies]
+# CLI argument parsing
+clap = { version = "4.0", features = ["derive"] }
+
+# Async runtime
+tokio = { version = "1.0", features = ["full"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# HTTP client
+reqwest = { version = "0.11", features = ["json", "rustls-tls"] }
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# File system operations
+walkdir = "2.0"
+
+# Process execution
+which = "4.0"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Time utilities
+chrono = { version = "0.4", features = ["serde"] }
+
+# Path utilities
+pathdiff = "0.2"
+
+# Workspace root detection
+cargo_metadata = "0.15"

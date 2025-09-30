@@ -179,9 +179,8 @@ impl crate::mcp::server::MCPToolHandler for UpdateWorkLogTool {
             .update_work_log(issue_key, work_log_id, &update_request)
             .await?;
 
-          let response_text = format!(
-            "Work log {work_log_id} updated successfully for issue {issue_key}"
-        );
+        let response_text =
+            format!("Work log {work_log_id} updated successfully for issue {issue_key}");
 
         Ok(MCPToolResult {
             content: vec![MCPContent::text(response_text)],
@@ -228,9 +227,8 @@ impl crate::mcp::server::MCPToolHandler for DeleteWorkLogTool {
 
         self.client.delete_work_log(issue_key, work_log_id).await?;
 
-          let response_text = format!(
-            "Work log {work_log_id} deleted successfully from issue {issue_key}"
-        );
+        let response_text =
+            format!("Work log {work_log_id} deleted successfully from issue {issue_key}");
 
         Ok(MCPToolResult {
             content: vec![MCPContent::text(response_text)],

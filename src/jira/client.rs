@@ -1371,22 +1371,33 @@ impl JiraClient {
             // If no specific fields are specified, use default behavior
             // Copy all fields except those in exclude_fields
             let mut fields: Vec<String> = original_fields.keys().cloned().collect();
-            
+
             // Remove excluded fields
             fields.retain(|field| !field_mapping.exclude_fields.contains(field));
-            
+
             // Always exclude system fields that shouldn't be copied
             let system_exclude_fields = vec![
-                "assignee", "reporter", "created", "updated", "status", 
-                "resolution", "resolutiondate", "worklog", "attachment",
-                "subtasks", "issuelinks", "watches", "votes"
+                "assignee",
+                "reporter",
+                "created",
+                "updated",
+                "status",
+                "resolution",
+                "resolutiondate",
+                "worklog",
+                "attachment",
+                "subtasks",
+                "issuelinks",
+                "watches",
+                "votes",
             ];
             fields.retain(|field| !system_exclude_fields.contains(&field.as_str()));
-            
+
             fields
         } else {
             // Use the specified copy_fields, but still respect exclude_fields
-            field_mapping.copy_fields
+            field_mapping
+                .copy_fields
                 .iter()
                 .filter(|field| !field_mapping.exclude_fields.contains(field))
                 .cloned()
@@ -1399,11 +1410,12 @@ impl JiraClient {
         for field_id in &fields_to_copy {
             if let Some(field_value) = original_fields.get(field_id) {
                 // Apply custom field mapping if specified
-                let target_field_id = if let Some(ref custom_mapping) = field_mapping.custom_field_mapping {
-                    custom_mapping.get(field_id).unwrap_or(field_id)
-                } else {
-                    field_id
-                };
+                let target_field_id =
+                    if let Some(ref custom_mapping) = field_mapping.custom_field_mapping {
+                        custom_mapping.get(field_id).unwrap_or(field_id)
+                    } else {
+                        field_id
+                    };
 
                 // Skip if the field is already set (e.g., summary, description)
                 if new_issue_data["fields"].get(target_field_id).is_some() {
@@ -1426,10 +1438,7 @@ impl JiraClient {
     /// # Errors
     ///
     /// Returns an error if field processing fails.
-    fn process_field_value(
-        field_id: &str,
-        field_value: &serde_json::Value,
-    ) -> serde_json::Value {
+    fn process_field_value(field_id: &str, field_value: &serde_json::Value) -> serde_json::Value {
         use serde_json::Value;
 
         // Handle different field types
