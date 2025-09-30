@@ -59,10 +59,20 @@ base64 = "0.21"
 futures = "0.3"
 async-trait = "0.1"
 
+# Performance optimization
+dashmap = "5.5"
+moka = { version = "0.12", features = ["future"] }
+bytes = "1.5"
+lazy_static = "1.4"
+
 [dev-dependencies]
 tokio-test = "0.4"
 mockito = "1.0"
 tempfile = "3.0"
+# Performance and benchmarking
+criterion = { version = "0.5", features = ["html_reports"] }
+flamegraph = "0.4"
+pprof = "0.12"
 
 [profile.release]
 opt-level = 3
