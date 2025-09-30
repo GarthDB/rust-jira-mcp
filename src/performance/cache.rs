@@ -244,7 +244,7 @@ where
 }
 
 static GLOBAL_CACHE_MANAGER: std::sync::LazyLock<CacheManager> =
-    std::sync::LazyLock::new(|| CacheManager::new());
+    std::sync::LazyLock::new(CacheManager::new);
 
 /// Get the global cache manager instance
 #[must_use]
