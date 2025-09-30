@@ -23,6 +23,7 @@ Create a `.env` file in your project root:
 ```bash
 # Required
 JIRA_EMAIL=your.email@company.com
+# Note: Jira PATs use Basic authentication (email:token), not Bearer
 JIRA_PERSONAL_ACCESS_TOKEN=your_personal_access_token_here
 
 # Optional

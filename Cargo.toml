@@ -1,6 +1,6 @@
 [package]
 name = "rust-jira-mcp"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 authors = ["GarthDB <garthdb@example.com>"]
 description = "A high-performance Rust-based MCP server for Jira API integration"
@@ -20,6 +20,7 @@ exclude = [
 [[bin]]
 name = "rust-jira-mcp"
 path = "src/main.rs"
+
 
 [dependencies]
 # MCP Protocol - using serde_json for now, will find proper MCP crate

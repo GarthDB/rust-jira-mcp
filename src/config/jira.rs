@@ -85,7 +85,11 @@ impl JiraConfig {
 
     #[must_use]
     pub fn auth_header(&self) -> String {
-        format!("Bearer {}", self.personal_access_token)
+        // Jira Personal Access Tokens require Basic authentication, not Bearer
+        // Format: Basic base64(email:token)
+        let credentials = format!("{}:{}", self.email, self.personal_access_token);
+        let encoded = base64::Engine::encode(&base64::engine::general_purpose::STANDARD, credentials);
+        format!("Basic {}", encoded)
     }
 
     #[must_use]

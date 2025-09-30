@@ -23,7 +23,7 @@ async fn test_jira_client_creation() {
         client.api_base_url(),
         "https://test-jira.example.com/rest/api/2"
     );
-    assert!(client.auth_header().contains("Bearer"));
+    assert!(client.auth_header().contains("Basic"));
     // Test that the HTTP client is configured
     let _http_client = client.http_client();
 }
@@ -57,7 +57,7 @@ async fn test_jira_client_http_methods() {
         client.api_base_url(),
         "https://test-jira.example.com/rest/api/2"
     );
-    assert!(client.auth_header().starts_with("Bearer"));
+    assert!(client.auth_header().starts_with("Basic"));
 
     // Test that the HTTP client is configured
     let _http_client = client.http_client();
@@ -93,7 +93,7 @@ async fn test_jira_client_transition_operations_structure() {
     let client = JiraClient::new(test_config()).unwrap();
 
     // Test client creation and basic configuration
-    assert!(client.auth_header().starts_with("Bearer"));
+    assert!(client.auth_header().starts_with("Basic"));
     let _client = client;
 }
 
@@ -114,7 +114,7 @@ async fn test_jira_client_metadata_operations_structure() {
     let client = JiraClient::new(test_config()).unwrap();
 
     // Test client creation and basic configuration
-    assert!(client.auth_header().contains("Bearer"));
+    assert!(client.auth_header().contains("Basic"));
     let _client = client;
 }
 
@@ -135,7 +135,7 @@ async fn test_jira_client_attachment_operations_structure() {
     let client = JiraClient::new(test_config()).unwrap();
 
     // Test client creation and basic configuration
-    assert!(client.auth_header().starts_with("Bearer"));
+    assert!(client.auth_header().starts_with("Basic"));
     let _client = client;
 }
 
@@ -156,7 +156,7 @@ async fn test_jira_client_component_operations_structure() {
     let client = JiraClient::new(test_config()).unwrap();
 
     // Test client creation and basic configuration
-    assert!(client.auth_header().contains("Bearer"));
+    assert!(client.auth_header().contains("Basic"));
     let _client = client;
 }
 
@@ -177,7 +177,7 @@ async fn test_jira_client_watcher_operations_structure() {
     let client = JiraClient::new(test_config()).unwrap();
 
     // Test client creation and basic configuration
-    assert!(client.auth_header().starts_with("Bearer"));
+    assert!(client.auth_header().starts_with("Basic"));
     let _client = client;
 }
 
@@ -198,7 +198,7 @@ async fn test_jira_client_zephyr_operations_structure() {
     let client = JiraClient::new(test_config()).unwrap();
 
     // Test client creation and basic configuration
-    assert!(client.auth_header().contains("Bearer"));
+    assert!(client.auth_header().contains("Basic"));
     let _client = client;
 }
 
@@ -219,7 +219,7 @@ async fn test_jira_client_error_handling_structure() {
     let client = JiraClient::new(test_config()).unwrap();
 
     // Test client creation and basic configuration
-    assert!(client.auth_header().starts_with("Bearer"));
+    assert!(client.auth_header().starts_with("Basic"));
     let _client = client;
 }
 
@@ -240,7 +240,7 @@ async fn test_jira_client_rate_limiting_structure() {
     let client = JiraClient::new(test_config()).unwrap();
 
     // Test client creation and basic configuration
-    assert!(client.auth_header().contains("Bearer"));
+    assert!(client.auth_header().contains("Basic"));
     let _client = client;
 }
 
@@ -286,7 +286,7 @@ async fn test_jira_client_timeout_configuration() {
         client.api_base_url(),
         "https://test-jira.example.com/rest/api/2"
     );
-    assert!(client.auth_header().starts_with("Bearer"));
+    assert!(client.auth_header().starts_with("Basic"));
 }
 
 #[tokio::test]
@@ -307,7 +307,7 @@ async fn test_jira_client_ssl_configuration() {
         client.api_base_url(),
         "https://test-jira.example.com/rest/api/2"
     );
-    assert!(client.auth_header().starts_with("Bearer"));
+    assert!(client.auth_header().starts_with("Basic"));
 }
 
 #[tokio::test]
@@ -326,9 +326,9 @@ async fn test_jira_client_auth_header_generation() {
     let client = JiraClient::new(config).unwrap();
     let auth_header = client.auth_header();
 
-    // The auth header should be a Bearer auth header
-    assert!(auth_header.starts_with("Bearer "));
-    assert!(auth_header.len() > 7); // More than just "Bearer "
+    // The auth header should be a Basic auth header
+    assert!(auth_header.starts_with("Basic "));
+    assert!(auth_header.len() > 7); // More than just "Basic "
 }
 
 #[tokio::test]

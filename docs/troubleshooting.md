@@ -82,6 +82,8 @@ RUST_LOG=debug cargo run --release
    curl -u "your.email@company.com:your_token" \
         "https://your-company.atlassian.net/rest/api/2/myself"
    ```
+   
+   **Note:** Jira Personal Access Tokens use Basic authentication (email:token), not Bearer authentication.
 
 4. **Check token permissions:**
    - Go to Jira → Account Settings → Security → API tokens

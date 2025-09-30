@@ -97,7 +97,7 @@ fn test_auth_header() {
     };
 
     let auth_header = config.auth_header();
-    assert_eq!(auth_header, "Bearer test-token-123");
+    assert_eq!(auth_header, "Basic dGVzdEBleGFtcGxlLmNvbTp0ZXN0LXRva2VuLTEyMw==");
 }
 
 #[test]
@@ -114,7 +114,7 @@ fn test_auth_header_with_empty_token() {
     };
 
     let auth_header = config.auth_header();
-    assert_eq!(auth_header, "Bearer ");
+    assert_eq!(auth_header, "Basic dGVzdEBleGFtcGxlLmNvbTo=");
 }
 
 #[test]
