@@ -282,19 +282,17 @@ fn test_jira_error_from_url_error() {
 #[test]
 fn test_result_type_alias() {
     // Test that the Result type alias works correctly
-    fn success_function() -> Result<String> {
-        Ok("success".to_string())
+    fn success_function() -> String {
+        "success".to_string()
     }
 
     fn error_function() -> Result<String> {
         Err(JiraError::api_error("test error"))
     }
 
-    assert!(success_function().is_ok());
-    assert!(error_function().is_err());
-
-    let success_result = success_function().unwrap();
+    let success_result = success_function();
     assert_eq!(success_result, "success");
+    assert!(error_function().is_err());
 
     let error_result = error_function().unwrap_err();
     match error_result {
@@ -312,7 +310,7 @@ fn test_jira_error_debug() {
         error_codes: Some(vec!["TEST_CODE".to_string()]),
     };
 
-    let debug_str = format!("{:?}", error);
+    let debug_str = format!("{error:?}");
     assert!(debug_str.contains("ApiError"));
     assert!(debug_str.contains("Test error"));
     assert!(debug_str.contains("TEST_CODE"));
@@ -325,7 +323,7 @@ fn test_jira_error_validation_debug() {
         message: "test message".to_string(),
     };
 
-    let debug_str = format!("{:?}", error);
+    let debug_str = format!("{error:?}");
     assert!(debug_str.contains("ValidationError"));
     assert!(debug_str.contains("test_field"));
     assert!(debug_str.contains("test message"));

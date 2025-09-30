@@ -155,6 +155,7 @@ impl PerformanceMetrics {
 
     /// Get current performance statistics
     #[must_use]
+    #[allow(clippy::cast_precision_loss)]
     pub fn get_stats(&self) -> PerformanceStats {
         let total_requests = self.total_requests.load(Ordering::Relaxed);
         let successful_requests = self.successful_requests.load(Ordering::Relaxed);
@@ -295,6 +296,10 @@ impl PerformanceMonitor {
     }
 
     /// Monitor an async operation
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the operation fails or if there are issues with performance monitoring.
     pub async fn monitor<F, T>(
         &self,
         operation: F,
@@ -313,6 +318,10 @@ impl PerformanceMonitor {
     }
 
     /// Monitor a sync operation
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the operation fails or if there are issues with performance monitoring.
     pub fn monitor_sync<F, T>(
         &self,
         operation: F,
@@ -331,9 +340,9 @@ impl PerformanceMonitor {
     }
 }
 
-lazy_static::lazy_static! {
-    pub static ref GLOBAL_METRICS: Arc<PerformanceMetrics> = Arc::new(PerformanceMetrics::new());
-}
+static GLOBAL_METRICS: std::sync::LazyLock<Arc<PerformanceMetrics>> = std::sync::LazyLock::new(|| {
+    Arc::new(PerformanceMetrics::new())
+});
 
 /// Get the global performance metrics instance
 #[must_use]

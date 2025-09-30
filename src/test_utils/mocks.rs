@@ -56,7 +56,7 @@ impl JiraMockBuilder {
     // --- Jira API Mocks ---
 
     /// Mock a successful issue retrieval
-    pub async fn mock_get_issue(&mut self, issue_key: &str) -> Mock {
+    pub fn mock_get_issue(&mut self, issue_key: &str) -> Mock {
         let response = json!({
             "id": "12345",
             "key": issue_key,
@@ -124,7 +124,7 @@ impl JiraMockBuilder {
     }
 
     /// Mock a 404 Not Found response for an issue
-    pub async fn mock_issue_not_found(&mut self, issue_key: &str) -> Mock {
+    pub fn mock_issue_not_found(&mut self, issue_key: &str) -> Mock {
         let response = json!({
             "errorMessages": ["Issue Does Not Exist"],
             "errors": {}
@@ -140,7 +140,7 @@ impl JiraMockBuilder {
     }
 
     /// Mock a successful issue search
-    pub async fn mock_search_issues(&mut self, jql: &str) -> Mock {
+    pub fn mock_search_issues(&mut self, jql: &str) -> Mock {
         let response = json!({
             "expand": "names,schema",
             "startAt": 0,
@@ -179,7 +179,7 @@ impl JiraMockBuilder {
     }
 
     /// Mock a successful issue creation
-    pub async fn mock_create_issue(&mut self) -> Mock {
+    pub fn mock_create_issue(&mut self) -> Mock {
         let response = json!({
             "id": "12346",
             "key": "TEST-124",
@@ -195,13 +195,13 @@ impl JiraMockBuilder {
     }
 
     /// Mock a successful issue update
-    pub async fn mock_update_issue(&mut self, issue_key: &str) -> Mock {
+    pub fn mock_update_issue(&mut self, issue_key: &str) -> Mock {
         let path = format!("/rest/api/2/issue/{issue_key}");
         self.server.mock("PUT", &*path).with_status(204).create()
     }
 
     /// Mock a successful comment creation
-    pub async fn mock_add_comment(&mut self, issue_key: &str) -> Mock {
+    pub fn mock_add_comment(&mut self, issue_key: &str) -> Mock {
         let response = json!({
             "id": "10001",
             "body": "Test comment",
@@ -225,7 +225,7 @@ impl JiraMockBuilder {
     }
 
     /// Mock a successful retrieval of comments
-    pub async fn mock_get_comments(&mut self, issue_key: &str) -> Mock {
+    pub fn mock_get_comments(&mut self, issue_key: &str) -> Mock {
         let response = json!({
             "comments": [
                 {
@@ -253,7 +253,7 @@ impl JiraMockBuilder {
     }
 
     /// Mock a successful retrieval of transitions
-    pub async fn mock_get_transitions(&mut self, issue_key: &str) -> Mock {
+    pub fn mock_get_transitions(&mut self, issue_key: &str) -> Mock {
         let response = json!({
             "transitions": [
                 {
@@ -279,13 +279,13 @@ impl JiraMockBuilder {
     }
 
     /// Mock a successful issue transition
-    pub async fn mock_transition_issue(&mut self, issue_key: &str) -> Mock {
+    pub fn mock_transition_issue(&mut self, issue_key: &str) -> Mock {
         let path = format!("/rest/api/2/issue/{issue_key}/transitions");
         self.server.mock("POST", &*path).with_status(204).create()
     }
 
     /// Mock a server error (500)
-    pub async fn mock_server_error(&mut self, endpoint: &str) -> Mock {
+    pub fn mock_server_error(&mut self, endpoint: &str) -> Mock {
         let response = json!({
             "errorMessages": ["Internal Server Error"],
             "errors": {}
@@ -300,7 +300,7 @@ impl JiraMockBuilder {
     }
 
     /// Mock a timeout error
-    pub async fn mock_timeout(&mut self, endpoint: &str) -> Mock {
+    pub fn mock_timeout(&mut self, endpoint: &str) -> Mock {
         self.server
             .mock("GET", endpoint)
             .with_status(408)
@@ -310,7 +310,7 @@ impl JiraMockBuilder {
     }
 
     /// Mock authentication failure
-    pub async fn mock_auth_failure(&mut self, endpoint: &str) -> Mock {
+    pub fn mock_auth_failure(&mut self, endpoint: &str) -> Mock {
         let response = json!({
             "errorMessages": ["You do not have permission to view this issue"],
             "errors": {}
@@ -344,6 +344,6 @@ pub async fn create_mock_client() -> (JiraMockBuilder, JiraClient) {
 pub async fn create_mock_with_issue(issue_key: &str) -> (JiraMockBuilder, JiraClient, Mock) {
     let mut mock_builder = JiraMockBuilder::new().await;
     let client = mock_builder.create_client();
-    let mock = mock_builder.mock_get_issue(issue_key).await;
+    let mock = mock_builder.mock_get_issue(issue_key);
     (mock_builder, client, mock)
 }

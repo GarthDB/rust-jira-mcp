@@ -203,7 +203,7 @@ impl crate::mcp::server::MCPToolHandler for UpdateIssueTool {
 
         self.client.update_issue(issue_key, &update_data).await?;
 
-        let response_text = format!("Issue {} updated successfully", issue_key);
+        let response_text = format!("Issue {issue_key} updated successfully");
 
         Ok(MCPToolResult {
             content: vec![MCPContent::text(response_text)],
@@ -268,6 +268,76 @@ impl crate::mcp::server::MCPToolHandler for GetIssueTool {
             assignee,
             self.client.api_base_url().replace("/rest/api/2", ""),
             issue.key
+        );
+
+        Ok(MCPToolResult {
+            content: vec![MCPContent::text(response_text)],
+            is_error: Some(false),
+        })
+    }
+}
+
+/// Link two Jira issues
+pub struct LinkIssuesTool {
+    client: JiraClient,
+}
+
+impl LinkIssuesTool {
+    #[must_use]
+    /// # Panics
+    /// This function does not panic.
+    pub fn new(config: JiraConfig) -> Self {
+        Self {
+            client: JiraClient::new(config).expect("Failed to create JiraClient"),
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl crate::mcp::server::MCPToolHandler for LinkIssuesTool {
+    async fn handle(&self, args: serde_json::Value) -> Result<MCPToolResult> {
+        let inward_issue_key = args
+            .get("inward_issue_key")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: inward_issue_key")
+            })?;
+
+        let outward_issue_key = args
+            .get("outward_issue_key")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: outward_issue_key")
+            })?;
+
+        let link_type_name = args
+            .get("link_type_name")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| {
+                crate::error::JiraError::api_error("Missing required parameter: link_type_name")
+            })?;
+
+        let comment = args.get("comment").and_then(|v| v.as_str());
+
+        info!(
+            "Linking issues: {} {} {}",
+            inward_issue_key, link_type_name, outward_issue_key
+        );
+
+        self.client
+            .link_issues(inward_issue_key, outward_issue_key, link_type_name, comment)
+            .await?;
+
+        let response_text = format!(
+            "Successfully linked {} {} {}{}",
+            inward_issue_key,
+            link_type_name,
+            outward_issue_key,
+            if comment.is_some() {
+                " with comment"
+            } else {
+                ""
+            }
         );
 
         Ok(MCPToolResult {

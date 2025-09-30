@@ -11,6 +11,9 @@ pub struct GetIssueWatchersTool {
 
 impl GetIssueWatchersTool {
     #[must_use]
+    /// # Panics
+    ///
+    /// Panics if the `JiraClient` cannot be created from the provided configuration.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -51,6 +54,9 @@ pub struct AddIssueWatcherTool {
 
 impl AddIssueWatcherTool {
     #[must_use]
+    /// # Panics
+    ///
+    /// Panics if the `JiraClient` cannot be created from the provided configuration.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -79,9 +85,8 @@ impl crate::mcp::server::MCPToolHandler for AddIssueWatcherTool {
 
         self.client.add_issue_watcher(issue_key, account_id).await?;
 
-        let response_text = format!(
-            "Watcher {} added successfully to issue {}",
-            account_id, issue_key
+          let response_text = format!(
+            "Watcher {account_id} added successfully to issue {issue_key}"
         );
 
         Ok(MCPToolResult {
@@ -98,6 +103,9 @@ pub struct RemoveIssueWatcherTool {
 
 impl RemoveIssueWatcherTool {
     #[must_use]
+    /// # Panics
+    ///
+    /// Panics if the `JiraClient` cannot be created from the provided configuration.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -128,9 +136,8 @@ impl crate::mcp::server::MCPToolHandler for RemoveIssueWatcherTool {
             .remove_issue_watcher(issue_key, account_id)
             .await?;
 
-        let response_text = format!(
-            "Watcher {} removed successfully from issue {}",
-            account_id, issue_key
+          let response_text = format!(
+            "Watcher {account_id} removed successfully from issue {issue_key}"
         );
 
         Ok(MCPToolResult {

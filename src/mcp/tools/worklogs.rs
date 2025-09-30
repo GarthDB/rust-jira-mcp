@@ -11,6 +11,9 @@ pub struct GetIssueWorkLogsTool {
 
 impl GetIssueWorkLogsTool {
     #[must_use]
+    /// # Panics
+    ///
+    /// Panics if the `JiraClient` cannot be created from the provided configuration.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -60,6 +63,9 @@ pub struct AddWorkLogTool {
 
 impl AddWorkLogTool {
     #[must_use]
+    /// # Panics
+    ///
+    /// Panics if the `JiraClient` cannot be created from the provided configuration.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -91,8 +97,8 @@ impl crate::mcp::server::MCPToolHandler for AddWorkLogTool {
 
         let work_log_request = crate::types::jira::JiraWorkLogCreateRequest {
             time_spent: time_spent.to_string(),
-            comment: comment.map(|c| c.to_string()),
-            started: started.map(|s| s.to_string()),
+            comment: comment.map(ToString::to_string),
+            started: started.map(ToString::to_string),
             visibility: None,
         };
 
@@ -123,6 +129,9 @@ pub struct UpdateWorkLogTool {
 
 impl UpdateWorkLogTool {
     #[must_use]
+    /// # Panics
+    ///
+    /// Panics if the `JiraClient` cannot be created from the provided configuration.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -161,8 +170,8 @@ impl crate::mcp::server::MCPToolHandler for UpdateWorkLogTool {
 
         let update_request = crate::types::jira::JiraWorkLogUpdateRequest {
             time_spent: Some(time_spent.to_string()),
-            comment: comment.map(|c| c.to_string()),
-            started: started.map(|s| s.to_string()),
+            comment: comment.map(ToString::to_string),
+            started: started.map(ToString::to_string),
             visibility: None,
         };
 
@@ -170,9 +179,8 @@ impl crate::mcp::server::MCPToolHandler for UpdateWorkLogTool {
             .update_work_log(issue_key, work_log_id, &update_request)
             .await?;
 
-        let response_text = format!(
-            "Work log {} updated successfully for issue {}",
-            work_log_id, issue_key
+          let response_text = format!(
+            "Work log {work_log_id} updated successfully for issue {issue_key}"
         );
 
         Ok(MCPToolResult {
@@ -189,6 +197,9 @@ pub struct DeleteWorkLogTool {
 
 impl DeleteWorkLogTool {
     #[must_use]
+    /// # Panics
+    ///
+    /// Panics if the `JiraClient` cannot be created from the provided configuration.
     pub fn new(config: JiraConfig) -> Self {
         Self {
             client: JiraClient::new(config).expect("Failed to create JiraClient"),
@@ -217,9 +228,8 @@ impl crate::mcp::server::MCPToolHandler for DeleteWorkLogTool {
 
         self.client.delete_work_log(issue_key, work_log_id).await?;
 
-        let response_text = format!(
-            "Work log {} deleted successfully from issue {}",
-            work_log_id, issue_key
+          let response_text = format!(
+            "Work log {work_log_id} deleted successfully from issue {issue_key}"
         );
 
         Ok(MCPToolResult {

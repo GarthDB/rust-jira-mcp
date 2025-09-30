@@ -35,6 +35,7 @@ fn test_jira_project_serialization() {
         name: "Test Project".to_string(),
         project_type_key: "software".to_string(),
         self_url: "https://example.com/rest/api/2/project/10000".to_string(),
+        avatar_urls: None,
     };
 
     let serialized = serde_json::to_string(&project).unwrap();
@@ -50,9 +51,13 @@ fn test_jira_project_serialization() {
 #[test]
 fn test_jira_user_serialization() {
     let user = JiraUser {
-        account_id: "5d5f8b8b8b8b8b8b8b8b8b8b".to_string(),
-        display_name: "John Doe".to_string(),
+        self_url: "https://jira.example.com/rest/api/2/user?username=john.doe".to_string(),
+        name: "john.doe".to_string(),
+        key: "john.doe".to_string(),
+        account_id: Some("5d5f8b8b8b8b8b8b8b8b8b8b".to_string()),
         email_address: Some("john.doe@example.com".to_string()),
+        avatar_urls: None,
+        display_name: "John Doe".to_string(),
         active: true,
         time_zone: Some("America/New_York".to_string()),
     };
@@ -70,6 +75,7 @@ fn test_jira_user_serialization() {
 #[test]
 fn test_jira_issue_type_serialization() {
     let issue_type = JiraIssueType {
+        self_url: "https://jira.example.com/rest/api/2/issuetype/10001".to_string(),
         id: "10001".to_string(),
         name: "Bug".to_string(),
         description: Some(
@@ -77,6 +83,7 @@ fn test_jira_issue_type_serialization() {
         ),
         icon_url: Some("https://example.com/icons/bug.png".to_string()),
         subtask: false,
+        avatar_id: Some(10001),
     };
 
     let serialized = serde_json::to_string(&issue_type).unwrap();
@@ -92,6 +99,7 @@ fn test_jira_issue_type_serialization() {
 #[test]
 fn test_jira_priority_serialization() {
     let priority = JiraPriority {
+        self_url: "https://jira.example.com/rest/api/2/priority/3".to_string(),
         id: "3".to_string(),
         name: "Medium".to_string(),
         description: Some("Medium priority".to_string()),
@@ -110,6 +118,7 @@ fn test_jira_priority_serialization() {
 #[test]
 fn test_jira_status_serialization() {
     let status_category = JiraStatusCategory {
+        self_url: "https://jira.example.com/rest/api/2/statuscategory/2".to_string(),
         id: 2,
         key: "new".to_string(),
         color_name: "blue-gray".to_string(),
@@ -117,6 +126,7 @@ fn test_jira_status_serialization() {
     };
 
     let status = JiraStatus {
+        self_url: "https://jira.example.com/rest/api/2/status/1".to_string(),
         id: "1".to_string(),
         name: "To Do".to_string(),
         description: Some("This issue is in the backlog".to_string()),
@@ -146,9 +156,13 @@ fn test_jira_status_serialization() {
 #[test]
 fn test_jira_comment_serialization() {
     let author = JiraUser {
-        account_id: "5d5f8b8b8b8b8b8b8b8b8b8b".to_string(),
-        display_name: "John Doe".to_string(),
+        self_url: "https://jira.example.com/rest/api/2/user?username=john.doe".to_string(),
+        name: "john.doe".to_string(),
+        key: "john.doe".to_string(),
+        account_id: Some("5d5f8b8b8b8b8b8b8b8b8b8b".to_string()),
         email_address: Some("john.doe@example.com".to_string()),
+        avatar_urls: None,
+        display_name: "John Doe".to_string(),
         active: true,
         time_zone: Some("America/New_York".to_string()),
     };
@@ -252,9 +266,13 @@ fn test_jira_search_result_serialization() {
 #[test]
 fn test_jira_work_log_serialization() {
     let author = JiraUser {
-        account_id: "5d5f8b8b8b8b8b8b8b8b8b8b".to_string(),
-        display_name: "John Doe".to_string(),
+        self_url: "https://jira.example.com/rest/api/2/user?username=john.doe".to_string(),
+        name: "john.doe".to_string(),
+        key: "john.doe".to_string(),
+        account_id: Some("5d5f8b8b8b8b8b8b8b8b8b8b".to_string()),
         email_address: Some("john.doe@example.com".to_string()),
+        avatar_urls: None,
+        display_name: "John Doe".to_string(),
         active: true,
         time_zone: Some("America/New_York".to_string()),
     };
@@ -391,7 +409,7 @@ fn test_bulk_operation_summary_success_rate() {
     let mut summary = BulkOperationSummary::new();
 
     // Test with no operations
-    assert_eq!(summary.success_rate(), 0.0);
+    assert!((summary.success_rate() - 0.0).abs() < f64::EPSILON);
 
     // Test with all successful operations
     summary.add_result(BulkOperationResult {
@@ -407,7 +425,7 @@ fn test_bulk_operation_summary_success_rate() {
         operation_type: BulkOperationType::Update,
     });
 
-    assert_eq!(summary.success_rate(), 100.0);
+    assert!((summary.success_rate() - 100.0).abs() < f64::EPSILON);
 
     // Test with mixed results
     summary.add_result(BulkOperationResult {
@@ -419,7 +437,7 @@ fn test_bulk_operation_summary_success_rate() {
 
     // Use approximate equality for floating point comparison
     let rate = summary.success_rate();
-    assert!((rate - 66.66666666666667).abs() < 0.1); // More lenient tolerance
+    assert!((rate - 66.666_666_666_666_67).abs() < 0.1); // More lenient tolerance
 }
 
 #[test]
@@ -713,9 +731,9 @@ fn test_bulk_operation_type_serialization() {
 
         // Compare by matching the variants since PartialEq is not implemented
         match (operation_type, deserialized) {
-            (BulkOperationType::Update, BulkOperationType::Update) => {}
-            (BulkOperationType::Transition, BulkOperationType::Transition) => {}
-            (BulkOperationType::AddComment, BulkOperationType::AddComment) => {}
+            (BulkOperationType::Update, BulkOperationType::Update) | 
+            (BulkOperationType::Transition, BulkOperationType::Transition) | 
+            (BulkOperationType::AddComment, BulkOperationType::AddComment) | 
             (BulkOperationType::Mixed, BulkOperationType::Mixed) => {}
             _ => panic!("Serialization/deserialization mismatch"),
         }

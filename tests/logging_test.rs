@@ -121,7 +121,7 @@ fn test_logging_config_clone() {
 #[test]
 fn test_logging_config_debug() {
     let config = LoggingConfig::default();
-    let debug_str = format!("{:?}", config);
+    let debug_str = format!("{config:?}");
     assert!(debug_str.contains("LoggingConfig"));
     assert!(debug_str.contains("Info"));
     assert!(debug_str.contains("Pretty"));
@@ -152,7 +152,7 @@ fn test_metrics_collector_clone() {
 #[test]
 fn test_metrics_collector_debug() {
     let collector = MetricsCollector::new();
-    let debug_str = format!("{:?}", collector);
+    let debug_str = format!("{collector:?}");
     assert!(debug_str.contains("MetricsCollector"));
 }
 

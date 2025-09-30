@@ -29,7 +29,7 @@ fn test_secret_manager_clone() {
 #[test]
 fn test_secret_manager_debug() {
     let manager = SecretManager::new();
-    let debug_str = format!("{:?}", manager);
+    let debug_str = format!("{manager:?}");
     assert!(debug_str.contains("SecretManager"));
 }
 
@@ -92,7 +92,7 @@ fn test_secret_value_clone() {
 #[test]
 fn test_secret_value_debug() {
     let secret = SecretValue::Plain("test-secret".to_string());
-    let debug_str = format!("{:?}", secret);
+    let debug_str = format!("{secret:?}");
     assert!(debug_str.contains("Plain"));
     assert!(debug_str.contains("test-secret"));
 }
@@ -221,7 +221,7 @@ fn test_secret_config_debug() {
         key_file: Some(PathBuf::from("/tmp/key")),
     };
 
-    let debug_str = format!("{:?}", config);
+    let debug_str = format!("{config:?}");
     assert!(debug_str.contains("SecretConfig"));
 }
 

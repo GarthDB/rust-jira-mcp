@@ -19,6 +19,10 @@ pub struct OptimizedJiraClient {
 
 impl OptimizedJiraClient {
     /// Create a new optimized Jira client
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the client configuration is invalid or if the underlying client cannot be created.
     pub fn new(config: JiraConfig) -> Result<Self> {
         let client = Client::builder()
             .timeout(config.timeout_duration())
@@ -37,6 +41,10 @@ impl OptimizedJiraClient {
     }
 
     /// Make an optimized GET request with caching
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the request fails or if there are issues with caching.
     pub async fn get_cached<T>(&self, endpoint: &str) -> Result<T>
     where
         T: DeserializeOwned + Clone + Send + Sync + Serialize + 'static,
@@ -67,6 +75,10 @@ impl OptimizedJiraClient {
     }
 
     /// Make a GET request without caching
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the request fails or if there are network/API issues.
     pub async fn get_uncached<T>(&self, endpoint: &str) -> Result<T>
     where
         T: DeserializeOwned,
@@ -75,6 +87,10 @@ impl OptimizedJiraClient {
     }
 
     /// Make a POST request with optimized serialization
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the request fails or if there are network/API issues.
     pub async fn post_optimized<T, U>(&self, endpoint: &str, body: &U) -> Result<T>
     where
         T: DeserializeOwned,
@@ -183,11 +199,13 @@ impl OptimizedJiraClient {
     }
 
     /// Get performance metrics
+    #[must_use]
     pub fn get_metrics(&self) -> Arc<PerformanceMetrics> {
         self.metrics.clone()
     }
 
     /// Get cache manager
+    #[must_use]
     pub fn get_cache_manager(&self) -> Arc<CacheManager> {
         self.cache_manager.clone()
     }
@@ -210,6 +228,7 @@ pub struct OptimizedStringBuilder {
 
 impl OptimizedStringBuilder {
     /// Create a new optimized string builder
+    #[must_use]
     pub fn new(capacity: usize) -> Self {
         Self {
             buffer: String::with_capacity(capacity),
@@ -227,16 +246,19 @@ impl OptimizedStringBuilder {
     }
 
     /// Build the final string
+    #[must_use]
     pub fn build(self) -> String {
         self.buffer
     }
 
     /// Get current length
+    #[must_use]
     pub fn len(&self) -> usize {
         self.buffer.len()
     }
 
     /// Check if empty
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         self.buffer.is_empty()
     }
@@ -252,6 +274,7 @@ pub struct MemoryTracker {
 
 impl MemoryTracker {
     /// Create a new memory tracker
+    #[must_use]
     pub fn new() -> Self {
         Self {
             peak_usage: std::sync::atomic::AtomicUsize::new(0),

@@ -1,0 +1,23 @@
+{
+  "project": {
+    "avatarUrls": {
+      "16x16": "https://jira.example.com/secure/projectavatar?size=xsmall&pid=10000&avatarId=10000",
+      "24x24": "https://jira.example.com/secure/projectavatar?size=small&pid=10000&avatarId=10000",
+      "32x32": "https://jira.example.com/secure/projectavatar?size=medium&pid=10000&avatarId=10000",
+      "48x48": "https://jira.example.com/secure/projectavatar?pid=10000&avatarId=10000"
+    },
+    "description": "Mock description for the TEST-MCP project",
+    "key": "TEST-MCP",
+    "lead": {
+      "accountId": "mock-12345",
+      "active": true,
+      "displayName": "Mock User",
+      "emailAddress": "mockuser@example.com",
+      "self": "https://jira.example.com/rest/api/2/user?username=mockuser"
+    },
+    "name": "Mock TEST-MCP Project",
+    "projectTypeKey": "software",
+    "url": "https://jira.example.com/rest/api/2/project/TEST-MCP"
+  },
+  "success": true
+}

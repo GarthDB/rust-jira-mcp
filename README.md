@@ -24,6 +24,53 @@ cp env.example .env
 cargo run --release
 ```
 
+## 🧪 Testing & Development
+
+This project includes a comprehensive xtask-based testing framework for safe development and testing:
+
+### Testing Commands
+
+```bash
+# Test MCP operations
+cargo run --package xtask -- test --suite read-only --project DNA
+cargo run --package xtask -- test --suite issues --project DNA
+cargo run --package xtask -- test --suite write --safe
+
+# Collect test fixtures from live API
+cargo run --package xtask -- collect-fixtures --project DNA
+
+# Generate synthetic test data
+cargo run --package xtask -- generate-fixtures --project TEST-MCP
+
+# Run comprehensive test suite
+cargo run --package xtask -- test-suite --project TEST-MCP
+
+# Clean up test data
+cargo run --package xtask -- cleanup --project TEST-MCP
+```
+
+### Makefile Shortcuts
+
+```bash
+# Quick test commands
+make test-readonly    # Run read-only tests
+make test-issues      # Run issue tests  
+make test-write       # Run write tests (safe project only)
+make test-suite       # Run comprehensive test suite
+make test-cleanup     # Clean up test data
+
+# Fixture management
+make collect-fixtures # Collect real API data
+make generate-fixtures # Generate synthetic data
+```
+
+### Safety Features
+
+- **Safe Testing**: Use `--safe` flag or `TEST-MCP` project for write operations
+- **Data Anonymization**: Automatic anonymization of sensitive data in fixtures
+- **Cleanup**: Automatic cleanup of test data after operations
+- **Dry Run**: Preview cleanup operations without making changes
+
 ## 📖 Documentation
 
 - **[Documentation Index](docs/README.md)** - Complete documentation overview and navigation

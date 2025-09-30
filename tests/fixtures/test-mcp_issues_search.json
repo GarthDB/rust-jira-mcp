@@ -1,0 +1,408 @@
+{
+  "expand": "schema,names",
+  "issues": [
+    {
+      "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations",
+      "fields": {
+        "assignee": {
+          "accountId": "mock-assignee-123",
+          "active": true,
+          "displayName": "Mock Assignee",
+          "emailAddress": "mockassignee@example.com",
+          "self": "https://jira.example.com/rest/api/2/user?username=mockassignee"
+        },
+        "components": [],
+        "created": "2025-09-30T18:37:44.953167+00:00",
+        "description": "This is a mock description for issue TEST-MCP-1001",
+        "fixVersions": [],
+        "issuelinks": [],
+        "issuetype": {
+          "avatarId": 18815,
+          "description": "A standard user story",
+          "iconUrl": "https://jira.example.com/secure/viewavatar?size=xsmall&avatarId=18815&avatarType=issuetype",
+          "id": "7",
+          "name": "Story",
+          "self": "https://jira.example.com/rest/api/2/issuetype/7",
+          "subtask": false
+        },
+        "labels": [
+          "mock",
+          "test",
+          "synthetic"
+        ],
+        "priority": {
+          "iconUrl": "https://jira.example.com/images/icons/priorities/normal.png",
+          "id": "8",
+          "name": "Normal",
+          "self": "https://jira.example.com/rest/api/2/priority/8"
+        },
+        "project": {
+          "id": "10000",
+          "key": "TEST-MCP",
+          "name": "Mock TEST-MCP Project",
+          "projectTypeKey": "software",
+          "self": "https://jira.example.com/rest/api/2/project/TEST-MCP"
+        },
+        "reporter": {
+          "accountId": "mock-reporter-123",
+          "active": true,
+          "displayName": "Mock Reporter",
+          "emailAddress": "mockreporter@example.com",
+          "self": "https://jira.example.com/rest/api/2/user?username=mockreporter"
+        },
+        "status": {
+          "description": "Status for In Progress",
+          "iconUrl": "https://jira.example.com/images/icons/statuses/visible.png",
+          "id": "3",
+          "name": "In Progress",
+          "self": "https://jira.example.com/rest/api/2/status/3",
+          "statusCategory": {
+            "colorName": "yellow",
+            "id": 3,
+            "key": "indeterminate",
+            "name": "In Progress",
+            "self": "https://jira.example.com/rest/api/2/statuscategory/indeterminate"
+          }
+        },
+        "summary": "Mock Issue Summary for TEST-MCP-1001",
+        "updated": "2025-09-30T18:37:44.953179+00:00",
+        "votes": {
+          "hasVoted": false,
+          "self": "https://jira.example.com/rest/api/2/issue/TEST-MCP-1001/votes",
+          "votes": 0
+        },
+        "watches": {
+          "isWatching": false,
+          "self": "https://jira.example.com/rest/api/2/issue/TEST-MCP-1001/watchers",
+          "watchCount": 0
+        }
+      },
+      "id": "10000001",
+      "key": "TEST-MCP-1001",
+      "self": "https://jira.example.com/rest/api/2/issue/TEST-MCP-1001"
+    },
+    {
+      "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations",
+      "fields": {
+        "assignee": {
+          "accountId": "mock-assignee-123",
+          "active": true,
+          "displayName": "Mock Assignee",
+          "emailAddress": "mockassignee@example.com",
+          "self": "https://jira.example.com/rest/api/2/user?username=mockassignee"
+        },
+        "components": [],
+        "created": "2025-09-30T18:37:44.953201+00:00",
+        "description": "This is a mock description for issue TEST-MCP-1002",
+        "fixVersions": [],
+        "issuelinks": [],
+        "issuetype": {
+          "avatarId": 18815,
+          "description": "A standard user story",
+          "iconUrl": "https://jira.example.com/secure/viewavatar?size=xsmall&avatarId=18815&avatarType=issuetype",
+          "id": "7",
+          "name": "Story",
+          "self": "https://jira.example.com/rest/api/2/issuetype/7",
+          "subtask": false
+        },
+        "labels": [
+          "mock",
+          "test",
+          "synthetic"
+        ],
+        "priority": {
+          "iconUrl": "https://jira.example.com/images/icons/priorities/normal.png",
+          "id": "8",
+          "name": "Normal",
+          "self": "https://jira.example.com/rest/api/2/priority/8"
+        },
+        "project": {
+          "id": "10000",
+          "key": "TEST-MCP",
+          "name": "Mock TEST-MCP Project",
+          "projectTypeKey": "software",
+          "self": "https://jira.example.com/rest/api/2/project/TEST-MCP"
+        },
+        "reporter": {
+          "accountId": "mock-reporter-123",
+          "active": true,
+          "displayName": "Mock Reporter",
+          "emailAddress": "mockreporter@example.com",
+          "self": "https://jira.example.com/rest/api/2/user?username=mockreporter"
+        },
+        "status": {
+          "description": "Status for In Progress",
+          "iconUrl": "https://jira.example.com/images/icons/statuses/visible.png",
+          "id": "3",
+          "name": "In Progress",
+          "self": "https://jira.example.com/rest/api/2/status/3",
+          "statusCategory": {
+            "colorName": "yellow",
+            "id": 3,
+            "key": "indeterminate",
+            "name": "In Progress",
+            "self": "https://jira.example.com/rest/api/2/statuscategory/indeterminate"
+          }
+        },
+        "summary": "Mock Issue Summary for TEST-MCP-1002",
+        "updated": "2025-09-30T18:37:44.953202+00:00",
+        "votes": {
+          "hasVoted": false,
+          "self": "https://jira.example.com/rest/api/2/issue/TEST-MCP-1002/votes",
+          "votes": 0
+        },
+        "watches": {
+          "isWatching": false,
+          "self": "https://jira.example.com/rest/api/2/issue/TEST-MCP-1002/watchers",
+          "watchCount": 0
+        }
+      },
+      "id": "10000002",
+      "key": "TEST-MCP-1002",
+      "self": "https://jira.example.com/rest/api/2/issue/TEST-MCP-1002"
+    },
+    {
+      "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations",
+      "fields": {
+        "assignee": {
+          "accountId": "mock-assignee-123",
+          "active": true,
+          "displayName": "Mock Assignee",
+          "emailAddress": "mockassignee@example.com",
+          "self": "https://jira.example.com/rest/api/2/user?username=mockassignee"
+        },
+        "components": [],
+        "created": "2025-09-30T18:37:44.953225+00:00",
+        "description": "This is a mock description for issue TEST-MCP-1003",
+        "fixVersions": [],
+        "issuelinks": [],
+        "issuetype": {
+          "avatarId": 18815,
+          "description": "A standard user story",
+          "iconUrl": "https://jira.example.com/secure/viewavatar?size=xsmall&avatarId=18815&avatarType=issuetype",
+          "id": "7",
+          "name": "Story",
+          "self": "https://jira.example.com/rest/api/2/issuetype/7",
+          "subtask": false
+        },
+        "labels": [
+          "mock",
+          "test",
+          "synthetic"
+        ],
+        "priority": {
+          "iconUrl": "https://jira.example.com/images/icons/priorities/normal.png",
+          "id": "8",
+          "name": "Normal",
+          "self": "https://jira.example.com/rest/api/2/priority/8"
+        },
+        "project": {
+          "id": "10000",
+          "key": "TEST-MCP",
+          "name": "Mock TEST-MCP Project",
+          "projectTypeKey": "software",
+          "self": "https://jira.example.com/rest/api/2/project/TEST-MCP"
+        },
+        "reporter": {
+          "accountId": "mock-reporter-123",
+          "active": true,
+          "displayName": "Mock Reporter",
+          "emailAddress": "mockreporter@example.com",
+          "self": "https://jira.example.com/rest/api/2/user?username=mockreporter"
+        },
+        "status": {
+          "description": "Status for In Progress",
+          "iconUrl": "https://jira.example.com/images/icons/statuses/visible.png",
+          "id": "3",
+          "name": "In Progress",
+          "self": "https://jira.example.com/rest/api/2/status/3",
+          "statusCategory": {
+            "colorName": "yellow",
+            "id": 3,
+            "key": "indeterminate",
+            "name": "In Progress",
+            "self": "https://jira.example.com/rest/api/2/statuscategory/indeterminate"
+          }
+        },
+        "summary": "Mock Issue Summary for TEST-MCP-1003",
+        "updated": "2025-09-30T18:37:44.953226+00:00",
+        "votes": {
+          "hasVoted": false,
+          "self": "https://jira.example.com/rest/api/2/issue/TEST-MCP-1003/votes",
+          "votes": 0
+        },
+        "watches": {
+          "isWatching": false,
+          "self": "https://jira.example.com/rest/api/2/issue/TEST-MCP-1003/watchers",
+          "watchCount": 0
+        }
+      },
+      "id": "10000003",
+      "key": "TEST-MCP-1003",
+      "self": "https://jira.example.com/rest/api/2/issue/TEST-MCP-1003"
+    },
+    {
+      "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations",
+      "fields": {
+        "assignee": {
+          "accountId": "mock-assignee-123",
+          "active": true,
+          "displayName": "Mock Assignee",
+          "emailAddress": "mockassignee@example.com",
+          "self": "https://jira.example.com/rest/api/2/user?username=mockassignee"
+        },
+        "components": [],
+        "created": "2025-09-30T18:37:44.953243+00:00",
+        "description": "This is a mock description for issue TEST-MCP-1004",
+        "fixVersions": [],
+        "issuelinks": [],
+        "issuetype": {
+          "avatarId": 18815,
+          "description": "A standard user story",
+          "iconUrl": "https://jira.example.com/secure/viewavatar?size=xsmall&avatarId=18815&avatarType=issuetype",
+          "id": "7",
+          "name": "Story",
+          "self": "https://jira.example.com/rest/api/2/issuetype/7",
+          "subtask": false
+        },
+        "labels": [
+          "mock",
+          "test",
+          "synthetic"
+        ],
+        "priority": {
+          "iconUrl": "https://jira.example.com/images/icons/priorities/normal.png",
+          "id": "8",
+          "name": "Normal",
+          "self": "https://jira.example.com/rest/api/2/priority/8"
+        },
+        "project": {
+          "id": "10000",
+          "key": "TEST-MCP",
+          "name": "Mock TEST-MCP Project",
+          "projectTypeKey": "software",
+          "self": "https://jira.example.com/rest/api/2/project/TEST-MCP"
+        },
+        "reporter": {
+          "accountId": "mock-reporter-123",
+          "active": true,
+          "displayName": "Mock Reporter",
+          "emailAddress": "mockreporter@example.com",
+          "self": "https://jira.example.com/rest/api/2/user?username=mockreporter"
+        },
+        "status": {
+          "description": "Status for In Progress",
+          "iconUrl": "https://jira.example.com/images/icons/statuses/visible.png",
+          "id": "3",
+          "name": "In Progress",
+          "self": "https://jira.example.com/rest/api/2/status/3",
+          "statusCategory": {
+            "colorName": "yellow",
+            "id": 3,
+            "key": "indeterminate",
+            "name": "In Progress",
+            "self": "https://jira.example.com/rest/api/2/statuscategory/indeterminate"
+          }
+        },
+        "summary": "Mock Issue Summary for TEST-MCP-1004",
+        "updated": "2025-09-30T18:37:44.953244+00:00",
+        "votes": {
+          "hasVoted": false,
+          "self": "https://jira.example.com/rest/api/2/issue/TEST-MCP-1004/votes",
+          "votes": 0
+        },
+        "watches": {
+          "isWatching": false,
+          "self": "https://jira.example.com/rest/api/2/issue/TEST-MCP-1004/watchers",
+          "watchCount": 0
+        }
+      },
+      "id": "10000004",
+      "key": "TEST-MCP-1004",
+      "self": "https://jira.example.com/rest/api/2/issue/TEST-MCP-1004"
+    },
+    {
+      "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations",
+      "fields": {
+        "assignee": {
+          "accountId": "mock-assignee-123",
+          "active": true,
+          "displayName": "Mock Assignee",
+          "emailAddress": "mockassignee@example.com",
+          "self": "https://jira.example.com/rest/api/2/user?username=mockassignee"
+        },
+        "components": [],
+        "created": "2025-09-30T18:37:44.953263+00:00",
+        "description": "This is a mock description for issue TEST-MCP-1005",
+        "fixVersions": [],
+        "issuelinks": [],
+        "issuetype": {
+          "avatarId": 18815,
+          "description": "A standard user story",
+          "iconUrl": "https://jira.example.com/secure/viewavatar?size=xsmall&avatarId=18815&avatarType=issuetype",
+          "id": "7",
+          "name": "Story",
+          "self": "https://jira.example.com/rest/api/2/issuetype/7",
+          "subtask": false
+        },
+        "labels": [
+          "mock",
+          "test",
+          "synthetic"
+        ],
+        "priority": {
+          "iconUrl": "https://jira.example.com/images/icons/priorities/normal.png",
+          "id": "8",
+          "name": "Normal",
+          "self": "https://jira.example.com/rest/api/2/priority/8"
+        },
+        "project": {
+          "id": "10000",
+          "key": "TEST-MCP",
+          "name": "Mock TEST-MCP Project",
+          "projectTypeKey": "software",
+          "self": "https://jira.example.com/rest/api/2/project/TEST-MCP"
+        },
+        "reporter": {
+          "accountId": "mock-reporter-123",
+          "active": true,
+          "displayName": "Mock Reporter",
+          "emailAddress": "mockreporter@example.com",
+          "self": "https://jira.example.com/rest/api/2/user?username=mockreporter"
+        },
+        "status": {
+          "description": "Status for In Progress",
+          "iconUrl": "https://jira.example.com/images/icons/statuses/visible.png",
+          "id": "3",
+          "name": "In Progress",
+          "self": "https://jira.example.com/rest/api/2/status/3",
+          "statusCategory": {
+            "colorName": "yellow",
+            "id": 3,
+            "key": "indeterminate",
+            "name": "In Progress",
+            "self": "https://jira.example.com/rest/api/2/statuscategory/indeterminate"
+          }
+        },
+        "summary": "Mock Issue Summary for TEST-MCP-1005",
+        "updated": "2025-09-30T18:37:44.953264+00:00",
+        "votes": {
+          "hasVoted": false,
+          "self": "https://jira.example.com/rest/api/2/issue/TEST-MCP-1005/votes",
+          "votes": 0
+        },
+        "watches": {
+          "isWatching": false,
+          "self": "https://jira.example.com/rest/api/2/issue/TEST-MCP-1005/watchers",
+          "watchCount": 0
+        }
+      },
+      "id": "10000005",
+      "key": "TEST-MCP-1005",
+      "self": "https://jira.example.com/rest/api/2/issue/TEST-MCP-1005"
+    }
+  ],
+  "maxResults": 5,
+  "startAt": 0,
+  "total": 5
+}

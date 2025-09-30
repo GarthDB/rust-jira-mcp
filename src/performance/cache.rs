@@ -206,6 +206,10 @@ where
     }
 
     /// Execute an operation with caching
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the operation fails or if there are issues with cache operations.
     pub async fn execute<F, Fut>(
         &self,
         key: String,
@@ -239,9 +243,9 @@ where
     }
 }
 
-lazy_static::lazy_static! {
-    pub static ref GLOBAL_CACHE_MANAGER: CacheManager = CacheManager::new();
-}
+static GLOBAL_CACHE_MANAGER: std::sync::LazyLock<CacheManager> = std::sync::LazyLock::new(|| {
+    CacheManager::new()
+});
 
 /// Get the global cache manager instance
 #[must_use]

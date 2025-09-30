@@ -75,7 +75,7 @@ fn test_jira_config_clone() {
 #[test]
 fn test_jira_config_debug() {
     let config = JiraConfig::default();
-    let debug_str = format!("{:?}", config);
+    let debug_str = format!("{config:?}");
 
     assert!(debug_str.contains("JiraConfig"));
     assert!(debug_str.contains("api_base_url"));
@@ -105,7 +105,7 @@ fn test_auth_header_with_empty_token() {
     let config = JiraConfig {
         api_base_url: "https://test.example.com/rest/api/2".to_string(),
         email: "test@example.com".to_string(),
-        personal_access_token: "".to_string(),
+        personal_access_token: String::new(),
         default_project: None,
         max_results: None,
         timeout_seconds: None,
@@ -190,7 +190,7 @@ fn test_validate_invalid_email() {
 fn test_validate_empty_email() {
     let config = JiraConfig {
         api_base_url: "https://test.example.com/rest/api/2".to_string(),
-        email: "".to_string(),
+        email: String::new(),
         personal_access_token: "test-token-1234567890".to_string(),
         default_project: None,
         max_results: None,

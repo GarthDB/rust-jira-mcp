@@ -69,6 +69,7 @@ pub enum AlertSeverity {
 
 impl PerformanceMonitor {
     /// Create a new performance monitor
+    #[must_use]
     pub fn new(metrics: Arc<PerformanceMetrics>, thresholds: AlertThresholds) -> Self {
         Self {
             metrics,
@@ -108,15 +109,15 @@ impl PerformanceMonitor {
                 let mut alerts_guard = alerts.write().await;
 
                 // Check for various alert conditions
-                Self::check_response_time_alert(&stats, &thresholds, &mut alerts_guard).await;
-                Self::check_success_rate_alert(&stats, &thresholds, &mut alerts_guard).await;
-                Self::check_memory_usage_alert(&stats, &thresholds, &mut alerts_guard).await;
-                Self::check_error_rate_alert(&stats, &thresholds, &mut alerts_guard).await;
-                Self::check_request_rate_alert(&stats, &thresholds, &mut alerts_guard).await;
-                Self::check_system_overload_alert(&stats, &thresholds, &mut alerts_guard).await;
+                Self::check_response_time_alert(&stats, &thresholds, &mut alerts_guard);
+                Self::check_success_rate_alert(&stats, &thresholds, &mut alerts_guard);
+                Self::check_memory_usage_alert(&stats, &thresholds, &mut alerts_guard);
+                Self::check_error_rate_alert(&stats, &thresholds, &mut alerts_guard);
+                Self::check_request_rate_alert(&stats, &thresholds, &mut alerts_guard);
+                Self::check_system_overload_alert(&stats, &thresholds, &mut alerts_guard);
 
                 // Clean up old alerts
-                Self::cleanup_old_alerts(&mut alerts_guard).await;
+                Self::cleanup_old_alerts(&mut alerts_guard);
             }
         });
     }
@@ -129,7 +130,8 @@ impl PerformanceMonitor {
     }
 
     /// Check for high response time alerts
-    async fn check_response_time_alert(
+    #[allow(clippy::cast_precision_loss)]
+    fn check_response_time_alert(
         stats: &crate::performance::PerformanceStats,
         thresholds: &AlertThresholds,
         alerts: &mut Vec<Alert>,
@@ -171,7 +173,7 @@ impl PerformanceMonitor {
     }
 
     /// Check for low success rate alerts
-    async fn check_success_rate_alert(
+    fn check_success_rate_alert(
         stats: &crate::performance::PerformanceStats,
         thresholds: &AlertThresholds,
         alerts: &mut Vec<Alert>,
@@ -208,7 +210,7 @@ impl PerformanceMonitor {
     }
 
     /// Check for high memory usage alerts
-    async fn check_memory_usage_alert(
+    fn check_memory_usage_alert(
         stats: &crate::performance::PerformanceStats,
         thresholds: &AlertThresholds,
         alerts: &mut Vec<Alert>,
@@ -254,7 +256,7 @@ impl PerformanceMonitor {
     }
 
     /// Check for high error rate alerts
-    async fn check_error_rate_alert(
+    fn check_error_rate_alert(
         stats: &crate::performance::PerformanceStats,
         thresholds: &AlertThresholds,
         alerts: &mut Vec<Alert>,
@@ -290,7 +292,7 @@ impl PerformanceMonitor {
     }
 
     /// Check for high request rate alerts
-    async fn check_request_rate_alert(
+    fn check_request_rate_alert(
         stats: &crate::performance::PerformanceStats,
         thresholds: &AlertThresholds,
         alerts: &mut Vec<Alert>,
@@ -330,7 +332,8 @@ impl PerformanceMonitor {
     }
 
     /// Check for system overload alerts
-    async fn check_system_overload_alert(
+    #[allow(clippy::cast_precision_loss)]
+    fn check_system_overload_alert(
         stats: &crate::performance::PerformanceStats,
         thresholds: &AlertThresholds,
         alerts: &mut Vec<Alert>,
@@ -370,8 +373,8 @@ impl PerformanceMonitor {
     }
 
     /// Clean up old alerts (older than 1 hour)
-    async fn cleanup_old_alerts(alerts: &mut Vec<Alert>) {
-        let cutoff_time = Instant::now() - Duration::from_secs(3600); // 1 hour
+    fn cleanup_old_alerts(alerts: &mut Vec<Alert>) {
+        let cutoff_time = Instant::now().checked_sub(Duration::from_secs(3600)).unwrap(); // 1 hour
         alerts.retain(|alert| alert.timestamp > cutoff_time);
     }
 
@@ -463,14 +466,15 @@ pub struct AlertStats {
     pub low_alerts: usize,
 }
 
-lazy_static::lazy_static! {
-    pub static ref GLOBAL_PERFORMANCE_MONITOR: PerformanceMonitor = PerformanceMonitor::new(
+static GLOBAL_PERFORMANCE_MONITOR: std::sync::LazyLock<PerformanceMonitor> = std::sync::LazyLock::new(|| {
+    PerformanceMonitor::new(
         crate::performance::get_global_metrics(),
         AlertThresholds::default()
-    );
-}
+    )
+});
 
 /// Get the global performance monitor
+#[must_use]
 pub fn get_global_performance_monitor() -> &'static PerformanceMonitor {
     &GLOBAL_PERFORMANCE_MONITOR
 }

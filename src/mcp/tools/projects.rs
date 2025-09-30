@@ -188,7 +188,7 @@ impl crate::mcp::server::MCPToolHandler for GetCustomFieldsTool {
                 .and_then(|t| t.as_str())
                 .unwrap_or("Unknown");
 
-            let field_text = format!("• {} ({}): {}\n", field_name, field_id, field_type);
+            let field_text = format!("• {field_name} ({field_id}): {field_type}\n");
             content.push(MCPContent::text(field_text));
         }
 

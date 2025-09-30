@@ -9,6 +9,14 @@ repository = "https://github.com/GarthDB/rust-jira-mcp"
 keywords = ["mcp", "jira", "api", "server", "model-context-protocol"]
 categories = ["api-bindings", "development-tools"]
 
+[workspace]
+members = [
+    "xtask"
+]
+exclude = [
+    "test_http"
+]
+
 [[bin]]
 name = "rust-jira-mcp"
 path = "src/main.rs"

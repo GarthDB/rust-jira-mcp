@@ -15,7 +15,7 @@ fn benchmark_async_task_manager(c: &mut Criterion) {
 
     let metrics = create_test_metrics();
 
-    for max_concurrent in [1, 5, 10, 20, 50].iter() {
+    for max_concurrent in &[1, 5, 10, 20, 50] {
         group.bench_with_input(
             BenchmarkId::new("task_execution", max_concurrent),
             max_concurrent,
@@ -26,8 +26,8 @@ fn benchmark_async_task_manager(c: &mut Criterion) {
                     rt.block_on(async {
                         let tasks: Vec<_> = (0..100)
                             .map(|i| {
-                                let task_id = format!("task_{}", i);
-                                let task_name = format!("Test Task {}", i);
+                                let task_id = format!("task_{i}");
+                                let task_name = format!("Test Task {i}");
                                 let task = move || async move {
                                     // Simulate some work
                                     tokio::time::sleep(Duration::from_millis(1)).await;
@@ -46,8 +46,8 @@ fn benchmark_async_task_manager(c: &mut Criterion) {
                             )
                             .await;
                         black_box(results);
-                    })
-                })
+                    });
+                });
             },
         );
     }
@@ -59,7 +59,7 @@ fn benchmark_async_rate_limiter(c: &mut Criterion) {
     let mut group = c.benchmark_group("async_rate_limiter");
     group.measurement_time(Duration::from_secs(5));
 
-    for requests_per_second in [10, 50, 100, 500].iter() {
+    for requests_per_second in &[10, 50, 100, 500] {
         group.bench_with_input(
             BenchmarkId::new("rate_limiting", requests_per_second),
             requests_per_second,
@@ -72,8 +72,8 @@ fn benchmark_async_rate_limiter(c: &mut Criterion) {
                         for _ in 0..requests_per_second {
                             rate_limiter.wait().await;
                         }
-                    })
-                })
+                    });
+                });
             },
         );
     }
@@ -85,7 +85,7 @@ fn benchmark_async_connection_pool(c: &mut Criterion) {
     let mut group = c.benchmark_group("async_connection_pool");
     group.measurement_time(Duration::from_secs(10));
 
-    for max_connections in [10, 50, 100, 200].iter() {
+    for max_connections in &[10, 50, 100, 200] {
         group.bench_with_input(
             BenchmarkId::new("connection_acquisition", max_connections),
             max_connections,
@@ -106,8 +106,8 @@ fn benchmark_async_connection_pool(c: &mut Criterion) {
                             .collect();
 
                         futures::future::join_all(handles).await;
-                    })
-                })
+                    });
+                });
             },
         );
     }
@@ -119,7 +119,7 @@ fn benchmark_concurrent_operations(c: &mut Criterion) {
     let mut group = c.benchmark_group("concurrent_operations");
     group.measurement_time(Duration::from_secs(10));
 
-    for concurrency in [1, 2, 4, 8, 16, 32].iter() {
+    for concurrency in &[1, 2, 4, 8, 16, 32] {
         group.bench_with_input(
             BenchmarkId::new("concurrent_json_parsing", concurrency),
             concurrency,
@@ -134,7 +134,7 @@ fn benchmark_concurrent_operations(c: &mut Criterion) {
                                     for j in 0..100 {
                                         let data = serde_json::json!({
                                             "id": i * 100 + j,
-                                            "name": format!("item_{}_{}", i, j),
+                                            "name": format!("item_{i}_{j}"),
                                             "data": vec![i * 100 + j; 10],
                                             "metadata": {
                                                 "created": "2024-01-01T00:00:00.000+0000",
@@ -153,8 +153,8 @@ fn benchmark_concurrent_operations(c: &mut Criterion) {
 
                         let results: Vec<_> = futures::future::join_all(handles).await;
                         black_box(results);
-                    })
-                })
+                    });
+                });
             },
         );
     }
@@ -166,7 +166,7 @@ fn benchmark_async_batching(c: &mut Criterion) {
     let mut group = c.benchmark_group("async_batching");
     group.measurement_time(Duration::from_secs(10));
 
-    for batch_size in [1, 5, 10, 20, 50].iter() {
+    for batch_size in &[1, 5, 10, 20, 50] {
         group.bench_with_input(
             BenchmarkId::new("batch_processing", batch_size),
             batch_size,
@@ -188,8 +188,8 @@ fn benchmark_async_batching(c: &mut Criterion) {
 
                         let results: Vec<_> = futures::future::join_all(handles).await;
                         black_box(results);
-                    })
-                })
+                    });
+                });
             },
         );
     }
@@ -211,7 +211,8 @@ fn benchmark_memory_allocation_patterns(c: &mut Criterion) {
                     let handle = tokio::spawn(async move {
                         let mut result = String::new();
                         for j in 0..1000 {
-                            result.push_str(&format!("item_{}_{}", i, j));
+                            use std::fmt::Write;
+                            write!(result, "item_{i}_{j}").unwrap();
                         }
                         result
                     });
@@ -220,8 +221,8 @@ fn benchmark_memory_allocation_patterns(c: &mut Criterion) {
 
                 let results: Vec<_> = futures::future::join_all(handles).await;
                 black_box(results);
-            })
-        })
+            });
+        });
     });
 
     group.bench_function("vec_operations", |b| {
@@ -243,8 +244,8 @@ fn benchmark_memory_allocation_patterns(c: &mut Criterion) {
 
                 let results: Vec<_> = futures::future::join_all(handles).await;
                 black_box(results);
-            })
-        })
+            });
+        });
     });
 
     group.finish();

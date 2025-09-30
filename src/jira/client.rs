@@ -614,7 +614,6 @@ impl JiraClient {
     /// # Errors
     ///
     /// Returns an error if the link creation fails.
-    #[allow(dead_code)]
     pub async fn link_issues(
         &self,
         inward_issue_key: &str,
@@ -1307,7 +1306,7 @@ impl JiraClient {
         clone_request: &JiraIssueCloneRequest,
     ) -> Result<JiraIssueCloneResponse> {
         // First, get the original issue
-        let _original_issue = self.get_issue(original_issue_key).await?;
+        let original_issue = self.get_issue(original_issue_key).await?;
 
         // Build the new issue data
         let mut new_issue_data = serde_json::json!({
@@ -1330,10 +1329,7 @@ impl JiraClient {
 
         // Apply field mapping
         if let Some(field_mapping) = &clone_request.field_mapping {
-            warn!(
-                "Field mapping requested but not implemented: {:?}",
-                field_mapping
-            );
+            Self::apply_field_mapping(&original_issue, &mut new_issue_data, field_mapping);
         }
 
         // Create the new issue
@@ -1351,6 +1347,128 @@ impl JiraClient {
             copied_watchers: None,
             copied_links: None,
         })
+    }
+
+    /// Apply field mapping to clone issue data
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if field mapping fails.
+    fn apply_field_mapping(
+        original_issue: &crate::types::jira::JiraIssue,
+        new_issue_data: &mut serde_json::Value,
+        field_mapping: &crate::types::jira::JiraFieldMapping,
+    ) {
+        use tracing::debug;
+
+        debug!("Applying field mapping: {:?}", field_mapping);
+
+        // Get the fields from the original issue
+        let original_fields = &original_issue.fields;
+
+        // Determine which fields to copy
+        let fields_to_copy = if field_mapping.copy_fields.is_empty() {
+            // If no specific fields are specified, use default behavior
+            // Copy all fields except those in exclude_fields
+            let mut fields: Vec<String> = original_fields.keys().cloned().collect();
+            
+            // Remove excluded fields
+            fields.retain(|field| !field_mapping.exclude_fields.contains(field));
+            
+            // Always exclude system fields that shouldn't be copied
+            let system_exclude_fields = vec![
+                "assignee", "reporter", "created", "updated", "status", 
+                "resolution", "resolutiondate", "worklog", "attachment",
+                "subtasks", "issuelinks", "watches", "votes"
+            ];
+            fields.retain(|field| !system_exclude_fields.contains(&field.as_str()));
+            
+            fields
+        } else {
+            // Use the specified copy_fields, but still respect exclude_fields
+            field_mapping.copy_fields
+                .iter()
+                .filter(|field| !field_mapping.exclude_fields.contains(field))
+                .cloned()
+                .collect()
+        };
+
+        debug!("Fields to copy: {:?}", fields_to_copy);
+
+        // Copy the specified fields
+        for field_id in &fields_to_copy {
+            if let Some(field_value) = original_fields.get(field_id) {
+                // Apply custom field mapping if specified
+                let target_field_id = if let Some(ref custom_mapping) = field_mapping.custom_field_mapping {
+                    custom_mapping.get(field_id).unwrap_or(field_id)
+                } else {
+                    field_id
+                };
+
+                // Skip if the field is already set (e.g., summary, description)
+                if new_issue_data["fields"].get(target_field_id).is_some() {
+                    debug!("Skipping field {} as it's already set", target_field_id);
+                    continue;
+                }
+
+                // Handle special field types
+                let processed_value = Self::process_field_value(field_id, field_value);
+                new_issue_data["fields"][target_field_id] = processed_value;
+                debug!("Copied field {} -> {}", field_id, target_field_id);
+            } else {
+                debug!("Field {} not found in original issue", field_id);
+            }
+        }
+    }
+
+    /// Process a field value for cloning, handling special field types
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if field processing fails.
+    fn process_field_value(
+        field_id: &str,
+        field_value: &serde_json::Value,
+    ) -> serde_json::Value {
+        use serde_json::Value;
+
+        // Handle different field types
+        match field_id {
+            // Priority field - copy the priority object
+            "priority" => {
+                if let Some(priority) = field_value.as_object() {
+                    Value::Object(priority.clone())
+                } else {
+                    field_value.clone()
+                }
+            }
+            // Labels, components, and fix versions fields - copy the array
+            "labels" | "components" | "fixVersions" => {
+                if let Some(array) = field_value.as_array() {
+                    Value::Array(array.clone())
+                } else {
+                    field_value.clone()
+                }
+            }
+            // Environment and due date fields - copy as string
+            "environment" | "duedate" => {
+                if let Some(str_value) = field_value.as_str() {
+                    Value::String(str_value.to_string())
+                } else {
+                    field_value.clone()
+                }
+            }
+            // Custom fields - copy as-is
+            _ => {
+                if field_id.starts_with("customfield_") {
+                    field_value.clone()
+                } else {
+                    // For other fields, copy as-is but log a warning for unknown fields
+                    tracing::debug!("Copying unknown field type {}: {:?}", field_id, field_value);
+                    field_value.clone()
+                }
+            }
+        }
     }
 
     // Zephyr Test Management Operations

@@ -34,7 +34,7 @@ async fn test_test_auth_tool() {
     let tool = TestAuthTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -64,7 +64,7 @@ async fn test_search_issues_tool_creation() {
     let tool = SearchIssuesTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -103,7 +103,7 @@ async fn test_create_issue_tool_creation() {
     let tool = CreateIssueTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -143,7 +143,7 @@ async fn test_update_issue_tool_creation() {
     let tool = UpdateIssueTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -166,7 +166,7 @@ async fn test_get_issue_tool_creation() {
     let tool = GetIssueTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -187,7 +187,7 @@ async fn test_get_comments_tool_creation() {
     let tool = GetCommentsTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -208,7 +208,7 @@ async fn test_add_comment_tool_creation() {
     let tool = AddCommentTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -245,7 +245,7 @@ async fn test_get_transitions_tool_creation() {
     let tool = GetTransitionsTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -266,7 +266,7 @@ async fn test_transition_issue_tool_creation() {
     let tool = TransitionIssueTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -303,7 +303,7 @@ async fn test_get_project_config_tool_creation() {
     let tool = GetProjectConfigTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -324,7 +324,7 @@ async fn test_get_project_metadata_tool_creation() {
     let tool = GetProjectMetadataTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -345,7 +345,7 @@ async fn test_get_priorities_and_statuses_tool_creation() {
     let tool = GetPrioritiesAndStatusesTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -354,7 +354,7 @@ async fn test_get_custom_fields_tool_creation() {
     let tool = GetCustomFieldsTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -363,7 +363,7 @@ async fn test_get_issue_type_metadata_tool_creation() {
     let tool = GetIssueTypeMetadataTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -384,7 +384,7 @@ async fn test_get_project_components_tool_creation() {
     let tool = GetProjectComponentsTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -405,7 +405,7 @@ async fn test_get_issue_types_tool_creation() {
     let tool = GetIssueTypesTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -426,7 +426,7 @@ async fn test_get_link_types_tool_creation() {
     let tool = GetLinkTypesTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -435,7 +435,7 @@ async fn test_get_issue_links_tool_creation() {
     let tool = GetIssueLinksTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -456,7 +456,7 @@ async fn test_create_issue_link_tool_creation() {
     let tool = CreateIssueLinkTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -477,7 +477,7 @@ async fn test_delete_issue_link_tool_creation() {
     let tool = DeleteIssueLinkTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -498,7 +498,7 @@ async fn test_get_issue_attachments_tool_creation() {
     let tool = GetIssueAttachmentsTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -519,7 +519,7 @@ async fn test_upload_attachment_tool_creation() {
     let tool = UploadAttachmentTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -540,7 +540,7 @@ async fn test_delete_attachment_tool_creation() {
     let tool = DeleteAttachmentTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -561,7 +561,7 @@ async fn test_download_attachment_tool_creation() {
     let tool = DownloadAttachmentTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -582,7 +582,7 @@ async fn test_get_issue_work_logs_tool_creation() {
     let tool = GetIssueWorkLogsTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -603,7 +603,7 @@ async fn test_add_work_log_tool_creation() {
     let tool = AddWorkLogTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -624,7 +624,7 @@ async fn test_update_work_log_tool_creation() {
     let tool = UpdateWorkLogTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -645,7 +645,7 @@ async fn test_delete_work_log_tool_creation() {
     let tool = DeleteWorkLogTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -666,7 +666,7 @@ async fn test_get_issue_watchers_tool_creation() {
     let tool = GetIssueWatchersTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -687,7 +687,7 @@ async fn test_add_issue_watcher_tool_creation() {
     let tool = AddIssueWatcherTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -708,7 +708,7 @@ async fn test_remove_issue_watcher_tool_creation() {
     let tool = RemoveIssueWatcherTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -729,7 +729,7 @@ async fn test_get_labels_tool_creation() {
     let tool = GetLabelsTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -738,7 +738,7 @@ async fn test_create_label_tool_creation() {
     let tool = CreateLabelTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -759,7 +759,7 @@ async fn test_update_label_tool_creation() {
     let tool = UpdateLabelTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -780,7 +780,7 @@ async fn test_delete_label_tool_creation() {
     let tool = DeleteLabelTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -801,7 +801,7 @@ async fn test_create_component_tool_creation() {
     let tool = CreateComponentTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -822,7 +822,7 @@ async fn test_update_component_tool_creation() {
     let tool = UpdateComponentTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -843,7 +843,7 @@ async fn test_delete_component_tool_creation() {
     let tool = DeleteComponentTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -864,7 +864,7 @@ async fn test_clone_issue_tool_creation() {
     let tool = CloneIssueTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -885,7 +885,7 @@ async fn test_bulk_update_issues_tool_creation() {
     let tool = BulkUpdateIssuesTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -906,7 +906,7 @@ async fn test_bulk_transition_issues_tool_creation() {
     let tool = BulkTransitionIssuesTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -927,7 +927,7 @@ async fn test_bulk_add_comments_tool_creation() {
     let tool = BulkAddCommentsTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]
@@ -948,7 +948,7 @@ async fn test_mixed_bulk_operations_tool_creation() {
     let tool = MixedBulkOperationsTool::new(config);
 
     // Test tool creation
-    let _tool = tool;
+    let _ = tool;
 }
 
 #[tokio::test]

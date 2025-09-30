@@ -166,7 +166,7 @@ fn test_mcp_content_text() {
 
 #[test]
 fn test_mcp_content_text_with_empty_string() {
-    let text = "".to_string();
+    let text = String::new();
     let content = MCPContent::text(text.clone());
 
     assert_eq!(content.content_type, "text");

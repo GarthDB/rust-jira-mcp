@@ -219,7 +219,7 @@ async fn test_jira_config_validation() {
     let invalid_config = JiraConfig {
         api_base_url: "invalid-url".to_string(),
         email: "invalid-email".to_string(),
-        personal_access_token: "".to_string(),
+        personal_access_token: String::new(),
         default_project: None,
         max_results: Some(0),
         timeout_seconds: Some(0),

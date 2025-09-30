@@ -108,7 +108,7 @@ async fn test_load_with_options_basic() {
     // This should work even with empty config due to defaults
     let result = manager.load_with_options(options).await;
     if let Err(ref e) = result {
-        eprintln!("Config loading failed: {}", e);
+        eprintln!("Config loading failed: {e}");
     }
     // The result might succeed or fail depending on environment
     // We just test that the function doesn't panic
@@ -167,14 +167,11 @@ async fn test_load_with_environment_variables() {
 
     let result = manager.load_with_options(options).await;
     // The result might succeed or fail depending on environment
-    match result {
-        Ok(_) => {
-            let config = manager.get_config().await;
-            assert!(!config.api_base_url.is_empty());
-        }
-        Err(_) => {
-            // Configuration loading failed - this is acceptable for this test
-        }
+    if let Ok(()) = result {
+        let config = manager.get_config().await;
+        assert!(!config.api_base_url.is_empty());
+    } else {
+        // Configuration loading failed - this is acceptable for this test
     }
 }
 
@@ -315,15 +312,12 @@ async fn test_validation_with_strict_mode() {
     let result = manager.load_with_options(options).await;
     // The result might succeed or fail depending on the current environment
     // We just verify that the method can be called
-    match result {
-        Ok(_) => {
-            let config = manager.get_config().await;
-            assert!(!config.api_base_url.is_empty());
-        }
-        Err(_) => {
-            // Validation failed as expected
-            // This is acceptable for this test
-        }
+    if let Ok(()) = result {
+        let config = manager.get_config().await;
+        assert!(!config.api_base_url.is_empty());
+    } else {
+        // Validation failed as expected
+        // This is acceptable for this test
     }
 }
 
@@ -339,15 +333,12 @@ async fn test_validation_with_non_strict_mode() {
 
     // This should succeed with default configuration
     let result = manager.load_with_options(options).await;
-    match result {
-        Ok(_) => {
-            let config = manager.get_config().await;
-            assert!(!config.api_base_url.is_empty());
-        }
-        Err(_) => {
-            // Even non-strict mode might fail in some environments
-            // This is acceptable for this test
-        }
+    if let Ok(()) = result {
+        let config = manager.get_config().await;
+        assert!(!config.api_base_url.is_empty());
+    } else {
+        // Even non-strict mode might fail in some environments
+        // This is acceptable for this test
     }
 }
 
@@ -364,15 +355,12 @@ async fn test_validation_email_format() {
 
     // Test that the validation system can be called
     let result = manager.load_with_options(options).await;
-    match result {
-        Ok(_) => {
-            let config = manager.get_config().await;
-            assert!(!config.api_base_url.is_empty());
-        }
-        Err(_) => {
-            // Validation failed as expected
-            // This is acceptable for this test
-        }
+    if let Ok(()) = result {
+        let config = manager.get_config().await;
+        assert!(!config.api_base_url.is_empty());
+    } else {
+        // Validation failed as expected
+        // This is acceptable for this test
     }
 }
 
@@ -389,15 +377,12 @@ async fn test_validation_url_format() {
 
     // Test that the validation system can be called
     let result = manager.load_with_options(options).await;
-    match result {
-        Ok(_) => {
-            let config = manager.get_config().await;
-            assert!(!config.api_base_url.is_empty());
-        }
-        Err(_) => {
-            // Validation failed as expected
-            // This is acceptable for this test
-        }
+    if let Ok(()) = result {
+        let config = manager.get_config().await;
+        assert!(!config.api_base_url.is_empty());
+    } else {
+        // Validation failed as expected
+        // This is acceptable for this test
     }
 }
 
@@ -420,16 +405,13 @@ async fn test_validation_max_results_range() {
     let result = manager.load_with_options(options).await;
     // The validation might not fail as expected due to config crate behavior
     // Just verify that the configuration loads (success or failure is acceptable)
-    match result {
-        Ok(_) => {
-            // If it succeeds, verify the config is loaded
-            let config = manager.get_config().await;
-            assert!(!config.api_base_url.is_empty());
-        }
-        Err(_) => {
-            // If it fails, that's also acceptable for this test
-            // This is acceptable for this test
-        }
+    if let Ok(()) = result {
+        // If it succeeds, verify the config is loaded
+        let config = manager.get_config().await;
+        assert!(!config.api_base_url.is_empty());
+    } else {
+        // If it fails, that's also acceptable for this test
+        // This is acceptable for this test
     }
 
     // Clean up
@@ -452,15 +434,12 @@ async fn test_validation_timeout_range() {
 
     // Test that the validation system can be called
     let result = manager.load_with_options(options).await;
-    match result {
-        Ok(_) => {
-            let config = manager.get_config().await;
-            assert!(!config.api_base_url.is_empty());
-        }
-        Err(_) => {
-            // Validation failed as expected
-            // This is acceptable for this test
-        }
+    if let Ok(()) = result {
+        let config = manager.get_config().await;
+        assert!(!config.api_base_url.is_empty());
+    } else {
+        // Validation failed as expected
+        // This is acceptable for this test
     }
 }
 
@@ -542,16 +521,13 @@ async fn test_log_file_default_setting() {
     };
 
     let result = manager.load_with_options(options).await;
-    match result {
-        Ok(_) => {
-            let config = manager.get_config().await;
-            // Log file should be set (either default or custom)
-            assert!(config.log_file.is_some());
-        }
-        Err(_) => {
-            // Configuration loading failed
-            // This is acceptable for this test
-        }
+    if let Ok(()) = result {
+        let config = manager.get_config().await;
+        // Log file should be set (either default or custom)
+        assert!(config.log_file.is_some());
+    } else {
+        // Configuration loading failed
+        // This is acceptable for this test
     }
 }
 
@@ -570,15 +546,12 @@ async fn test_log_file_preserved_when_set() {
     };
 
     let result = manager.load_with_options(options).await;
-    match result {
-        Ok(_) => {
-            let config = manager.get_config().await;
-            assert!(config.log_file.is_some());
-        }
-        Err(_) => {
-            // Configuration loading failed
-            // This is acceptable for this test
-        }
+    if let Ok(()) = result {
+        let config = manager.get_config().await;
+        assert!(config.log_file.is_some());
+    } else {
+        // Configuration loading failed
+        // This is acceptable for this test
     }
 
     // Clean up
@@ -603,11 +576,11 @@ async fn test_config_source_serialization() {
 
         // Compare by matching the variants since PartialEq is not implemented
         match (&source, &deserialized) {
-            (ConfigSource::Default, ConfigSource::Default) => {}
-            (ConfigSource::Environment, ConfigSource::Environment) => {}
+            (ConfigSource::Default, ConfigSource::Default) | 
+            (ConfigSource::Environment, ConfigSource::Environment) | 
             (ConfigSource::DotEnv, ConfigSource::DotEnv) => {}
-            (ConfigSource::Toml(path1), ConfigSource::Toml(path2)) => assert_eq!(path1, path2),
-            (ConfigSource::Yaml(path1), ConfigSource::Yaml(path2)) => assert_eq!(path1, path2),
+            (ConfigSource::Toml(path1), ConfigSource::Toml(path2)) | 
+            (ConfigSource::Yaml(path1), ConfigSource::Yaml(path2)) | 
             (ConfigSource::Json(path1), ConfigSource::Json(path2)) => assert_eq!(path1, path2),
             _ => panic!("Serialization/deserialization mismatch"),
         }
