@@ -19,33 +19,36 @@ impl Profiler {
             checkpoints: Vec::new(),
         }
     }
-    
+
     /// Add a checkpoint with a name
     pub fn checkpoint(&mut self, name: impl Into<String>) {
         let checkpoint_name = name.into();
         let now = Instant::now();
         self.checkpoints.push((checkpoint_name.clone(), now));
-        debug!("Profiler '{}' checkpoint '{}' at {:?}", self.name, checkpoint_name, now);
+        debug!(
+            "Profiler '{}' checkpoint '{}' at {:?}",
+            self.name, checkpoint_name, now
+        );
     }
-    
+
     /// Get the elapsed time since the profiler started
     #[must_use]
     pub fn elapsed(&self) -> Duration {
         self.start_time.elapsed()
     }
-    
+
     /// Get the elapsed time since the last checkpoint
     #[must_use]
     pub fn elapsed_since_last_checkpoint(&self) -> Option<Duration> {
         self.checkpoints.last().map(|(_, time)| time.elapsed())
     }
-    
+
     /// Get detailed timing information
     #[must_use]
     pub fn get_timing_report(&self) -> TimingReport {
         let total_elapsed = self.elapsed();
         let mut segments = Vec::new();
-        
+
         if self.checkpoints.is_empty() {
             segments.push(TimingSegment {
                 name: "total".to_string(),
@@ -54,25 +57,27 @@ impl Profiler {
             });
         } else {
             let mut last_time = self.start_time;
-            
+
             for (name, time) in self.checkpoints.iter() {
                 let segment_duration = time.duration_since(last_time);
-                let percentage = (segment_duration.as_nanos() as f64 / total_elapsed.as_nanos() as f64) * 100.0;
-                
+                let percentage =
+                    (segment_duration.as_nanos() as f64 / total_elapsed.as_nanos() as f64) * 100.0;
+
                 segments.push(TimingSegment {
                     name: name.clone(),
                     duration: segment_duration,
                     percentage,
                 });
-                
+
                 last_time = *time;
             }
-            
+
             // Add final segment if there's time remaining
             if last_time < Instant::now() {
                 let final_duration = Instant::now().duration_since(last_time);
-                let percentage = (final_duration.as_nanos() as f64 / total_elapsed.as_nanos() as f64) * 100.0;
-                
+                let percentage =
+                    (final_duration.as_nanos() as f64 / total_elapsed.as_nanos() as f64) * 100.0;
+
                 segments.push(TimingSegment {
                     name: "final".to_string(),
                     duration: final_duration,
@@ -80,21 +85,27 @@ impl Profiler {
                 });
             }
         }
-        
+
         TimingReport {
             profiler_name: self.name.clone(),
             total_duration: total_elapsed,
             segments,
         }
     }
-    
+
     /// Log the timing report
     pub fn log_timing_report(&self) {
         let report = self.get_timing_report();
-        info!("Profiler '{}' completed in {:?}", report.profiler_name, report.total_duration);
-        
+        info!(
+            "Profiler '{}' completed in {:?}",
+            report.profiler_name, report.total_duration
+        );
+
         for segment in &report.segments {
-            info!("  {}: {:?} ({:.1}%)", segment.name, segment.duration, segment.percentage);
+            info!(
+                "  {}: {:?} ({:.1}%)",
+                segment.name, segment.duration, segment.percentage
+            );
         }
     }
 }
@@ -151,7 +162,7 @@ impl PerformanceUtils {
         let duration = start.elapsed();
         (result, duration)
     }
-    
+
     /// Measure the execution time of an async closure
     pub async fn measure_time_async<F, T>(f: F) -> (T, Duration)
     where
@@ -162,27 +173,27 @@ impl PerformanceUtils {
         let duration = start.elapsed();
         (result, duration)
     }
-    
+
     /// Benchmark a function multiple times and return statistics
     pub fn benchmark<F, T>(iterations: usize, f: F) -> BenchmarkResult
     where
         F: Fn() -> T,
     {
         let mut durations = Vec::with_capacity(iterations);
-        
+
         for _ in 0..iterations {
             let (_, duration) = Self::measure_time(&f);
             durations.push(duration);
         }
-        
+
         durations.sort();
-        
+
         let total: Duration = durations.iter().sum();
         let average = total / durations.len() as u32;
         let min = durations[0];
         let max = durations[durations.len() - 1];
         let median = durations[durations.len() / 2];
-        
+
         BenchmarkResult {
             iterations,
             total_duration: total,
@@ -217,7 +228,7 @@ impl BenchmarkResult {
             0.0
         }
     }
-    
+
     /// Log the benchmark results
     pub fn log_results(&self, operation_name: &str) {
         info!("Benchmark Results for '{}':", operation_name);

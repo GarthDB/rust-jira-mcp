@@ -1,5 +1,5 @@
-use criterion::{black_box, criterion_group, criterion_main, Criterion, BenchmarkId};
-use rust_jira_mcp::performance::{CacheManager, MokaCache, CacheKeyGenerator, CacheStore};
+use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
+use rust_jira_mcp::performance::{CacheKeyGenerator, CacheManager, CacheStore, MokaCache};
 use serde_json::json;
 use std::sync::Arc;
 use std::time::Duration;
@@ -25,9 +25,9 @@ fn create_test_data() -> Vec<(String, serde_json::Value)> {
 fn benchmark_cache_insertion(c: &mut Criterion) {
     let mut group = c.benchmark_group("cache_insertion");
     group.measurement_time(Duration::from_secs(10));
-    
+
     let test_data = create_test_data();
-    
+
     for cache_size in [100, 500, 1000].iter() {
         group.bench_with_input(
             BenchmarkId::new("moka_cache", cache_size),
@@ -45,17 +45,17 @@ fn benchmark_cache_insertion(c: &mut Criterion) {
             },
         );
     }
-    
+
     group.finish();
 }
 
 fn benchmark_cache_retrieval(c: &mut Criterion) {
     let mut group = c.benchmark_group("cache_retrieval");
     group.measurement_time(Duration::from_secs(10));
-    
+
     let test_data = create_test_data();
     let cache_size = 1000;
-    
+
     group.bench_function("moka_cache_get", |b| {
         b.iter(|| {
             let cache = MokaCache::new(cache_size as u64, Duration::from_secs(300));
@@ -65,7 +65,7 @@ fn benchmark_cache_retrieval(c: &mut Criterion) {
                 for (key, value) in &test_data[..100] {
                     cache.insert(key.clone(), value.clone()).await;
                 }
-                
+
                 // Then retrieve
                 for (key, _) in &test_data[..100] {
                     black_box(cache.get(key).await);
@@ -73,16 +73,16 @@ fn benchmark_cache_retrieval(c: &mut Criterion) {
             })
         })
     });
-    
+
     group.finish();
 }
 
 fn benchmark_cache_hit_rates(c: &mut Criterion) {
     let mut group = c.benchmark_group("cache_hit_rates");
     group.measurement_time(Duration::from_secs(10));
-    
+
     let test_data = create_test_data();
-    
+
     for hit_rate in [0.1, 0.5, 0.9].iter() {
         group.bench_with_input(
             BenchmarkId::new("cache_hit_rate", (hit_rate * 100.0) as u32),
@@ -96,11 +96,11 @@ fn benchmark_cache_hit_rates(c: &mut Criterion) {
                         for (key, value) in &test_data[..50] {
                             cache.insert(key.clone(), value.clone()).await;
                         }
-                        
+
                         // Simulate different hit rates
                         let total_requests = 1000;
                         let hits = (total_requests as f64 * hit_rate) as usize;
-                        
+
                         for i in 0..total_requests {
                             let key = if i < hits {
                                 // Cache hit
@@ -116,55 +116,51 @@ fn benchmark_cache_hit_rates(c: &mut Criterion) {
             },
         );
     }
-    
+
     group.finish();
 }
 
 fn benchmark_cache_key_generation(c: &mut Criterion) {
     let mut group = c.benchmark_group("cache_key_generation");
     group.measurement_time(Duration::from_secs(5));
-    
+
     group.bench_function("api_response_key", |b| {
         b.iter(|| {
             for i in 0..1000 {
                 black_box(CacheKeyGenerator::api_response(
                     &format!("endpoint_{}", i),
-                    &format!("params_{}", i)
+                    &format!("params_{}", i),
                 ));
             }
         })
     });
-    
+
     group.bench_function("search_key", |b| {
         b.iter(|| {
             for i in 0..1000 {
-                black_box(CacheKeyGenerator::search(
-                    &format!("jql_{}", i),
-                    i,
-                    i * 2
-                ));
+                black_box(CacheKeyGenerator::search(&format!("jql_{}", i), i, i * 2));
             }
         })
     });
-    
+
     group.bench_function("parsed_object_key", |b| {
         b.iter(|| {
             for i in 0..1000 {
                 black_box(CacheKeyGenerator::parsed_object(
                     &format!("type_{}", i),
-                    &format!("id_{}", i)
+                    &format!("id_{}", i),
                 ));
             }
         })
     });
-    
+
     group.finish();
 }
 
 fn benchmark_cache_manager_operations(c: &mut Criterion) {
     let mut group = c.benchmark_group("cache_manager_operations");
     group.measurement_time(Duration::from_secs(10));
-    
+
     group.bench_function("cache_manager_operations", |b| {
         b.iter(|| {
             let cache_manager = CacheManager::new();
@@ -179,7 +175,7 @@ fn benchmark_cache_manager_operations(c: &mut Criterion) {
                     });
                     cache_manager.api_responses.insert(key, value).await;
                 }
-                
+
                 // Test parsed objects cache
                 for i in 0..100 {
                     let key = format!("parsed_object_{}", i);
@@ -189,7 +185,7 @@ fn benchmark_cache_manager_operations(c: &mut Criterion) {
                     });
                     cache_manager.parsed_objects.insert(key, value).await;
                 }
-                
+
                 // Test config cache
                 for i in 0..50 {
                     let key = format!("config_{}", i);
@@ -199,20 +195,20 @@ fn benchmark_cache_manager_operations(c: &mut Criterion) {
                     });
                     cache_manager.config_cache.insert(key, value).await;
                 }
-                
+
                 // Get stats
                 black_box(cache_manager.get_stats().await);
             })
         })
     });
-    
+
     group.finish();
 }
 
 fn benchmark_concurrent_cache_access(c: &mut Criterion) {
     let mut group = c.benchmark_group("concurrent_cache_access");
     group.measurement_time(Duration::from_secs(10));
-    
+
     for concurrency in [1, 2, 4, 8, 16].iter() {
         group.bench_with_input(
             BenchmarkId::new("concurrent_cache_ops", concurrency),
@@ -238,7 +234,7 @@ fn benchmark_concurrent_cache_access(c: &mut Criterion) {
                                 })
                             })
                             .collect();
-                        
+
                         let results: Vec<_> = futures::future::join_all(handles).await;
                         black_box(results);
                     })
@@ -246,7 +242,7 @@ fn benchmark_concurrent_cache_access(c: &mut Criterion) {
             },
         );
     }
-    
+
     group.finish();
 }
 

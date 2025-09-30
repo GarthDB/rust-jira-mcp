@@ -26,11 +26,11 @@ pub struct AlertThresholds {
 impl Default for AlertThresholds {
     fn default() -> Self {
         Self {
-            max_response_time_ms: 5000, // 5 seconds
-            min_success_rate_percent: 95.0, // 95%
+            max_response_time_ms: 5000,                // 5 seconds
+            min_success_rate_percent: 95.0,            // 95%
             max_memory_usage_bytes: 100 * 1024 * 1024, // 100MB
-            max_error_rate_percent: 5.0, // 5%
-            max_requests_per_second: 1000.0, // 1000 RPS
+            max_error_rate_percent: 5.0,               // 5%
+            max_requests_per_second: 1000.0,           // 1000 RPS
         }
     }
 }
@@ -88,7 +88,10 @@ impl PerformanceMonitor {
         *monitoring_active = true;
         drop(monitoring_active);
 
-        info!("Starting performance monitoring with {}s interval", check_interval.as_secs());
+        info!(
+            "Starting performance monitoring with {}s interval",
+            check_interval.as_secs()
+        );
 
         let metrics = self.metrics.clone();
         let alerts = self.alerts.clone();
@@ -97,13 +100,13 @@ impl PerformanceMonitor {
 
         tokio::spawn(async move {
             let mut interval = interval(check_interval);
-            
+
             while *monitoring_active.read().await {
                 interval.tick().await;
-                
+
                 let stats = metrics.get_stats();
                 let mut alerts_guard = alerts.write().await;
-                
+
                 // Check for various alert conditions
                 Self::check_response_time_alert(&stats, &thresholds, &mut alerts_guard).await;
                 Self::check_success_rate_alert(&stats, &thresholds, &mut alerts_guard).await;
@@ -111,7 +114,7 @@ impl PerformanceMonitor {
                 Self::check_error_rate_alert(&stats, &thresholds, &mut alerts_guard).await;
                 Self::check_request_rate_alert(&stats, &thresholds, &mut alerts_guard).await;
                 Self::check_system_overload_alert(&stats, &thresholds, &mut alerts_guard).await;
-                
+
                 // Clean up old alerts
                 Self::cleanup_old_alerts(&mut alerts_guard).await;
             }
@@ -139,7 +142,9 @@ impl PerformanceMonitor {
                     "Average response time {}ms exceeds threshold {}ms",
                     stats.average_response_time_ms, thresholds.max_response_time_ms
                 ),
-                severity: if stats.average_response_time_ms > thresholds.max_response_time_ms as f64 * 2.0 {
+                severity: if stats.average_response_time_ms
+                    > thresholds.max_response_time_ms as f64 * 2.0
+                {
                     AlertSeverity::Critical
                 } else {
                     AlertSeverity::High
@@ -147,12 +152,21 @@ impl PerformanceMonitor {
                 timestamp: Instant::now(),
                 resolved: false,
                 metadata: std::collections::HashMap::from([
-                    ("average_response_time_ms".to_string(), stats.average_response_time_ms.to_string()),
-                    ("threshold_ms".to_string(), thresholds.max_response_time_ms.to_string()),
+                    (
+                        "average_response_time_ms".to_string(),
+                        stats.average_response_time_ms.to_string(),
+                    ),
+                    (
+                        "threshold_ms".to_string(),
+                        thresholds.max_response_time_ms.to_string(),
+                    ),
                 ]),
             };
             alerts.push(alert);
-            warn!("High response time alert triggered: {}ms", stats.average_response_time_ms);
+            warn!(
+                "High response time alert triggered: {}ms",
+                stats.average_response_time_ms
+            );
         }
     }
 
@@ -179,11 +193,17 @@ impl PerformanceMonitor {
                 resolved: false,
                 metadata: std::collections::HashMap::from([
                     ("success_rate".to_string(), stats.success_rate.to_string()),
-                    ("threshold".to_string(), thresholds.min_success_rate_percent.to_string()),
+                    (
+                        "threshold".to_string(),
+                        thresholds.min_success_rate_percent.to_string(),
+                    ),
                 ]),
             };
             alerts.push(alert);
-            warn!("Low success rate alert triggered: {:.1}%", stats.success_rate);
+            warn!(
+                "Low success rate alert triggered: {:.1}%",
+                stats.success_rate
+            );
         }
     }
 
@@ -201,7 +221,9 @@ impl PerformanceMonitor {
                     "Memory usage {} bytes exceeds threshold {} bytes",
                     stats.current_memory_usage_bytes, thresholds.max_memory_usage_bytes
                 ),
-                severity: if stats.current_memory_usage_bytes > thresholds.max_memory_usage_bytes * 2 {
+                severity: if stats.current_memory_usage_bytes
+                    > thresholds.max_memory_usage_bytes * 2
+                {
                     AlertSeverity::Critical
                 } else {
                     AlertSeverity::High
@@ -209,13 +231,25 @@ impl PerformanceMonitor {
                 timestamp: Instant::now(),
                 resolved: false,
                 metadata: std::collections::HashMap::from([
-                    ("current_memory_bytes".to_string(), stats.current_memory_usage_bytes.to_string()),
-                    ("peak_memory_bytes".to_string(), stats.peak_memory_usage_bytes.to_string()),
-                    ("threshold_bytes".to_string(), thresholds.max_memory_usage_bytes.to_string()),
+                    (
+                        "current_memory_bytes".to_string(),
+                        stats.current_memory_usage_bytes.to_string(),
+                    ),
+                    (
+                        "peak_memory_bytes".to_string(),
+                        stats.peak_memory_usage_bytes.to_string(),
+                    ),
+                    (
+                        "threshold_bytes".to_string(),
+                        thresholds.max_memory_usage_bytes.to_string(),
+                    ),
                 ]),
             };
             alerts.push(alert);
-            warn!("High memory usage alert triggered: {} bytes", stats.current_memory_usage_bytes);
+            warn!(
+                "High memory usage alert triggered: {} bytes",
+                stats.current_memory_usage_bytes
+            );
         }
     }
 
@@ -244,7 +278,10 @@ impl PerformanceMonitor {
                 metadata: std::collections::HashMap::from([
                     ("error_rate".to_string(), error_rate.to_string()),
                     ("success_rate".to_string(), stats.success_rate.to_string()),
-                    ("threshold".to_string(), thresholds.max_error_rate_percent.to_string()),
+                    (
+                        "threshold".to_string(),
+                        thresholds.max_error_rate_percent.to_string(),
+                    ),
                 ]),
             };
             alerts.push(alert);
@@ -274,12 +311,21 @@ impl PerformanceMonitor {
                 timestamp: Instant::now(),
                 resolved: false,
                 metadata: std::collections::HashMap::from([
-                    ("requests_per_second".to_string(), stats.requests_per_second.to_string()),
-                    ("threshold".to_string(), thresholds.max_requests_per_second.to_string()),
+                    (
+                        "requests_per_second".to_string(),
+                        stats.requests_per_second.to_string(),
+                    ),
+                    (
+                        "threshold".to_string(),
+                        thresholds.max_requests_per_second.to_string(),
+                    ),
                 ]),
             };
             alerts.push(alert);
-            warn!("High request rate alert triggered: {:.1} RPS", stats.requests_per_second);
+            warn!(
+                "High request rate alert triggered: {:.1} RPS",
+                stats.requests_per_second
+            );
         }
     }
 
@@ -289,7 +335,8 @@ impl PerformanceMonitor {
         thresholds: &AlertThresholds,
         alerts: &mut Vec<Alert>,
     ) {
-        let is_overloaded = stats.average_response_time_ms > thresholds.max_response_time_ms as f64 * 1.5
+        let is_overloaded = stats.average_response_time_ms
+            > thresholds.max_response_time_ms as f64 * 1.5
             && stats.success_rate < thresholds.min_success_rate_percent * 0.8
             && stats.requests_per_second > thresholds.max_requests_per_second * 0.8;
 
@@ -302,10 +349,19 @@ impl PerformanceMonitor {
                 timestamp: Instant::now(),
                 resolved: false,
                 metadata: std::collections::HashMap::from([
-                    ("average_response_time_ms".to_string(), stats.average_response_time_ms.to_string()),
+                    (
+                        "average_response_time_ms".to_string(),
+                        stats.average_response_time_ms.to_string(),
+                    ),
                     ("success_rate".to_string(), stats.success_rate.to_string()),
-                    ("requests_per_second".to_string(), stats.requests_per_second.to_string()),
-                    ("memory_usage_bytes".to_string(), stats.current_memory_usage_bytes.to_string()),
+                    (
+                        "requests_per_second".to_string(),
+                        stats.requests_per_second.to_string(),
+                    ),
+                    (
+                        "memory_usage_bytes".to_string(),
+                        stats.current_memory_usage_bytes.to_string(),
+                    ),
                 ]),
             };
             alerts.push(alert);
@@ -322,13 +378,18 @@ impl PerformanceMonitor {
     /// Get all active alerts
     pub async fn get_active_alerts(&self) -> Vec<Alert> {
         let alerts = self.alerts.read().await;
-        alerts.iter().filter(|alert| !alert.resolved).cloned().collect()
+        alerts
+            .iter()
+            .filter(|alert| !alert.resolved)
+            .cloned()
+            .collect()
     }
 
     /// Get alerts by severity
     pub async fn get_alerts_by_severity(&self, severity: AlertSeverity) -> Vec<Alert> {
         let alerts = self.alerts.read().await;
-        alerts.iter()
+        alerts
+            .iter()
             .filter(|alert| alert.severity == severity && !alert.resolved)
             .cloned()
             .collect()
@@ -351,10 +412,22 @@ impl PerformanceMonitor {
         let alerts = self.alerts.read().await;
         let total_alerts = alerts.len();
         let active_alerts = alerts.iter().filter(|a| !a.resolved).count();
-        let critical_alerts = alerts.iter().filter(|a| a.severity == AlertSeverity::Critical && !a.resolved).count();
-        let high_alerts = alerts.iter().filter(|a| a.severity == AlertSeverity::High && !a.resolved).count();
-        let medium_alerts = alerts.iter().filter(|a| a.severity == AlertSeverity::Medium && !a.resolved).count();
-        let low_alerts = alerts.iter().filter(|a| a.severity == AlertSeverity::Low && !a.resolved).count();
+        let critical_alerts = alerts
+            .iter()
+            .filter(|a| a.severity == AlertSeverity::Critical && !a.resolved)
+            .count();
+        let high_alerts = alerts
+            .iter()
+            .filter(|a| a.severity == AlertSeverity::High && !a.resolved)
+            .count();
+        let medium_alerts = alerts
+            .iter()
+            .filter(|a| a.severity == AlertSeverity::Medium && !a.resolved)
+            .count();
+        let low_alerts = alerts
+            .iter()
+            .filter(|a| a.severity == AlertSeverity::Low && !a.resolved)
+            .count();
 
         AlertStats {
             total_alerts,
@@ -372,8 +445,10 @@ impl PerformanceMonitor {
         info!("Alert Status:");
         info!("  Total Alerts: {}", stats.total_alerts);
         info!("  Active Alerts: {}", stats.active_alerts);
-        info!("  Critical: {}, High: {}, Medium: {}, Low: {}", 
-              stats.critical_alerts, stats.high_alerts, stats.medium_alerts, stats.low_alerts);
+        info!(
+            "  Critical: {}, High: {}, Medium: {}, Low: {}",
+            stats.critical_alerts, stats.high_alerts, stats.medium_alerts, stats.low_alerts
+        );
     }
 }
 

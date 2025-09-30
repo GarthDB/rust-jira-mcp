@@ -159,10 +159,10 @@
 
 pub mod config;
 pub mod error;
+pub mod jira;
 pub mod logging;
 pub mod mcp;
 pub mod performance;
-pub mod jira;
 pub mod types;
 pub mod utils;
 

@@ -1,9 +1,11 @@
+use super::{
+    CacheKeyGenerator, CacheManager, OptimizedJiraClient as BaseClient, PerformanceMetrics,
+};
 use crate::config::JiraConfig;
 use crate::error::{JiraError, Result};
-use super::{CacheManager, PerformanceMetrics, OptimizedJiraClient as BaseClient, CacheKeyGenerator};
 use crate::types::jira::{
-    JiraIssue, JiraSearchResult, JiraComment, JiraTransition,
-    BulkOperationConfig, BulkOperationSummary, BulkOperationItem,
+    BulkOperationConfig, BulkOperationItem, BulkOperationSummary, JiraComment, JiraIssue,
+    JiraSearchResult, JiraTransition,
 };
 use serde_json::json;
 use std::sync::Arc;
@@ -47,10 +49,11 @@ impl JiraClientOptimized {
         max_results: Option<i32>,
     ) -> Result<JiraSearchResult> {
         let start_at = start_at.unwrap_or(0);
-        let max_results = max_results.unwrap_or_else(|| i32::try_from(self.config.max_results.unwrap_or(50)).unwrap_or(50));
-        
+        let max_results = max_results
+            .unwrap_or_else(|| i32::try_from(self.config.max_results.unwrap_or(50)).unwrap_or(50));
+
         let cache_key = CacheKeyGenerator::search(jql, start_at, max_results);
-        
+
         // Try cache first
         if let Some(cached) = self.cache_manager.parsed_objects.get(&cache_key).await {
             debug!("Cache hit for search: {}", jql);
@@ -78,11 +81,14 @@ impl JiraClientOptimized {
 
         let endpoint = format!("search?{query_string}");
         let result = self.base_client.get_uncached(&endpoint).await?;
-        
+
         // Cache the result
         let json_value = serde_json::to_value(&result).map_err(JiraError::SerializationError)?;
-        self.cache_manager.parsed_objects.insert(cache_key, json_value).await;
-        
+        self.cache_manager
+            .parsed_objects
+            .insert(cache_key, json_value)
+            .await;
+
         Ok(result)
     }
 
@@ -98,7 +104,10 @@ impl JiraClientOptimized {
         update_data: &serde_json::Value,
     ) -> Result<()> {
         let endpoint = format!("issue/{issue_key}");
-        let _: serde_json::Value = self.base_client.post_optimized(&endpoint, update_data).await?;
+        let _: serde_json::Value = self
+            .base_client
+            .post_optimized(&endpoint, update_data)
+            .await?;
         Ok(())
     }
 
@@ -108,7 +117,9 @@ impl JiraClientOptimized {
         let comment_data = json!({
             "body": comment_body
         });
-        self.base_client.post_optimized(&endpoint, &comment_data).await
+        self.base_client
+            .post_optimized(&endpoint, &comment_data)
+            .await
     }
 
     /// Get comments with caching
@@ -173,7 +184,10 @@ impl JiraClientOptimized {
                 serde_json::Value::String(comment_text.to_string());
         }
 
-        let _: serde_json::Value = self.base_client.post_optimized(&endpoint, &transition_data).await?;
+        let _: serde_json::Value = self
+            .base_client
+            .post_optimized(&endpoint, &transition_data)
+            .await?;
         Ok(())
     }
 
@@ -186,7 +200,10 @@ impl JiraClientOptimized {
         let start_time = std::time::Instant::now();
         let mut summary = BulkOperationSummary::new();
 
-        info!("Starting optimized bulk operation with {} items", operations.len());
+        info!(
+            "Starting optimized bulk operation with {} items",
+            operations.len()
+        );
 
         // Validate operation count
         if operations.len() > 100 {
@@ -243,7 +260,9 @@ impl JiraClientOptimized {
                 let config = config.clone();
                 let operation = operation.clone();
                 tokio::spawn(async move {
-                    client.execute_single_operation_optimized(&operation, &config).await
+                    client
+                        .execute_single_operation_optimized(&operation, &config)
+                        .await
                 })
             })
             .collect();
@@ -312,10 +331,7 @@ impl JiraClientOptimized {
     }
 
     /// Perform the actual operation with optimizations
-    async fn perform_operation_optimized(
-        &self,
-        operation: &BulkOperationItem,
-    ) -> Result<()> {
+    async fn perform_operation_optimized(&self, operation: &BulkOperationItem) -> Result<()> {
         match operation.operation_type {
             crate::types::jira::BulkOperationType::Update => {
                 let fields = &operation.data;
@@ -347,7 +363,8 @@ impl JiraClientOptimized {
             crate::types::jira::BulkOperationType::Mixed => {
                 // Handle mixed operations
                 if operation.data.get("fields").is_some() {
-                    self.update_issue(&operation.issue_key, &operation.data).await
+                    self.update_issue(&operation.issue_key, &operation.data)
+                        .await
                 } else if operation.data.get("transition_id").is_some() {
                     let transition_id = operation
                         .data

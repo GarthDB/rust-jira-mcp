@@ -1,5 +1,7 @@
-use criterion::{black_box, criterion_group, criterion_main, Criterion, BenchmarkId};
-use rust_jira_mcp::performance::{AsyncTaskManager, AsyncRateLimiter, AsyncConnectionPool, PerformanceMetrics};
+use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
+use rust_jira_mcp::performance::{
+    AsyncConnectionPool, AsyncRateLimiter, AsyncTaskManager, PerformanceMetrics,
+};
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -10,9 +12,9 @@ fn create_test_metrics() -> Arc<PerformanceMetrics> {
 fn benchmark_async_task_manager(c: &mut Criterion) {
     let mut group = c.benchmark_group("async_task_manager");
     group.measurement_time(Duration::from_secs(10));
-    
+
     let metrics = create_test_metrics();
-    
+
     for max_concurrent in [1, 5, 10, 20, 50].iter() {
         group.bench_with_input(
             BenchmarkId::new("task_execution", max_concurrent),
@@ -34,32 +36,37 @@ fn benchmark_async_task_manager(c: &mut Criterion) {
                                 (task_id, task_name, task)
                             })
                             .collect();
-                        
-                        let results = task_manager.execute_tasks_concurrent(tasks.into_iter().map(|(id, name, task)| (id, name, task())).collect()).await;
+
+                        let results = task_manager
+                            .execute_tasks_concurrent(
+                                tasks
+                                    .into_iter()
+                                    .map(|(id, name, task)| (id, name, task()))
+                                    .collect(),
+                            )
+                            .await;
                         black_box(results);
                     })
                 })
             },
         );
     }
-    
+
     group.finish();
 }
 
 fn benchmark_async_rate_limiter(c: &mut Criterion) {
     let mut group = c.benchmark_group("async_rate_limiter");
     group.measurement_time(Duration::from_secs(5));
-    
+
     for requests_per_second in [10, 50, 100, 500].iter() {
         group.bench_with_input(
             BenchmarkId::new("rate_limiting", requests_per_second),
             requests_per_second,
             |b, &requests_per_second| {
                 b.iter(|| {
-                    let rate_limiter = AsyncRateLimiter::new(
-                        requests_per_second,
-                        Duration::from_secs(1)
-                    );
+                    let rate_limiter =
+                        AsyncRateLimiter::new(requests_per_second, Duration::from_secs(1));
                     let rt = tokio::runtime::Runtime::new().unwrap();
                     rt.block_on(async {
                         for _ in 0..requests_per_second {
@@ -70,14 +77,14 @@ fn benchmark_async_rate_limiter(c: &mut Criterion) {
             },
         );
     }
-    
+
     group.finish();
 }
 
 fn benchmark_async_connection_pool(c: &mut Criterion) {
     let mut group = c.benchmark_group("async_connection_pool");
     group.measurement_time(Duration::from_secs(10));
-    
+
     for max_connections in [10, 50, 100, 200].iter() {
         group.bench_with_input(
             BenchmarkId::new("connection_acquisition", max_connections),
@@ -97,21 +104,21 @@ fn benchmark_async_connection_pool(c: &mut Criterion) {
                                 })
                             })
                             .collect();
-                        
+
                         futures::future::join_all(handles).await;
                     })
                 })
             },
         );
     }
-    
+
     group.finish();
 }
 
 fn benchmark_concurrent_operations(c: &mut Criterion) {
     let mut group = c.benchmark_group("concurrent_operations");
     group.measurement_time(Duration::from_secs(10));
-    
+
     for concurrency in [1, 2, 4, 8, 16, 32].iter() {
         group.bench_with_input(
             BenchmarkId::new("concurrent_json_parsing", concurrency),
@@ -135,14 +142,15 @@ fn benchmark_concurrent_operations(c: &mut Criterion) {
                                             }
                                         });
                                         let json_str = serde_json::to_string(&data).unwrap();
-                                        let parsed: serde_json::Value = serde_json::from_str(&json_str).unwrap();
+                                        let parsed: serde_json::Value =
+                                            serde_json::from_str(&json_str).unwrap();
                                         results.push(parsed);
                                     }
                                     results
                                 })
                             })
                             .collect();
-                        
+
                         let results: Vec<_> = futures::future::join_all(handles).await;
                         black_box(results);
                     })
@@ -150,14 +158,14 @@ fn benchmark_concurrent_operations(c: &mut Criterion) {
             },
         );
     }
-    
+
     group.finish();
 }
 
 fn benchmark_async_batching(c: &mut Criterion) {
     let mut group = c.benchmark_group("async_batching");
     group.measurement_time(Duration::from_secs(10));
-    
+
     for batch_size in [1, 5, 10, 20, 50].iter() {
         group.bench_with_input(
             BenchmarkId::new("batch_processing", batch_size),
@@ -167,7 +175,7 @@ fn benchmark_async_batching(c: &mut Criterion) {
                     let rt = tokio::runtime::Runtime::new().unwrap();
                     rt.block_on(async {
                         let mut handles = Vec::new();
-                        
+
                         for batch in (0..100).collect::<Vec<_>>().chunks(batch_size) {
                             let batch = batch.to_vec();
                             let handle = tokio::spawn(async move {
@@ -177,7 +185,7 @@ fn benchmark_async_batching(c: &mut Criterion) {
                             });
                             handles.push(handle);
                         }
-                        
+
                         let results: Vec<_> = futures::future::join_all(handles).await;
                         black_box(results);
                     })
@@ -185,20 +193,20 @@ fn benchmark_async_batching(c: &mut Criterion) {
             },
         );
     }
-    
+
     group.finish();
 }
 
 fn benchmark_memory_allocation_patterns(c: &mut Criterion) {
     let mut group = c.benchmark_group("memory_allocation_patterns");
     group.measurement_time(Duration::from_secs(10));
-    
+
     group.bench_function("string_concatenation", |b| {
         b.iter(|| {
             let rt = tokio::runtime::Runtime::new().unwrap();
             rt.block_on(async {
                 let mut handles = Vec::new();
-                
+
                 for i in 0..100 {
                     let handle = tokio::spawn(async move {
                         let mut result = String::new();
@@ -209,19 +217,19 @@ fn benchmark_memory_allocation_patterns(c: &mut Criterion) {
                     });
                     handles.push(handle);
                 }
-                
+
                 let results: Vec<_> = futures::future::join_all(handles).await;
                 black_box(results);
             })
         })
     });
-    
+
     group.bench_function("vec_operations", |b| {
         b.iter(|| {
             let rt = tokio::runtime::Runtime::new().unwrap();
             rt.block_on(async {
                 let mut handles = Vec::new();
-                
+
                 for i in 0..100 {
                     let handle = tokio::spawn(async move {
                         let mut vec = Vec::with_capacity(1000);
@@ -232,13 +240,13 @@ fn benchmark_memory_allocation_patterns(c: &mut Criterion) {
                     });
                     handles.push(handle);
                 }
-                
+
                 let results: Vec<_> = futures::future::join_all(handles).await;
                 black_box(results);
             })
         })
     });
-    
+
     group.finish();
 }
 

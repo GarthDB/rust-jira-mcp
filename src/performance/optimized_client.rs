@@ -36,14 +36,13 @@ impl OptimizedJiraClient {
         })
     }
 
-
     /// Make an optimized GET request with caching
     pub async fn get_cached<T>(&self, endpoint: &str) -> Result<T>
     where
         T: DeserializeOwned + Clone + Send + Sync + Serialize + 'static,
     {
         let cache_key = crate::performance::CacheKeyGenerator::api_response(endpoint, "");
-        
+
         // Try cache first
         if let Some(cached) = self.cache_manager.api_responses.get(&cache_key).await {
             debug!("Cache hit for endpoint: {}", endpoint);
@@ -56,11 +55,14 @@ impl OptimizedJiraClient {
 
         // Make the request
         let result = self.get_uncached(endpoint).await?;
-        
+
         // Cache the result
         let json_value = serde_json::to_value(&result).map_err(JiraError::SerializationError)?;
-        self.cache_manager.api_responses.insert(cache_key, json_value).await;
-        
+        self.cache_manager
+            .api_responses
+            .insert(cache_key, json_value)
+            .await;
+
         Ok(result)
     }
 
@@ -88,7 +90,7 @@ impl OptimizedJiraClient {
         U: Serialize + ?Sized,
     {
         let start_time = std::time::Instant::now();
-        
+
         let url = self.build_url(endpoint)?;
         let request_builder = self.build_request(method, &url, body)?;
 
@@ -100,7 +102,8 @@ impl OptimizedJiraClient {
                 debug!("Response status: {}", status);
 
                 if status.is_success() {
-                    let response_text = response.text().await.map_err(JiraError::HttpClientError)?;
+                    let response_text =
+                        response.text().await.map_err(JiraError::HttpClientError)?;
                     debug!("Response body length: {} bytes", response_text.len());
 
                     let result = serde_json::from_str(&response_text).map_err(|e| {
@@ -121,7 +124,7 @@ impl OptimizedJiraClient {
                         .unwrap_or_else(|_| serde_json::Value::Object(serde_json::Map::new()));
 
                     let jira_error = JiraError::from_jira_response(status, &error_json);
-                    
+
                     // Record metrics
                     let duration = start_time.elapsed();
                     self.metrics.record_request(duration, false);
@@ -131,7 +134,7 @@ impl OptimizedJiraClient {
             }
             Err(e) => {
                 warn!("Request failed: {}", e);
-                
+
                 // Record metrics
                 let duration = start_time.elapsed();
                 self.metrics.record_request(duration, false);
@@ -258,21 +261,27 @@ impl MemoryTracker {
 
     /// Track memory allocation
     pub fn track_allocation(&self, size: usize) {
-        let current = self.current_usage.fetch_add(size, std::sync::atomic::Ordering::Relaxed);
+        let current = self
+            .current_usage
+            .fetch_add(size, std::sync::atomic::Ordering::Relaxed);
         let new_total = current + size;
-        
+
         // Update peak usage
         loop {
             let peak = self.peak_usage.load(std::sync::atomic::Ordering::Relaxed);
             if new_total <= peak {
                 break;
             }
-            if self.peak_usage.compare_exchange_weak(
-                peak,
-                new_total,
-                std::sync::atomic::Ordering::Relaxed,
-                std::sync::atomic::Ordering::Relaxed,
-            ).is_ok() {
+            if self
+                .peak_usage
+                .compare_exchange_weak(
+                    peak,
+                    new_total,
+                    std::sync::atomic::Ordering::Relaxed,
+                    std::sync::atomic::Ordering::Relaxed,
+                )
+                .is_ok()
+            {
                 break;
             }
         }
@@ -280,12 +289,14 @@ impl MemoryTracker {
 
     /// Track memory deallocation
     pub fn track_deallocation(&self, size: usize) {
-        self.current_usage.fetch_sub(size, std::sync::atomic::Ordering::Relaxed);
+        self.current_usage
+            .fetch_sub(size, std::sync::atomic::Ordering::Relaxed);
     }
 
     /// Get current memory usage
     pub fn get_current_usage(&self) -> usize {
-        self.current_usage.load(std::sync::atomic::Ordering::Relaxed)
+        self.current_usage
+            .load(std::sync::atomic::Ordering::Relaxed)
     }
 
     /// Get peak memory usage

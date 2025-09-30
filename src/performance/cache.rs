@@ -35,10 +35,10 @@ where
             .max_capacity(capacity)
             .time_to_live(ttl)
             .build();
-        
+
         Self { cache }
     }
-    
+
     /// Create a new Moka cache with default settings
     #[must_use]
     pub fn new_default() -> Self {
@@ -55,24 +55,24 @@ where
     async fn get(&self, key: &K) -> Option<V> {
         self.cache.get(key).await
     }
-    
+
     async fn insert(&self, key: K, value: V) -> Option<V> {
         self.cache.insert(key, value).await;
         None
     }
-    
+
     async fn remove(&self, key: &K) -> Option<V> {
         self.cache.remove(key).await
     }
-    
+
     async fn clear(&self) {
         self.cache.invalidate_all();
     }
-    
+
     async fn len(&self) -> usize {
         usize::try_from(self.cache.entry_count()).unwrap_or(0)
     }
-    
+
     async fn is_empty(&self) -> bool {
         self.cache.entry_count() == 0
     }
@@ -98,7 +98,7 @@ impl CacheManager {
             config_cache: Box::new(MokaCache::new(100, Duration::from_secs(3600))), // 1 hour
         }
     }
-    
+
     /// Create a new cache manager with custom settings
     #[must_use]
     pub fn with_settings(
@@ -115,7 +115,7 @@ impl CacheManager {
             config_cache: Box::new(MokaCache::new(config_cache_capacity, config_cache_ttl)),
         }
     }
-    
+
     /// Get cache statistics
     pub async fn get_stats(&self) -> CacheStats {
         CacheStats {
@@ -124,7 +124,7 @@ impl CacheManager {
             config_cache_count: self.config_cache.len().await,
         }
     }
-    
+
     /// Clear all caches
     pub async fn clear_all(&self) {
         self.api_responses.clear().await;
@@ -132,7 +132,7 @@ impl CacheManager {
         self.config_cache.clear().await;
         info!("All caches cleared");
     }
-    
+
     /// Log cache statistics
     pub async fn log_stats(&self) {
         let stats = self.get_stats().await;
@@ -166,19 +166,19 @@ impl CacheKeyGenerator {
     pub fn api_response(endpoint: &str, params: &str) -> String {
         format!("api:{endpoint}:{params}")
     }
-    
+
     /// Generate a cache key for parsed objects
     #[must_use]
     pub fn parsed_object(object_type: &str, id: &str) -> String {
         format!("parsed:{object_type}:{id}")
     }
-    
+
     /// Generate a cache key for configuration
     #[must_use]
     pub fn config(config_type: &str) -> String {
         format!("config:{config_type}")
     }
-    
+
     /// Generate a cache key for search results
     #[must_use]
     pub fn search(jql: &str, start_at: i32, max_results: i32) -> String {
@@ -198,12 +198,19 @@ where
 {
     /// Create a new cached operation
     #[must_use]
-    pub fn new(cache: Box<dyn CacheStore<String, T>>, metrics: Option<crate::performance::PerformanceMetrics>) -> Self {
+    pub fn new(
+        cache: Box<dyn CacheStore<String, T>>,
+        metrics: Option<crate::performance::PerformanceMetrics>,
+    ) -> Self {
         Self { cache, metrics }
     }
-    
+
     /// Execute an operation with caching
-    pub async fn execute<F, Fut>(&self, key: String, operation: F) -> Result<T, Box<dyn std::error::Error + Send + Sync>>
+    pub async fn execute<F, Fut>(
+        &self,
+        key: String,
+        operation: F,
+    ) -> Result<T, Box<dyn std::error::Error + Send + Sync>>
     where
         F: FnOnce() -> Fut,
         Fut: std::future::Future<Output = Result<T, Box<dyn std::error::Error + Send + Sync>>>,
@@ -216,18 +223,18 @@ where
             }
             return Ok(cached_value);
         }
-        
+
         debug!("Cache miss for key: {}", key);
         if let Some(ref metrics) = self.metrics {
             metrics.record_cache_miss();
         }
-        
+
         // Execute the operation
         let result = operation().await?;
-        
+
         // Store in cache
         self.cache.insert(key, result.clone()).await;
-        
+
         Ok(result)
     }
 }

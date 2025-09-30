@@ -1,7 +1,7 @@
 use crate::performance::PerformanceMetrics;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
-use tokio::sync::{Semaphore, RwLock};
+use tokio::sync::{RwLock, Semaphore};
 use tokio::task::JoinHandle;
 use tracing::{debug, warn};
 
@@ -51,11 +51,15 @@ impl AsyncTaskManager {
         task: F,
     ) -> Result<T, Box<dyn std::error::Error + Send + Sync>>
     where
-        F: std::future::Future<Output = Result<T, Box<dyn std::error::Error + Send + Sync>>> + Send + 'static,
+        F: std::future::Future<Output = Result<T, Box<dyn std::error::Error + Send + Sync>>>
+            + Send
+            + 'static,
         T: Send + 'static,
     {
         let _permit = self.semaphore.acquire().await.map_err(|e| {
-            Box::new(std::io::Error::other(format!("Failed to acquire semaphore: {e}"))) as Box<dyn std::error::Error + Send + Sync>
+            Box::new(std::io::Error::other(format!(
+                "Failed to acquire semaphore: {e}"
+            ))) as Box<dyn std::error::Error + Send + Sync>
         })?;
 
         let start_time = Instant::now();
@@ -109,16 +113,16 @@ impl AsyncTaskManager {
         tasks: Vec<(String, String, F)>,
     ) -> Vec<Result<T, Box<dyn std::error::Error + Send + Sync>>>
     where
-        F: std::future::Future<Output = Result<T, Box<dyn std::error::Error + Send + Sync>>> + Send + 'static,
+        F: std::future::Future<Output = Result<T, Box<dyn std::error::Error + Send + Sync>>>
+            + Send
+            + 'static,
         T: Send + 'static,
     {
         let handles: Vec<JoinHandle<Result<T, Box<dyn std::error::Error + Send + Sync>>>> = tasks
             .into_iter()
             .map(|(task_id, task_name, task)| {
                 let manager = self.clone();
-                tokio::spawn(async move {
-                    manager.execute_task(task_id, task_name, task).await
-                })
+                tokio::spawn(async move { manager.execute_task(task_id, task_name, task).await })
             })
             .collect();
 
@@ -144,7 +148,10 @@ impl AsyncTaskManager {
         batch_delay: Duration,
     ) -> Vec<Result<T, Box<dyn std::error::Error + Send + Sync>>>
     where
-        F: std::future::Future<Output = Result<T, Box<dyn std::error::Error + Send + Sync>>> + Send + 'static + Clone,
+        F: std::future::Future<Output = Result<T, Box<dyn std::error::Error + Send + Sync>>>
+            + Send
+            + 'static
+            + Clone,
         T: Send + 'static,
     {
         let mut all_results = Vec::new();
@@ -172,7 +179,10 @@ impl AsyncTaskManager {
     /// Get active task count
     pub async fn get_active_task_count(&self) -> usize {
         let queue = self.task_queue.read().await;
-        queue.iter().filter(|t| t.status == TaskStatus::Running).count()
+        queue
+            .iter()
+            .filter(|t| t.status == TaskStatus::Running)
+            .count()
     }
 
     /// Clear completed tasks from queue
@@ -214,19 +224,19 @@ impl AsyncRateLimiter {
     /// Wait for rate limit permission
     pub async fn wait(&self) {
         let _permit = self.semaphore.acquire().await;
-        
+
         let now = Instant::now();
         let elapsed = {
             let last_request = self.last_request.read().await;
             now.duration_since(*last_request)
         };
-        
+
         if elapsed < self.interval {
             let sleep_duration = self.interval - elapsed;
             debug!("Rate limiting: sleeping for {:?}", sleep_duration);
             tokio::time::sleep(sleep_duration).await;
         }
-        
+
         {
             let mut last_request = self.last_request.write().await;
             *last_request = Instant::now();
@@ -255,15 +265,13 @@ impl AsyncConnectionPool {
     /// Acquire a connection
     pub async fn acquire(&self) -> ConnectionGuard {
         let _permit = self.semaphore.acquire().await;
-        
+
         {
             let mut active = self.active_connections.write().await;
             *active += 1;
         }
-        
-        ConnectionGuard {
-            pool: self.clone(),
-        }
+
+        ConnectionGuard { pool: self.clone() }
     }
 
     /// Get current connection count
@@ -337,9 +345,8 @@ where
         let should_process = {
             let items = self.pending_items.read().await;
             let last_batch = self.last_batch_time.read().await;
-            
-            items.len() >= self.batch_size || 
-            last_batch.elapsed() >= self.batch_timeout
+
+            items.len() >= self.batch_size || last_batch.elapsed() >= self.batch_timeout
         };
 
         if should_process {
