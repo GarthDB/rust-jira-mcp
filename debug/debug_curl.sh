@@ -47,7 +47,11 @@ curl -v -H "Authorization: Bearer $JIRA_PERSONAL_ACCESS_TOKEN" \
 
 echo
 echo "=== Test 3: MCP Server Debug Tool ==="
-echo "Running: cargo run --bin debug_auth"
+echo "Running: cargo run --bin debug_auth (from debug directory)"
 echo
 
-cargo run --bin debug_auth
+# Note: debug_auth is now in the debug directory
+# You can run it with: cargo run --bin debug_auth
+# Or compile it separately: rustc debug/debug_auth.rs --extern rust_jira_mcp
+echo "To run debug_auth, use: cargo run --bin debug_auth"
+echo "(Note: debug_auth binary has been moved to debug/ directory)"

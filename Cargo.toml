@@ -21,9 +21,6 @@ exclude = [
 name = "rust-jira-mcp"
 path = "src/main.rs"
 
-[[bin]]
-name = "debug_auth"
-path = "src/bin/debug_auth.rs"
 
 
 [dependencies]
