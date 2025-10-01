@@ -27,7 +27,6 @@ async fn test_sprint_tools_creation() {
     let _get_board_sprints_tool = GetBoardSprintsTool::new(config.clone());
 
     // If we get here, all tools were created successfully
-    assert!(true);
 }
 
 #[tokio::test]
