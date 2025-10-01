@@ -173,13 +173,24 @@ impl JiraClient {
             let request_builder = self.build_request(method.clone(), &url, body)?;
 
             info!("Making {} request to {}", method, url);
-            // Note: RequestBuilder doesn't expose headers directly, so we skip this debug log
-            // debug!("Request headers: {:?}", request_builder.headers());
+            
+            // Log detailed request information for debugging
+            let auth_header = self.auth_header();
+            debug!("Request URL: {}", url);
+            debug!("Authorization header: {}", auth_header);
+            debug!("Content-Type: application/json");
+            debug!("Accept: application/json");
 
             match request_builder.send().await {
                 Ok(response) => {
                     let status = response.status();
                     debug!("Response status: {}", status);
+                    
+                    // Log response headers for debugging redirects
+                    debug!("Response headers:");
+                    for (key, value) in response.headers() {
+                        debug!("  {}: {}", key, value.to_str().unwrap_or("<invalid>"));
+                    }
 
                     if status.is_success() {
                         let response_text =
@@ -196,6 +207,13 @@ impl JiraClient {
                     let error_text = response.text().await.map_err(JiraError::HttpClientError)?;
 
                     error!("HTTP error {}: {}", status, error_text);
+                    
+                    // Log additional details for redirects (like Okta SSO)
+                    if status.is_redirection() {
+                        error!("REDIRECT DETECTED - This might be Okta SSO redirect");
+                        error!("Response body (first 500 chars): {}", 
+                               error_text.chars().take(500).collect::<String>());
+                    }
 
                     // Parse Jira error response
                     let error_json: serde_json::Value = serde_json::from_str(&error_text)
@@ -245,7 +263,14 @@ impl JiraClient {
 
     /// Build a complete URL from the endpoint
     fn build_url(&self, endpoint: &str) -> Result<Url> {
-        let base_url = Url::parse(&self.config.api_base_url)
+        // Ensure the base URL ends with a slash for proper joining
+        let base_url_str = if self.config.api_base_url.ends_with('/') {
+            self.config.api_base_url.clone()
+        } else {
+            format!("{}/", self.config.api_base_url)
+        };
+        
+        let base_url = Url::parse(&base_url_str)
             .map_err(|e| JiraError::config_error(&format!("Invalid API base URL: {e}")))?;
 
         base_url
@@ -268,7 +293,8 @@ impl JiraClient {
             .request(method, url.as_str())
             .header("Authorization", self.auth_header())
             .header("Content-Type", "application/json")
-            .header("Accept", "application/json");
+            .header("Accept", "application/json")
+            .header("User-Agent", "rust-jira-mcp/0.4.1");
 
         if let Some(body) = body {
             let json_body = serde_json::to_string(body).map_err(JiraError::SerializationError)?;
@@ -1636,7 +1662,16 @@ impl JiraClient {
 
     /// Build a complete URL from the Zephyr endpoint
     fn build_zephyr_url(&self, endpoint: &str) -> Result<Url> {
-        let base_url = Url::parse(&self.zephyr_api_base_url())
+        let zephyr_base_url = self.zephyr_api_base_url();
+        
+        // Ensure the base URL ends with a slash for proper joining
+        let base_url_str = if zephyr_base_url.ends_with('/') {
+            zephyr_base_url
+        } else {
+            format!("{}/", zephyr_base_url)
+        };
+        
+        let base_url = Url::parse(&base_url_str)
             .map_err(|e| JiraError::config_error(&format!("Invalid Zephyr API base URL: {e}")))?;
 
         base_url
@@ -1659,7 +1694,8 @@ impl JiraClient {
             .request(method, url.as_str())
             .header("Authorization", self.auth_header())
             .header("Content-Type", "application/json")
-            .header("Accept", "application/json");
+            .header("Accept", "application/json")
+            .header("User-Agent", "rust-jira-mcp/0.4.1");
 
         if let Some(body) = body {
             let json_body = serde_json::to_string(body).map_err(JiraError::SerializationError)?;

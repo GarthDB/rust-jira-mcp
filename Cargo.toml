@@ -1,6 +1,6 @@
 [package]
 name = "rust-jira-mcp"
-version = "0.4.1"
+version = "0.4.2"
 edition = "2021"
 authors = ["GarthDB <garthdb@example.com>"]
 description = "A high-performance Rust-based MCP server for Jira API integration"
@@ -20,6 +20,10 @@ exclude = [
 [[bin]]
 name = "rust-jira-mcp"
 path = "src/main.rs"
+
+[[bin]]
+name = "debug_auth"
+path = "src/bin/debug_auth.rs"
 
 
 [dependencies]
