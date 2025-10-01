@@ -802,3 +802,112 @@ impl Default for JiraFieldMapping {
         }
     }
 }
+
+// ============================================================================
+// Sprint-related types for Jira Agile API
+// ============================================================================
+
+/// Jira sprint representation
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JiraSprint {
+    pub id: i32,
+    #[serde(rename = "self")]
+    pub self_url: String,
+    pub state: JiraSprintState,
+    pub name: String,
+    #[serde(rename = "startDate")]
+    pub start_date: Option<String>,
+    #[serde(rename = "endDate")]
+    pub end_date: Option<String>,
+    #[serde(rename = "completeDate")]
+    pub complete_date: Option<String>,
+    #[serde(rename = "activatedDate")]
+    pub activated_date: Option<String>,
+    #[serde(rename = "rapidViewId")]
+    pub rapid_view_id: Option<i32>,
+    pub sequence: Option<i32>,
+    pub goal: Option<String>,
+    pub synced: Option<bool>,
+    #[serde(rename = "autoStartStop")]
+    pub auto_start_stop: Option<bool>,
+    #[serde(rename = "incompleteIssuesDestinationId")]
+    pub incomplete_issues_destination_id: Option<i32>,
+}
+
+/// Jira sprint state
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub enum JiraSprintState {
+    #[serde(rename = "future")]
+    Future,
+    #[serde(rename = "active")]
+    Active,
+    #[serde(rename = "closed")]
+    Closed,
+}
+
+/// Request to add issues to a sprint
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JiraSprintAddIssuesRequest {
+    pub issues: Vec<String>,
+}
+
+/// Request to update a sprint
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JiraSprintUpdateRequest {
+    pub name: Option<String>,
+    pub state: Option<JiraSprintState>,
+    #[serde(rename = "startDate")]
+    pub start_date: Option<String>,
+    #[serde(rename = "endDate")]
+    pub end_date: Option<String>,
+    pub goal: Option<String>,
+}
+
+/// Response when adding issues to a sprint
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JiraSprintAddIssuesResponse {
+    pub success: bool,
+    pub errors: Option<Vec<JiraSprintError>>,
+}
+
+/// Error when adding issues to a sprint
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JiraSprintError {
+    pub issue_key: String,
+    pub error_message: String,
+}
+
+/// Response when querying sprint issues
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JiraSprintIssuesResponse {
+    pub issues: Vec<JiraIssue>,
+    pub total: i32,
+    #[serde(rename = "maxResults")]
+    pub max_results: i32,
+    #[serde(rename = "startAt")]
+    pub start_at: i32,
+}
+
+/// Request to create a new sprint
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JiraSprintCreateRequest {
+    pub name: String,
+    #[serde(rename = "rapidViewId")]
+    pub rapid_view_id: i32,
+    #[serde(rename = "startDate")]
+    pub start_date: Option<String>,
+    #[serde(rename = "endDate")]
+    pub end_date: Option<String>,
+    pub goal: Option<String>,
+}
+
+/// Response when creating a sprint
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JiraSprintCreateResponse {
+    pub id: i32,
+    #[serde(rename = "self")]
+    pub self_url: String,
+    pub name: String,
+    #[serde(rename = "rapidViewId")]
+    pub rapid_view_id: i32,
+}

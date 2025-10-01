@@ -31,13 +31,13 @@ impl crate::mcp::server::MCPToolHandler for SearchIssuesTool {
 
         let start_at = args
             .get("start_at")
-            .or_else(|| args.get("startAt"))  // Support both snake_case and camelCase
+            .or_else(|| args.get("startAt")) // Support both snake_case and camelCase
             .and_then(serde_json::Value::as_i64)
             .map(|v| i32::try_from(v).unwrap_or(0));
 
         let max_results = args
             .get("max_results")
-            .or_else(|| args.get("maxResults"))  // Support both snake_case and camelCase
+            .or_else(|| args.get("maxResults")) // Support both snake_case and camelCase
             .and_then(serde_json::Value::as_i64)
             .map(|v| i32::try_from(v).unwrap_or(0));
 

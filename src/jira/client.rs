@@ -5,7 +5,9 @@ use crate::types::jira::{
     BulkOperationType, JiraAttachment, JiraComment, JiraComponent, JiraComponentCreateRequest,
     JiraComponentUpdateRequest, JiraIssue, JiraIssueCloneRequest, JiraIssueCloneResponse,
     JiraIssueLink, JiraIssueLinkCreateRequest, JiraLabel, JiraLabelCreateRequest,
-    JiraLabelUpdateRequest, JiraLinkType, JiraSearchResult, JiraTransition, JiraWatchersResponse,
+    JiraLabelUpdateRequest, JiraLinkType, JiraSearchResult, JiraSprint, JiraSprintAddIssuesRequest,
+    JiraSprintAddIssuesResponse, JiraSprintCreateRequest, JiraSprintCreateResponse,
+    JiraSprintIssuesResponse, JiraSprintUpdateRequest, JiraTransition, JiraWatchersResponse,
     JiraWorkLog, JiraWorkLogCreateRequest, JiraWorkLogUpdateRequest, ZephyrTestCase,
     ZephyrTestCaseCreateRequest, ZephyrTestCaseSearchResult, ZephyrTestCycle, ZephyrTestExecution,
     ZephyrTestExecutionCreateRequest, ZephyrTestPlan, ZephyrTestStep, ZephyrTestStepCreateRequest,
@@ -173,7 +175,7 @@ impl JiraClient {
             let request_builder = self.build_request(method.clone(), &url, body)?;
 
             info!("Making {} request to {}", method, url);
-            
+
             // Log detailed request information for debugging
             let auth_header = self.auth_header();
             debug!("Request URL: {}", url);
@@ -185,7 +187,7 @@ impl JiraClient {
                 Ok(response) => {
                     let status = response.status();
                     debug!("Response status: {}", status);
-                    
+
                     // Log response headers for debugging redirects
                     debug!("Response headers:");
                     for (key, value) in response.headers() {
@@ -207,12 +209,14 @@ impl JiraClient {
                     let error_text = response.text().await.map_err(JiraError::HttpClientError)?;
 
                     error!("HTTP error {}: {}", status, error_text);
-                    
+
                     // Log additional details for redirects (like Okta SSO)
                     if status.is_redirection() {
                         error!("REDIRECT DETECTED - This might be Okta SSO redirect");
-                        error!("Response body (first 500 chars): {}", 
-                               error_text.chars().take(500).collect::<String>());
+                        error!(
+                            "Response body (first 500 chars): {}",
+                            error_text.chars().take(500).collect::<String>()
+                        );
                     }
 
                     // Parse Jira error response
@@ -269,7 +273,7 @@ impl JiraClient {
         } else {
             format!("{}/", self.config.api_base_url)
         };
-        
+
         let base_url = Url::parse(&base_url_str)
             .map_err(|e| JiraError::config_error(&format!("Invalid API base URL: {e}")))?;
 
@@ -1663,14 +1667,14 @@ impl JiraClient {
     /// Build a complete URL from the Zephyr endpoint
     fn build_zephyr_url(&self, endpoint: &str) -> Result<Url> {
         let zephyr_base_url = self.zephyr_api_base_url();
-        
+
         // Ensure the base URL ends with a slash for proper joining
         let base_url_str = if zephyr_base_url.ends_with('/') {
             zephyr_base_url
         } else {
             format!("{}/", zephyr_base_url)
         };
-        
+
         let base_url = Url::parse(&base_url_str)
             .map_err(|e| JiraError::config_error(&format!("Invalid Zephyr API base URL: {e}")))?;
 
@@ -1945,6 +1949,162 @@ impl JiraClient {
             let test_plan: ZephyrTestPlan =
                 serde_json::from_value(plan.clone()).map_err(JiraError::SerializationError)?;
             result.push(test_plan);
+        }
+
+        Ok(result)
+    }
+
+    // ============================================================================
+    // Sprint Operations (Jira Agile API)
+    // ============================================================================
+
+    /// Get a sprint by ID
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the sprint cannot be found or the request fails
+    pub async fn get_sprint(&self, sprint_id: i32) -> Result<JiraSprint> {
+        let endpoint = format!("agile/1.0/sprint/{sprint_id}");
+        self.get(&endpoint).await
+    }
+
+    /// Create a new sprint
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the sprint creation fails or the response cannot be parsed
+    pub async fn create_sprint(
+        &self,
+        sprint: &JiraSprintCreateRequest,
+    ) -> Result<JiraSprintCreateResponse> {
+        self.post("agile/1.0/sprint", sprint).await
+    }
+
+    /// Update a sprint
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the sprint update fails or the response cannot be parsed
+    pub async fn update_sprint(
+        &self,
+        sprint_id: i32,
+        update: &JiraSprintUpdateRequest,
+    ) -> Result<JiraSprint> {
+        let endpoint = format!("agile/1.0/sprint/{sprint_id}");
+        self.put(&endpoint, update).await
+    }
+
+    /// Add issues to a sprint
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if adding issues to the sprint fails or the response cannot be parsed
+    pub async fn add_issues_to_sprint(
+        &self,
+        sprint_id: i32,
+        issues: &[String],
+    ) -> Result<JiraSprintAddIssuesResponse> {
+        let endpoint = format!("agile/1.0/sprint/{sprint_id}/issue");
+        let request = JiraSprintAddIssuesRequest {
+            issues: issues.to_vec(),
+        };
+        self.post(&endpoint, &request).await
+    }
+
+    /// Get issues in a sprint
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the request fails or the response cannot be parsed
+    pub async fn get_sprint_issues(
+        &self,
+        sprint_id: i32,
+        start_at: Option<i32>,
+        max_results: Option<i32>,
+    ) -> Result<JiraSprintIssuesResponse> {
+        let mut params = vec![];
+
+        if let Some(start) = start_at {
+            params.push(("startAt".to_string(), start.to_string()));
+        }
+
+        if let Some(max) = max_results {
+            params.push(("maxResults".to_string(), max.to_string()));
+        } else if let Some(default_max) = self.config.max_results {
+            params.push(("maxResults".to_string(), default_max.to_string()));
+        }
+
+        let query_string = if params.is_empty() {
+            String::new()
+        } else {
+            params
+                .iter()
+                .map(|(k, v)| format!("{}={}", urlencoding::encode(k), urlencoding::encode(v)))
+                .collect::<Vec<_>>()
+                .join("&")
+        };
+
+        let endpoint = if query_string.is_empty() {
+            format!("agile/1.0/sprint/{sprint_id}/issue")
+        } else {
+            format!("agile/1.0/sprint/{sprint_id}/issue?{query_string}")
+        };
+
+        self.get(&endpoint).await
+    }
+
+    /// Start a sprint (set state to active)
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if starting the sprint fails
+    pub async fn start_sprint(&self, sprint_id: i32) -> Result<JiraSprint> {
+        let update = JiraSprintUpdateRequest {
+            name: None,
+            state: Some(crate::types::jira::JiraSprintState::Active),
+            start_date: None,
+            end_date: None,
+            goal: None,
+        };
+        self.update_sprint(sprint_id, &update).await
+    }
+
+    /// Close a sprint (set state to closed)
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if closing the sprint fails
+    pub async fn close_sprint(&self, sprint_id: i32) -> Result<JiraSprint> {
+        let update = JiraSprintUpdateRequest {
+            name: None,
+            state: Some(crate::types::jira::JiraSprintState::Closed),
+            start_date: None,
+            end_date: None,
+            goal: None,
+        };
+        self.update_sprint(sprint_id, &update).await
+    }
+
+    /// Get sprints for a board (rapid view)
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the request fails or the response cannot be parsed
+    pub async fn get_board_sprints(&self, rapid_view_id: i32) -> Result<Vec<JiraSprint>> {
+        let endpoint = format!("agile/1.0/board/{rapid_view_id}/sprint");
+        let response: serde_json::Value = self.get(&endpoint).await?;
+
+        // Extract sprints from the response
+        let sprints = response
+            .get("values")
+            .and_then(|v| v.as_array())
+            .ok_or_else(|| JiraError::api_error("Invalid sprints response format"))?;
+
+        let mut result = Vec::new();
+        for sprint in sprints {
+            let sprint: JiraSprint =
+                serde_json::from_value(sprint.clone()).map_err(JiraError::SerializationError)?;
+            result.push(sprint);
         }
 
         Ok(result)

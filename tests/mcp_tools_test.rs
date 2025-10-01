@@ -1147,8 +1147,8 @@ async fn test_tool_configuration_usage() {
 #[tokio::test]
 async fn test_parameter_extraction_logic() {
     // Test the parameter extraction logic directly
-    use rust_jira_mcp::mcp::tools::issues::SearchIssuesTool;
     use rust_jira_mcp::config::JiraConfig;
+    use rust_jira_mcp::mcp::tools::issues::SearchIssuesTool;
     use serde_json::json;
 
     let config = JiraConfig {
@@ -1171,7 +1171,7 @@ async fn test_parameter_extraction_logic() {
         "maxResults": 25
     });
 
-    // Test snake_case parameters  
+    // Test snake_case parameters
     let snake_args = json!({
         "jql": "project = TEST",
         "start_at": 10,

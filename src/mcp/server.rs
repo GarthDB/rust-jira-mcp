@@ -3,23 +3,27 @@ use crate::error::Result;
 use crate::mcp::tools::{
     AddCommentTool,
     AddIssueWatcherTool,
+    AddIssuesToSprintTool,
     AddWorkLogTool,
     BulkAddCommentsTool,
     BulkTransitionIssuesTool,
     BulkUpdateIssuesTool,
     // Issue Cloning Tools
     CloneIssueTool,
+    CloseSprintTool,
     // Issue Component Tools
     CreateComponentTool,
     CreateIssueLinkTool,
     CreateIssueTool,
     CreateLabelTool,
+    CreateSprintTool,
     DeleteAttachmentTool,
     DeleteComponentTool,
     DeleteIssueLinkTool,
     DeleteLabelTool,
     DeleteWorkLogTool,
     DownloadAttachmentTool,
+    GetBoardSprintsTool,
     GetCommentsTool,
     GetCustomFieldsTool,
     // File Attachment Tools
@@ -40,11 +44,14 @@ use crate::mcp::tools::{
     GetProjectComponentsTool,
     GetProjectConfigTool,
     GetProjectMetadataTool,
+    GetSprintIssuesTool,
+    GetSprintTool,
     GetTransitionsTool,
     LinkIssuesTool,
     MixedBulkOperationsTool,
     RemoveIssueWatcherTool,
     SearchIssuesTool,
+    StartSprintTool,
     TestAuthTool,
     TransitionIssueTool,
     UpdateComponentTool,
@@ -96,6 +103,7 @@ impl MCPServer {
         Self::register_label_tools(&mut tools, &config);
         Self::register_component_tools(&mut tools, &config);
         Self::register_cloning_tools(&mut tools, &config);
+        Self::register_sprint_tools(&mut tools, &config);
         Self::register_zephyr_tools(&mut tools, &config);
 
         Self {
@@ -348,6 +356,41 @@ impl MCPServer {
         tools.insert(
             "clone_jira_issue".to_string(),
             Box::new(CloneIssueTool::new(config.clone())),
+        );
+    }
+
+    /// Register sprint management tools
+    fn register_sprint_tools(
+        tools: &mut HashMap<String, Box<dyn MCPToolHandler + Send + Sync>>,
+        config: &JiraConfig,
+    ) {
+        tools.insert(
+            "get_sprint".to_string(),
+            Box::new(GetSprintTool::new(config.clone())),
+        );
+        tools.insert(
+            "create_sprint".to_string(),
+            Box::new(CreateSprintTool::new(config.clone())),
+        );
+        tools.insert(
+            "add_issues_to_sprint".to_string(),
+            Box::new(AddIssuesToSprintTool::new(config.clone())),
+        );
+        tools.insert(
+            "get_sprint_issues".to_string(),
+            Box::new(GetSprintIssuesTool::new(config.clone())),
+        );
+        tools.insert(
+            "start_sprint".to_string(),
+            Box::new(StartSprintTool::new(config.clone())),
+        );
+        tools.insert(
+            "close_sprint".to_string(),
+            Box::new(CloseSprintTool::new(config.clone())),
+        );
+        tools.insert(
+            "get_board_sprints".to_string(),
+            Box::new(GetBoardSprintsTool::new(config.clone())),
         );
     }
 
@@ -1050,6 +1093,162 @@ impl MCPServer {
                         }
                     },
                     "required": ["operations"]
+                }),
+            },
+        ]
+    }
+
+    /// Get sprint tool definitions
+    fn get_sprint_tool_definitions() -> Vec<MCPTool> {
+        let mut tools = Vec::new();
+        tools.extend(Self::get_sprint_basic_tools());
+        tools.extend(Self::get_sprint_management_tools());
+        tools.extend(Self::get_sprint_query_tools());
+        tools
+    }
+
+    /// Get basic sprint tools (get, create)
+    fn get_sprint_basic_tools() -> Vec<MCPTool> {
+        vec![
+            MCPTool {
+                name: "get_sprint".to_string(),
+                description: "Get sprint details by sprint ID".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "sprint_id": {
+                            "type": "integer",
+                            "description": "The ID of the sprint to retrieve"
+                        }
+                    },
+                    "required": ["sprint_id"]
+                }),
+            },
+            MCPTool {
+                name: "create_sprint".to_string(),
+                description: "Create a new sprint".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string",
+                            "description": "The name of the sprint"
+                        },
+                        "rapid_view_id": {
+                            "type": "integer",
+                            "description": "The ID of the board (rapid view) for this sprint"
+                        },
+                        "start_date": {
+                            "type": "string",
+                            "description": "Start date in ISO format (optional)"
+                        },
+                        "end_date": {
+                            "type": "string",
+                            "description": "End date in ISO format (optional)"
+                        },
+                        "goal": {
+                            "type": "string",
+                            "description": "Sprint goal (optional)"
+                        }
+                    },
+                    "required": ["name", "rapid_view_id"]
+                }),
+            },
+        ]
+    }
+
+    /// Get sprint management tools (add issues, start, close)
+    fn get_sprint_management_tools() -> Vec<MCPTool> {
+        vec![
+            MCPTool {
+                name: "add_issues_to_sprint".to_string(),
+                description: "Add issues to a sprint".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "sprint_id": {
+                            "type": "integer",
+                            "description": "The ID of the sprint"
+                        },
+                        "issues": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "description": "Array of issue keys to add to the sprint"
+                        }
+                    },
+                    "required": ["sprint_id", "issues"]
+                }),
+            },
+            MCPTool {
+                name: "start_sprint".to_string(),
+                description: "Start a sprint (set state to active)".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "sprint_id": {
+                            "type": "integer",
+                            "description": "The ID of the sprint to start"
+                        }
+                    },
+                    "required": ["sprint_id"]
+                }),
+            },
+            MCPTool {
+                name: "close_sprint".to_string(),
+                description: "Close a sprint (set state to closed)".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "sprint_id": {
+                            "type": "integer",
+                            "description": "The ID of the sprint to close"
+                        }
+                    },
+                    "required": ["sprint_id"]
+                }),
+            },
+        ]
+    }
+
+    /// Get sprint query tools (get issues, get board sprints)
+    fn get_sprint_query_tools() -> Vec<MCPTool> {
+        vec![
+            MCPTool {
+                name: "get_sprint_issues".to_string(),
+                description: "Get all issues in a sprint".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "sprint_id": {
+                            "type": "integer",
+                            "description": "The ID of the sprint"
+                        },
+                        "start_at": {
+                            "type": "integer",
+                            "description": "Starting index for pagination (optional)"
+                        },
+                        "max_results": {
+                            "type": "integer",
+                            "description": "Maximum number of results to return (optional)"
+                        }
+                    },
+                    "required": ["sprint_id"]
+                }),
+            },
+            MCPTool {
+                name: "get_board_sprints".to_string(),
+                description: "Get all sprints for a board (rapid view)".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "rapid_view_id": {
+                            "type": "integer",
+                            "description": "The ID of the board (rapid view)"
+                        }
+                    },
+                    "required": ["rapid_view_id"]
                 }),
             },
         ]
@@ -1840,6 +2039,7 @@ impl MCPServer {
         tools.extend(Self::get_basic_tool_definitions());
         tools.extend(Self::get_project_tool_definitions());
         tools.extend(Self::get_bulk_tool_definitions());
+        tools.extend(Self::get_sprint_tool_definitions());
         tools.extend(Self::get_zephyr_tool_definitions());
         tools.extend(Self::get_linking_tool_definitions());
         tools.extend(Self::get_attachment_tool_definitions());
