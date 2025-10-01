@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.1] - 2025-10-01
+
+### Fixed
+- **Parameter Naming Compatibility**: Fixed parameter naming mismatch between camelCase and snake_case formats
+  - MCP tools now accept both `maxResults`/`max_results` and `startAt`/`start_at` parameter formats
+  - Maintains backward compatibility with existing snake_case clients
+  - Resolves parsing failures when clients send camelCase parameters (e.g., Ferris MCP client)
+  - Updated tool schemas to document both parameter naming conventions
+
+### Added
+- **Comprehensive Parameter Testing**: Added extensive test coverage for both parameter naming conventions
+  - Tests for camelCase parameters (e.g., `maxResults`, `startAt`)
+  - Tests for snake_case parameters (e.g., `max_results`, `start_at`)
+  - Tests for mixed parameter usage and priority handling
+  - Integration tests for both parameter formats
+
+### Changed
+- **Tool Parameter Handling**: Updated `SearchIssuesTool` and `GetZephyrTestCasesTool` to support both parameter formats
+- **Tool Schemas**: Enhanced MCP tool schemas to document both parameter naming conventions
+- **Parameter Priority**: When both formats are provided, snake_case takes precedence for backward compatibility
+
 ## [0.4.0] - 2025-09-30
 
 ### Added

@@ -660,11 +660,19 @@ impl MCPServer {
                         },
                         "start_at": {
                             "type": "integer",
-                            "description": "The index of the first item to return"
+                            "description": "The index of the first item to return (also accepts startAt)"
+                        },
+                        "startAt": {
+                            "type": "integer",
+                            "description": "The index of the first item to return (alternative to start_at)"
                         },
                         "max_results": {
                             "type": "integer",
-                            "description": "The maximum number of items to return"
+                            "description": "The maximum number of items to return (also accepts maxResults)"
+                        },
+                        "maxResults": {
+                            "type": "integer",
+                            "description": "The maximum number of items to return (alternative to max_results)"
                         },
                         "fields": {
                             "type": "array",
@@ -1174,11 +1182,19 @@ impl MCPServer {
                         },
                         "start_at": {
                             "type": "integer",
-                            "description": "The index of the first item to return"
+                            "description": "The index of the first item to return (also accepts startAt)"
+                        },
+                        "startAt": {
+                            "type": "integer",
+                            "description": "The index of the first item to return (alternative to start_at)"
                         },
                         "max_results": {
                             "type": "integer",
-                            "description": "The maximum number of items to return"
+                            "description": "The maximum number of items to return (also accepts maxResults)"
+                        },
+                        "maxResults": {
+                            "type": "integer",
+                            "description": "The maximum number of items to return (alternative to max_results)"
                         }
                     },
                     "required": ["project_key"]

@@ -95,7 +95,7 @@ impl JiraConfig {
             let credentials = format!("{}:{}", self.email, self.personal_access_token);
             let encoded =
                 base64::Engine::encode(&base64::engine::general_purpose::STANDARD, credentials);
-            format!("Basic {}", encoded)
+            format!("Basic {encoded}")
         }
     }
 
