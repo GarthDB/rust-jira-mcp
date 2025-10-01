@@ -117,20 +117,69 @@ cargo build --release
 
 The server includes a comprehensive configuration management system with support for environment variables, configuration files, secret management, and hot-reloading.
 
+### 🔐 Authentication Setup
+
+The server supports **two authentication methods** and automatically detects which one to use based on your token format:
+
+#### Method 1: Adobe Jira (Bearer Token Authentication)
+For Adobe Jira instances, use your Bearer token directly:
+
+```bash
+# Required for Adobe Jira
+JIRA_EMAIL=your.email@adobe.com
+JIRA_PERSONAL_ACCESS_TOKEN=YOUR_ADOBE_JIRA_TOKEN_HERE
+JIRA_API_BASE_URL=https://jira.corp.adobe.com/rest/api/2
+```
+
+#### Method 2: Standard Jira (Basic Authentication)
+For standard Atlassian Jira instances, use Basic authentication:
+
+```bash
+# Required for Standard Jira
+JIRA_EMAIL=your.email@company.com
+JIRA_PERSONAL_ACCESS_TOKEN=your_standard_pat_token
+JIRA_API_BASE_URL=https://your-company.atlassian.net/rest/api/2
+```
+
+### 🧠 Smart Authentication Detection
+
+The server automatically detects your authentication method:
+
+- **Bearer Token**: If your token is long (>20 chars) and contains no colons
+- **Basic Auth**: If your token is short or contains colons (like `user:password`)
+
 ### Quick Start
 
 Create a `.env` file in your project root:
 
 ```bash
-# Required
+# Required - Choose one based on your Jira instance
 JIRA_EMAIL=your.email@company.com
-JIRA_PERSONAL_ACCESS_TOKEN=your_personal_access_token_here
+JIRA_PERSONAL_ACCESS_TOKEN=your_token_here
 
 # Optional
-JIRA_API_BASE_URL=https://jira.corp.adobe.com/rest/api/2
+JIRA_API_BASE_URL=https://your-company.atlassian.net/rest/api/2
 JIRA_DEFAULT_PROJECT=PROJ
 JIRA_MAX_RESULTS=50
 JIRA_TIMEOUT_SECONDS=30
+```
+
+### 🔍 Testing Your Authentication
+
+Test your authentication setup:
+
+```bash
+# Test with curl (Adobe Jira - Bearer)
+curl -H "Authorization: Bearer YOUR_TOKEN" \
+     "https://jira.corp.adobe.com/rest/api/2/myself"
+
+# Test with curl (Standard Jira - Basic)
+curl -u "your.email@company.com:YOUR_TOKEN" \
+     "https://your-company.atlassian.net/rest/api/2/myself"
+
+# Test with the MCP server
+cargo run --release
+# Then call the test_jira_auth tool
 ```
 
 ### Configuration Features

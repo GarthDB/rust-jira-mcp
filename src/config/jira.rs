@@ -85,11 +85,17 @@ impl JiraConfig {
 
     #[must_use]
     pub fn auth_header(&self) -> String {
-        // Jira Personal Access Tokens require Basic authentication, not Bearer
-        // Format: Basic base64(email:token)
-        let credentials = format!("{}:{}", self.email, self.personal_access_token);
-        let encoded = base64::Engine::encode(&base64::engine::general_purpose::STANDARD, credentials);
-        format!("Basic {}", encoded)
+        // Check if the token looks like it's already base64 encoded (Adobe Jira format)
+        // Adobe Jira uses Bearer tokens, while standard Jira uses Basic auth
+        if self.personal_access_token.len() > 20 && !self.personal_access_token.contains(':') {
+            // This looks like a Bearer token (Adobe Jira format)
+            format!("Bearer {}", self.personal_access_token)
+        } else {
+            // This looks like a standard Jira PAT, use Basic auth
+            let credentials = format!("{}:{}", self.email, self.personal_access_token);
+            let encoded = base64::Engine::encode(&base64::engine::general_purpose::STANDARD, credentials);
+            format!("Basic {}", encoded)
+        }
     }
 
     #[must_use]

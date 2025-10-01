@@ -18,22 +18,42 @@ The configuration system provides:
 
 ### 1. Environment Variables (Recommended)
 
-Create a `.env` file in your project root:
+Create a `.env` file in your project root. The server supports **two authentication methods** and automatically detects which one to use:
 
+#### Adobe Jira (Bearer Token Authentication)
 ```bash
-# Required
-JIRA_EMAIL=your.email@company.com
-# Note: Jira PATs use Basic authentication (email:token), not Bearer
-JIRA_PERSONAL_ACCESS_TOKEN=your_personal_access_token_here
+# Required for Adobe Jira
+JIRA_EMAIL=your.email@adobe.com
+JIRA_PERSONAL_ACCESS_TOKEN=YOUR_ADOBE_JIRA_TOKEN_HERE
+JIRA_API_BASE_URL=https://jira.corp.adobe.com/rest/api/2
 
 # Optional
-JIRA_API_BASE_URL=https://jira.corp.adobe.com/rest/api/2
 JIRA_DEFAULT_PROJECT=PROJ
 JIRA_MAX_RESULTS=50
 JIRA_TIMEOUT_SECONDS=30
 JIRA_STRICT_SSL=true
 JIRA_LOG_FILE=~/Desktop/jira-api.log
 ```
+
+#### Standard Jira (Basic Authentication)
+```bash
+# Required for Standard Jira
+JIRA_EMAIL=your.email@company.com
+JIRA_PERSONAL_ACCESS_TOKEN=your_standard_pat_token
+JIRA_API_BASE_URL=https://your-company.atlassian.net/rest/api/2
+
+# Optional
+JIRA_DEFAULT_PROJECT=PROJ
+JIRA_MAX_RESULTS=50
+JIRA_TIMEOUT_SECONDS=30
+JIRA_STRICT_SSL=true
+JIRA_LOG_FILE=~/Desktop/jira-api.log
+```
+
+#### Smart Authentication Detection
+The server automatically detects your authentication method:
+- **Bearer Token**: If your token is long (>20 chars) and contains no colons
+- **Basic Auth**: If your token is short or contains colons (like `user:password`)
 
 ### 2. Configuration Files
 

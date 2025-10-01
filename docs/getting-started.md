@@ -67,17 +67,34 @@ cargo install rust-jira-mcp
    ```
 
 2. **Edit the `.env` file with your Jira credentials:**
+
+   **For Adobe Jira (Bearer Token):**
    ```bash
-   # Required
-   JIRA_EMAIL=your.email@company.com
-   JIRA_PERSONAL_ACCESS_TOKEN=your_personal_access_token_here
+   # Required for Adobe Jira
+   JIRA_EMAIL=your.email@adobe.com
+   JIRA_PERSONAL_ACCESS_TOKEN=YOUR_ADOBE_JIRA_TOKEN_HERE
+   JIRA_API_BASE_URL=https://jira.corp.adobe.com/rest/api/2
    
    # Optional
-   JIRA_API_BASE_URL=https://your-company.atlassian.net/rest/api/2
    JIRA_DEFAULT_PROJECT=PROJ
    JIRA_MAX_RESULTS=50
    JIRA_TIMEOUT_SECONDS=30
    ```
+
+   **For Standard Jira (Basic Auth):**
+   ```bash
+   # Required for Standard Jira
+   JIRA_EMAIL=your.email@company.com
+   JIRA_PERSONAL_ACCESS_TOKEN=your_standard_pat_token
+   JIRA_API_BASE_URL=https://your-company.atlassian.net/rest/api/2
+   
+   # Optional
+   JIRA_DEFAULT_PROJECT=PROJ
+   JIRA_MAX_RESULTS=50
+   JIRA_TIMEOUT_SECONDS=30
+   ```
+
+   **Note:** The server automatically detects your authentication method based on token format!
 
 3. **Test your configuration:**
    ```bash

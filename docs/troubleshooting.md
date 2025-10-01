@@ -78,12 +78,20 @@ RUST_LOG=debug cargo run --release
    - Token should be active (not expired)
 
 3. **Test token manually:**
+   
+   **For Adobe Jira (Bearer Token):**
+   ```bash
+   curl -H "Authorization: Bearer YOUR_TOKEN" \
+        "https://jira.corp.adobe.com/rest/api/2/myself"
+   ```
+   
+   **For Standard Jira (Basic Auth):**
    ```bash
    curl -u "your.email@company.com:your_token" \
         "https://your-company.atlassian.net/rest/api/2/myself"
    ```
    
-   **Note:** Jira Personal Access Tokens use Basic authentication (email:token), not Bearer authentication.
+   **Note:** The server automatically detects your authentication method based on token format.
 
 4. **Check token permissions:**
    - Go to Jira → Account Settings → Security → API tokens

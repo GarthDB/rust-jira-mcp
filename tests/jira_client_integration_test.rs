@@ -23,7 +23,34 @@ async fn test_jira_client_creation() {
         client.api_base_url(),
         "https://test-jira.example.com/rest/api/2"
     );
-    assert!(client.auth_header().contains("Basic"));
+    // Should use Basic auth for standard token format (contains colon)
+    assert!(client.auth_header().starts_with("Basic "));
+    // Test that the HTTP client is configured
+    let _http_client = client.http_client();
+}
+
+#[tokio::test]
+async fn test_jira_client_creation_bearer_token() {
+    // Test Adobe Jira format (Bearer token)
+    let config = JiraConfig {
+        api_base_url: "https://test-jira.example.com/rest/api/2".to_string(),
+        email: "test@example.com".to_string(),
+        personal_access_token: "YOUR_ADOBE_JIRA_TOKEN_HERE".to_string(),
+        default_project: None,
+        max_results: Some(50),
+        timeout_seconds: Some(30),
+        log_file: None,
+        strict_ssl: Some(false),
+    };
+
+    let client = JiraClient::new(config).unwrap();
+
+    assert_eq!(
+        client.api_base_url(),
+        "https://test-jira.example.com/rest/api/2"
+    );
+    // Should use Bearer auth for Adobe Jira token format
+    assert!(client.auth_header().starts_with("Bearer "));
     // Test that the HTTP client is configured
     let _http_client = client.http_client();
 }
@@ -114,7 +141,8 @@ async fn test_jira_client_metadata_operations_structure() {
     let client = JiraClient::new(test_config()).unwrap();
 
     // Test client creation and basic configuration
-    assert!(client.auth_header().contains("Basic"));
+    // Should use Basic auth for standard token format (contains colon)
+    assert!(client.auth_header().starts_with("Basic "));
     let _client = client;
 }
 
@@ -156,7 +184,8 @@ async fn test_jira_client_component_operations_structure() {
     let client = JiraClient::new(test_config()).unwrap();
 
     // Test client creation and basic configuration
-    assert!(client.auth_header().contains("Basic"));
+    // Should use Basic auth for standard token format (contains colon)
+    assert!(client.auth_header().starts_with("Basic "));
     let _client = client;
 }
 
@@ -198,7 +227,8 @@ async fn test_jira_client_zephyr_operations_structure() {
     let client = JiraClient::new(test_config()).unwrap();
 
     // Test client creation and basic configuration
-    assert!(client.auth_header().contains("Basic"));
+    // Should use Basic auth for standard token format (contains colon)
+    assert!(client.auth_header().starts_with("Basic "));
     let _client = client;
 }
 
@@ -240,7 +270,8 @@ async fn test_jira_client_rate_limiting_structure() {
     let client = JiraClient::new(test_config()).unwrap();
 
     // Test client creation and basic configuration
-    assert!(client.auth_header().contains("Basic"));
+    // Should use Basic auth for standard token format (contains colon)
+    assert!(client.auth_header().starts_with("Basic "));
     let _client = client;
 }
 

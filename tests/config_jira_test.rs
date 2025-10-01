@@ -84,7 +84,26 @@ fn test_jira_config_debug() {
 }
 
 #[test]
-fn test_auth_header() {
+fn test_auth_header_bearer_token() {
+    // Test Adobe Jira format (Bearer token)
+    let config = JiraConfig {
+        api_base_url: "https://test.example.com/rest/api/2".to_string(),
+        email: "test@example.com".to_string(),
+        personal_access_token: "YOUR_ADOBE_JIRA_TOKEN_HERE".to_string(),
+        default_project: None,
+        max_results: None,
+        timeout_seconds: None,
+        log_file: None,
+        strict_ssl: None,
+    };
+
+    let auth_header = config.auth_header();
+        assert_eq!(auth_header, "Bearer YOUR_ADOBE_JIRA_TOKEN_HERE");
+}
+
+#[test]
+fn test_auth_header_basic_token() {
+    // Test standard Jira format (Basic auth)
     let config = JiraConfig {
         api_base_url: "https://test.example.com/rest/api/2".to_string(),
         email: "test@example.com".to_string(),
@@ -98,6 +117,24 @@ fn test_auth_header() {
 
     let auth_header = config.auth_header();
     assert_eq!(auth_header, "Basic dGVzdEBleGFtcGxlLmNvbTp0ZXN0LXRva2VuLTEyMw==");
+}
+
+#[test]
+fn test_auth_header_with_colon_token() {
+    // Test token with colon (should use Basic auth)
+    let config = JiraConfig {
+        api_base_url: "https://test.example.com/rest/api/2".to_string(),
+        email: "test@example.com".to_string(),
+        personal_access_token: "user:password".to_string(),
+        default_project: None,
+        max_results: None,
+        timeout_seconds: None,
+        log_file: None,
+        strict_ssl: None,
+    };
+
+    let auth_header = config.auth_header();
+    assert_eq!(auth_header, "Basic dGVzdEBleGFtcGxlLmNvbTp1c2VyOnBhc3N3b3Jk");
 }
 
 #[test]
@@ -115,6 +152,24 @@ fn test_auth_header_with_empty_token() {
 
     let auth_header = config.auth_header();
     assert_eq!(auth_header, "Basic dGVzdEBleGFtcGxlLmNvbTo=");
+}
+
+#[test]
+fn test_auth_header_short_token() {
+    // Test short token (should use Basic auth)
+    let config = JiraConfig {
+        api_base_url: "https://test.example.com/rest/api/2".to_string(),
+        email: "test@example.com".to_string(),
+        personal_access_token: "short".to_string(),
+        default_project: None,
+        max_results: None,
+        timeout_seconds: None,
+        log_file: None,
+        strict_ssl: None,
+    };
+
+    let auth_header = config.auth_header();
+    assert_eq!(auth_header, "Basic dGVzdEBleGFtcGxlLmNvbTpzaG9ydA==");
 }
 
 #[test]
