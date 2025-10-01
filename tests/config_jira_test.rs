@@ -98,7 +98,7 @@ fn test_auth_header_bearer_token() {
     };
 
     let auth_header = config.auth_header();
-        assert_eq!(auth_header, "Bearer YOUR_ADOBE_JIRA_TOKEN_HERE");
+    assert_eq!(auth_header, "Bearer YOUR_ADOBE_JIRA_TOKEN_HERE");
 }
 
 #[test]
@@ -116,7 +116,10 @@ fn test_auth_header_basic_token() {
     };
 
     let auth_header = config.auth_header();
-    assert_eq!(auth_header, "Basic dGVzdEBleGFtcGxlLmNvbTp0ZXN0LXRva2VuLTEyMw==");
+    assert_eq!(
+        auth_header,
+        "Basic dGVzdEBleGFtcGxlLmNvbTp0ZXN0LXRva2VuLTEyMw=="
+    );
 }
 
 #[test]
@@ -134,7 +137,10 @@ fn test_auth_header_with_colon_token() {
     };
 
     let auth_header = config.auth_header();
-    assert_eq!(auth_header, "Basic dGVzdEBleGFtcGxlLmNvbTp1c2VyOnBhc3N3b3Jk");
+    assert_eq!(
+        auth_header,
+        "Basic dGVzdEBleGFtcGxlLmNvbTp1c2VyOnBhc3N3b3Jk"
+    );
 }
 
 #[test]
