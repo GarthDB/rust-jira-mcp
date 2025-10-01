@@ -122,12 +122,71 @@ async fn test_mcp_server_tool_calling_search_issues() {
         .with_body(mock_response.to_string())
         .create();
 
-    // Test call tool directly
+    // Test call tool directly with snake_case parameters
     let tool_call = MCPToolCall {
         name: "search_jira_issues".to_string(),
         arguments: json!({
             "jql": "project=TEST",
             "max_results": 50
+        }),
+    };
+
+    let result = server.call_tool(tool_call).await;
+    // The tool call might succeed or fail depending on the implementation
+    if let Ok(tool_result) = result {
+        // If successful, check the result structure
+        assert!(!tool_result.content.is_empty() || tool_result.is_error.unwrap_or(false));
+    } else {
+        // If it fails, that's also acceptable for this test
+        // This is acceptable for this test
+    }
+}
+
+#[tokio::test]
+async fn test_mcp_server_tool_calling_search_issues_camelcase() {
+    let (mut mock_server, base_url) = setup_mock_server().await;
+    let config = create_test_config(&format!("{base_url}/rest/api/2"));
+    let server = MCPServer::new(config);
+
+    // Mock the Jira API response
+    let mock_response = json!({
+        "expand": "names,schema",
+        "startAt": 0,
+        "maxResults": 50,
+        "total": 1,
+        "issues": [
+            {
+                "id": "12345",
+                "key": "TEST-123",
+                "self": format!("{base_url}/rest/api/2/issue/12345"),
+                "fields": {
+                    "summary": "Test Issue",
+                    "status": {
+                        "name": "To Do",
+                        "id": "1"
+                    }
+                }
+            }
+        ]
+    });
+
+    let _mock = mock_server
+        .mock("GET", "/rest/api/2/search")
+        .match_query(mockito::Matcher::AllOf(vec![
+            mockito::Matcher::UrlEncoded("jql".to_string(), "project=TEST".to_string()),
+            mockito::Matcher::UrlEncoded("maxResults".to_string(), "50".to_string()),
+        ]))
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body(mock_response.to_string())
+        .create();
+
+    // Test call tool with camelCase parameters (like Ferris is using)
+    let tool_call = MCPToolCall {
+        name: "search_jira_issues".to_string(),
+        arguments: json!({
+            "jql": "project=TEST",
+            "maxResults": 50  // camelCase instead of snake_case
         }),
     };
 

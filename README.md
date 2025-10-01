@@ -225,6 +225,15 @@ For detailed configuration documentation, see [CONFIGURATION.md](CONFIGURATION.m
 - `get_custom_fields` - Get custom field definitions
 - `get_project_metadata` - Get comprehensive project metadata
 
+### Sprint Management Tools (NEW!)
+- `get_sprint` - Get sprint details by sprint ID
+- `create_sprint` - Create a new sprint
+- `add_issues_to_sprint` - Add issues to a sprint
+- `get_sprint_issues` - Get all issues in a sprint
+- `start_sprint` - Start a sprint (set state to active)
+- `close_sprint` - Close a sprint (set state to closed)
+- `get_board_sprints` - Get all sprints for a board
+
 ## Usage Examples
 
 ### Basic Issue Operations
@@ -278,6 +287,21 @@ For detailed configuration documentation, see [CONFIGURATION.md](CONFIGURATION.m
   "params": {
     "name": "get_priorities_and_statuses",
     "arguments": {}
+  }
+}
+```
+
+### Sprint Management Operations
+
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "get_sprint_issues",
+    "arguments": {
+      "sprint_id": 12345,
+      "max_results": 50
+    }
   }
 }
 ```

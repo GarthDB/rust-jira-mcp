@@ -93,8 +93,9 @@ impl JiraConfig {
         } else {
             // This looks like a standard Jira PAT, use Basic auth
             let credentials = format!("{}:{}", self.email, self.personal_access_token);
-            let encoded = base64::Engine::encode(&base64::engine::general_purpose::STANDARD, credentials);
-            format!("Basic {}", encoded)
+            let encoded =
+                base64::Engine::encode(&base64::engine::general_purpose::STANDARD, credentials);
+            format!("Basic {encoded}")
         }
     }
 

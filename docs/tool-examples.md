@@ -895,6 +895,321 @@ Update test execution status.
 }
 ```
 
+## Sprint Management Tools
+
+### get_sprint
+
+Get sprint details by sprint ID.
+
+**Request:**
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "get_sprint",
+    "arguments": {
+      "sprint_id": 12345
+    }
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "Sprint: 12345\nName: Sprint 15 - User Authentication\nState: Active\nStart Date: 2025-10-01T00:00:00.000Z\nEnd Date: 2025-10-15T00:00:00.000Z\nGoal: Implement user authentication system\nURL: https://your-company.atlassian.net/secure/RapidBoard.jspa?rapidView=123&view=planning.nodetail&selectedIssue=12345"
+    }
+  ]
+}
+```
+
+### create_sprint
+
+Create a new sprint.
+
+**Request:**
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "create_sprint",
+    "arguments": {
+      "name": "Sprint 16 - Payment Integration",
+      "rapid_view_id": 123,
+      "start_date": "2025-10-16T00:00:00.000Z",
+      "end_date": "2025-10-30T00:00:00.000Z",
+      "goal": "Integrate payment processing system"
+    }
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "Sprint created successfully!\nID: 12346\nName: Sprint 16 - Payment Integration\nBoard ID: 123\nURL: https://your-company.atlassian.net/secure/RapidBoard.jspa?rapidView=123&view=planning.nodetail&selectedIssue=12346"
+    }
+  ]
+}
+```
+
+### add_issues_to_sprint
+
+Add issues to a sprint.
+
+**Request:**
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "add_issues_to_sprint",
+    "arguments": {
+      "sprint_id": 12345,
+      "issues": ["PROJ-123", "PROJ-124", "PROJ-125"]
+    }
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "Added 3 issues to sprint 12345\n"
+    }
+  ]
+}
+```
+
+### get_sprint_issues
+
+Get all issues in a sprint.
+
+**Request:**
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "get_sprint_issues",
+    "arguments": {
+      "sprint_id": 12345,
+      "max_results": 50
+    }
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "Found 3 issues in sprint 12345 (showing 3 of 3 total)\n\n"
+    },
+    {
+      "type": "text",
+      "text": "• PROJ-123 - Implement user login\n  Status: In Progress\n  Assignee: John Doe\n  URL: https://your-company.atlassian.net/browse/PROJ-123\n"
+    },
+    {
+      "type": "text",
+      "text": "• PROJ-124 - Add password reset\n  Status: To Do\n  Assignee: Jane Smith\n  URL: https://your-company.atlassian.net/browse/PROJ-124\n"
+    },
+    {
+      "type": "text",
+      "text": "• PROJ-125 - Update user profile\n  Status: Done\n  Assignee: Bob Johnson\n  URL: https://your-company.atlassian.net/browse/PROJ-125\n"
+    }
+  ]
+}
+```
+
+### start_sprint
+
+Start a sprint (set state to active).
+
+**Request:**
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "start_sprint",
+    "arguments": {
+      "sprint_id": 12345
+    }
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "Sprint started successfully!\nID: 12345\nName: Sprint 15 - User Authentication\nState: Active\nURL: https://your-company.atlassian.net/secure/RapidBoard.jspa?rapidView=123&view=planning.nodetail&selectedIssue=12345"
+    }
+  ]
+}
+```
+
+### close_sprint
+
+Close a sprint (set state to closed).
+
+**Request:**
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "close_sprint",
+    "arguments": {
+      "sprint_id": 12345
+    }
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "Sprint closed successfully!\nID: 12345\nName: Sprint 15 - User Authentication\nState: Closed\nURL: https://your-company.atlassian.net/secure/RapidBoard.jspa?rapidView=123&view=planning.nodetail&selectedIssue=12345"
+    }
+  ]
+}
+```
+
+### get_board_sprints
+
+Get all sprints for a board (rapid view).
+
+**Request:**
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "get_board_sprints",
+    "arguments": {
+      "rapid_view_id": 123
+    }
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "Found 3 sprints for board 123\n\n"
+    },
+    {
+      "type": "text",
+      "text": "• 12345 - Sprint 15 - User Authentication\n  State: Closed\n  Start: 2025-09-15T00:00:00.000Z\n  End: 2025-09-29T00:00:00.000Z\n  Goal: Implement user authentication system\n  URL: https://your-company.atlassian.net/secure/RapidBoard.jspa?rapidView=123&view=planning.nodetail&selectedIssue=12345\n"
+    },
+    {
+      "type": "text",
+      "text": "• 12346 - Sprint 16 - Payment Integration\n  State: Active\n  Start: 2025-10-01T00:00:00.000Z\n  End: 2025-10-15T00:00:00.000Z\n  Goal: Integrate payment processing system\n  URL: https://your-company.atlassian.net/secure/RapidBoard.jspa?rapidView=123&view=planning.nodetail&selectedIssue=12346\n"
+    },
+    {
+      "type": "text",
+      "text": "• 12347 - Sprint 17 - Mobile App\n  State: Future\n  Start: Not set\n  End: Not set\n  Goal: No goal set\n  URL: https://your-company.atlassian.net/secure/RapidBoard.jspa?rapidView=123&view=planning.nodetail&selectedIssue=12347\n"
+    }
+  ]
+}
+```
+
+### Sprint Management Workflow Examples
+
+**Complete Sprint Planning Workflow:**
+```json
+// 1. Get all sprints for a board
+{
+  "method": "tools/call",
+  "params": {
+    "name": "get_board_sprints",
+    "arguments": {
+      "rapid_view_id": 123
+    }
+  }
+}
+
+// 2. Create a new sprint
+{
+  "method": "tools/call",
+  "params": {
+    "name": "create_sprint",
+    "arguments": {
+      "name": "Sprint 18 - API Documentation",
+      "rapid_view_id": 123,
+      "start_date": "2025-11-01T00:00:00.000Z",
+      "end_date": "2025-11-15T00:00:00.000Z",
+      "goal": "Complete API documentation and examples"
+    }
+  }
+}
+
+// 3. Add issues to the sprint
+{
+  "method": "tools/call",
+  "params": {
+    "name": "add_issues_to_sprint",
+    "arguments": {
+      "sprint_id": 12348,
+      "issues": ["PROJ-200", "PROJ-201", "PROJ-202"]
+    }
+  }
+}
+
+// 4. Start the sprint
+{
+  "method": "tools/call",
+  "params": {
+    "name": "start_sprint",
+    "arguments": {
+      "sprint_id": 12348
+    }
+  }
+}
+```
+
+**Sprint Monitoring Workflow:**
+```json
+// 1. Get current active sprint issues
+{
+  "method": "tools/call",
+  "params": {
+    "name": "get_sprint_issues",
+    "arguments": {
+      "sprint_id": 12346,
+      "max_results": 100
+    }
+  }
+}
+
+// 2. Close the sprint when complete
+{
+  "method": "tools/call",
+  "params": {
+    "name": "close_sprint",
+    "arguments": {
+      "sprint_id": 12346
+    }
+  }
+}
+```
+
 ## Error Handling
 
 All tools return structured error responses when something goes wrong:
